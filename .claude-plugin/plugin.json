@@ -1,0 +1,11 @@
+{
+  "name": "specengine",
+  "displayName": "SpecEngine",
+  "version": "1.2.0",
+  "description": "狀態驅動的 BDD 規格治理框架：spec-01~06、spec-flow-align、spec-run、spec-manifest-sync 共 9 個 Skill，涵蓋需求冷啟動、互動釐清、流程圖對齊、Gherkin 形式化、測試骨架、TDD 實作與規格漂移巡檢。",
+  "author": {
+    "name": "Allen Tsai",
+    "email": "allen.tsai@cohesiondata.com"
+  },
+  "keywords": ["spec-driven-development", "bdd", "gherkin", "tdd"]
+}
