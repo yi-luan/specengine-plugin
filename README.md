@@ -1,66 +1,91 @@
-# SpecEngine Plugin
+# SpecEngine
 
-狀態驅動的 BDD 規格治理框架，打包為 Claude Code Plugin。技術棧、目錄、測試指令全部由各專案自己的 `.claude/spec/architecture-manifest.md` 宣告，plugin 本身不綁定任何語言或框架。
+讓 Claude 替你寫程式時，先把需求問清楚、再把規格釘死、最後才動手的一套流程。裝在 Claude Code 裡用。
 
-## 內容
+## 它解決什麼問題
 
-| 目錄 | 內容 |
-| :--- | :--- |
-| `skills/` | 10 個 Skill：`spec-01` ~ `spec-06`、`spec-flow-align`、`spec-run`、`spec-manifest-sync`、`spec-status` |
-| `scripts/` | `spec-status.js`（從產物推導模組階段）、`feature-lint.js`（feature／dbml 純淨度、`@rule:` tag、矩陣結構、矩陣↔feature 一致性、句型索引）、`spec-guard.js`（snapshot／verify 凍結、`@binds` 驗證、lock／audit）。只用 Node 內建模組 |
-| `docs/contract-rules.md` | Gherkin 與 DBML 的表達規範 |
-| `templates/` | `architecture-manifest.template.md`、`claude-md-specengine-section.template.md`，首次導入時由 `spec-manifest-sync` 落地 |
+叫 AI 寫程式，常見兩種翻車。
 
-## 流程
+**第一種：它自己腦補。** 你給四句話需求，剩下的 90% 它自己猜。猜錯的地方要到驗收才發現。
 
-```text
-spec-01 冷啟動 ──► spec-02 釐清 ──► spec-flow-align 流程圖確認 ──► spec-03 Gherkin ──► spec-04 紅燈骨架 ──► spec-05 紅轉綠
-                   （MCQ，使用者親答）  （使用者親自確認）              （feature-lint）                      （spec-guard）
+**第二種：它偷改考卷。** 測試過不了，最省事的做法是把測試改成程式會過的樣子，然後報告「全部通過」。你永遠不知道。
 
-spec-06 漂移巡檢、spec-manifest-sync 環境核實：週期性治理，不在 spec-run 串接範圍
-```
+SpecEngine 對這兩件事各有一個答案：
 
-`spec-run` 以 `spec-status.js` 推導的階段為起點，不重跑已完成的階段。隨時可用 `spec status` 查「現在到哪、下一步是什麼」。
+- 需求裡沒講的事，變成選擇題丟給人決定，AI 不准猜。
+- 規格一旦定案，寫程式期間用檢查腳本釘死，AI 碰不得。想矇混會被腳本抓到。
 
-## 狀態是算出來的
+## 怎麼用
 
-模組階段不存在任何狀態欄裡，而是從產物推導：有 `locks/<ID>.lock.json` 就是 IMPLEMENTED，有含該模組 `@rule` 的 Step 檔就是 STUBBED，有含 `@rule:` tag 的 feature 就是 FORMALIZED，佇列有題就是 CLARIFYING，只有矩陣就是 CLARIFIED。`overview.md` 的狀態欄只是給人看的快取。問題檔只有兩種結局：答了進 `resolved/`，沒答進 `parked/` 變成 feature 裡的 TODO。
+### 第一次導入專案
 
-## 三種決定，三個家
+裝好 plugin 後，在你的專案裡對 Claude 說：
 
-- **會發生動作的規則**（有人做了什麼，系統發生什麼）→ 矩陣 → 流程圖分支 → `.feature` Scenario → 測試。
-- **刻意不做的決定**（系統無動作、不提供功能、屬其他模組）→ `.specengine/spec/exclusions.md`。流程圖確認時列在「已知取捨」區，不畫分支、不寫測試。
-- **形式化錯誤**（矩陣對、`.feature` 抄錯）→ 執行者自修，留紀錄在 `resolved/fixes/`，不問使用者。真正的規格瑕疵才開選擇題。
+> 幫我把 SpecEngine 導入這個專案
 
-這個分法是在真實專案跑一輪後定下來的。所有輔助檔案的格式在 `docs/contract-rules.md` 第 5 節。
+它會掃描專案，把「用什麼語言、測試怎麼跑、程式放哪裡」這些環境資訊寫進一份設定檔。查不到的留白，五個非填不可的欄位一次問你。
 
-## 從句子到程式碼的綁定
+### 開始一個功能
 
-整條鏈靠一個東西貫穿：步驟句子的文字。
+把需求貼給它，說：
 
-```text
-.feature          Given 會員點數餘額為 "100"             ← 句子 + 雙引號參數，spec-guard 凍結
-steps/            Given('會員點數餘額為 {string}', ...)   ← 句子變成函式的 key，只呼叫 Driver
-drivers/*.driver  interface 點數折抵Driver { 設定會員餘額(n) }   ← 綁定契約，spec-guard 凍結
-drivers/*.inprocess / *.ui                                ← 技術細節，spec-05 實作，可切換
-src/              PointsRedemptionService.redeem()        ← 產品代碼
-```
+> spec run
 
-manifest 的 `Binding Layer` 設為 `driver` 時走上面的結構；設為 `direct` 時 step 直接呼叫 Service，省掉 Driver 層。每個 `Rule:` 掛 `@rule:R-XXXX` tag，測試報告帶著它，`spec-06` 直接從報告算覆蓋率。
+它會從頭跑到尾，中間只有需要你決定的時候才停。
 
-## 被腳本強制的不變性
+### 隨時看進度
 
-| 不變性 | 腳本 | 時機 |
+> spec status
+
+告訴你每個功能模組現在到哪一步、還有幾題沒答、下一步該做什麼。
+
+## 流程長什麼樣
+
+用「會員點數折抵」當例子。
+
+| 站 | 誰做 | 做什麼 |
 | :--- | :--- | :--- |
-| feature／dbml 純淨、Rule 掛 tag 且排序 | `feature-lint.js` | spec-03 收工 |
-| 矩陣結構齊全、矩陣 Rule 與 feature tag 一一對應 | `feature-lint.js` | spec-01／02／03 |
-| 既有句型索引，供 spec-03 複用 | `feature-lint.js` 產出 `steps-index.json` | 每次 lint 通過 |
-| `@binds` 指向真實存在的 Driver 方法 | `spec-guard.js snapshot` | spec-05 開工 |
-| 實作期間規格、句型、Driver 介面不動 | `spec-guard.js snapshot`／`verify` | spec-05 頭尾 |
-| 完工後規格、句型、介面不被事後偷改 | `spec-guard.js lock`／`audit` | spec-05 收工、spec-06 |
-| 模組階段 | `spec-status.js` | spec-run 起點、任何時候 |
+| 1 掃需求 | Claude | 讀需求，整理出確定的規則、資料長什麼樣、以及需求沒講的洞。每個洞變一題選擇題。不問你。 |
+| 2 你回答 | 你 | 它分組拿選擇題問你，一次最多四題。你答完它立刻寫進規格。可以通用的決定記成公司慣例，下次不再問。 |
+| 3 看圖確認 | 你 | 它把規則畫成流程圖，請你看整體有沒有漏。有漏就回第 2 站補問。 |
+| 4 寫正式規格 | Claude | 把規則寫成「在什麼情況、做什麼、應該怎樣」的句子，邊界值列表格，逐列核對，跑檢查。 |
+| 5 建測試骨架 | Claude | 每句規格綁一個測試，全部先故意失敗。中間隔一層 Driver，以後畫面改版規格不用動。 |
+| 6 寫程式 | Claude | 開工前把規格「拍照存證」。寫程式讓測試一盞盞變綠。收工比對照片，規格沒動才算過，然後上鎖。 |
 
-零腦補與不代答仍靠 Skill 內的硬性約束維持，無法用腳本驗證。
+另外兩個不在流程裡的動作：
+
+- **巡檢**（`spec 06`）：上線後定期跑，看規格有沒有被事後偷改、資料庫有沒有被手動改過沒回寫。只報告不修。
+- **環境核實**（`spec manifest sync`）：專案架構變了或 plugin 升級時跑，更新那份環境設定檔。
+
+## 三種決定，三個地方
+
+你在第 2 站回答的東西，依性質放在不同地方：
+
+- **會發生動作的規則**（有人做了什麼，系統發生什麼）→ 進規則清單 → 畫進流程圖 → 寫成測試。
+- **刻意不做的決定**（系統故意不動作、不提供某功能、屬於別的模組）→ 進「刻意不做清單」。流程圖確認時另外列出來讓你看，但不畫分支、不寫測試。
+- **Claude 自己抄錯的**（規格很清楚，是它寫測試例子時寫錯）→ 它自己修、留一筆紀錄，不問你。只有真的規格矛盾才停下來問。
+
+## 誰在守規矩
+
+| 要守的事 | 怎麼守 |
+| :--- | :--- |
+| 不確定的事不猜 | 流程設計：第 1、3、6 站只准寫問題，不准寫答案 |
+| 問題由人答 | 第 2、3 站真的停下來等你 |
+| 規格格式正確、每條規則有對應測試 | 腳本 `feature-lint.js`，第 4 站收工前必跑 |
+| 寫程式期間規格不動 | 腳本 `spec-guard.js` 拍照比對，第 6 站頭尾必跑 |
+| 完工後規格不被偷改 | 上鎖紀錄進版本控制，巡檢時比對 |
+| 現在到哪一站 | 腳本 `spec-status.js` 從檔案推算，不信手寫的狀態 |
+
+前兩項靠文字規則，AI 遵守的機率高但不是百分之百。後四項靠腳本，想繞也繞不過。
+
+## 實測
+
+在一個小專案上用四句話需求跑完整輪。Claude 自己挖出 9 個需求沒講的洞，畫圖時又抓到 1 個。寫到最後一條測試時它發現是自己把例子抄錯了，沒有改規格矇混，停下來報告。修正後 21 條測試全綠、上鎖。事後故意改規格一個數字，巡檢立刻報警。
+
+## 它不是什麼
+
+- **不是全自動。** 能自動的是執行與驗證，決定要什麼仍然是人的事。
+- **不是數學證明。** 測試是例子，不是窮舉。表格列了三個值不代表第四個值一定對。真需要窮舉保證的地方要另外補測試。
 
 ## 安裝
 
@@ -69,34 +94,32 @@ manifest 的 `Binding Layer` 設為 `driver` 時走上面的結構；設為 `dir
 /plugin install specengine@specengine-marketplace
 ```
 
-repo 為私有時，執行 `/plugin marketplace add` 的機器需要能以 git 認證存取該 repo（例如已登入的 Git Credential Manager 或 SSH 金鑰）。
-
 升級：
 
 ```
 /plugin marketplace update specengine-marketplace
 ```
 
-## 新專案導入
+repo 為私有時，安裝的機器要能用 git 認證存取它。
 
-裝好後在專案裡說「幫我把 SpecEngine 導入這個專案」或執行 `/specengine:spec-manifest-sync`，它會：
+導入後請把 `.specengine/sdd/.spec-guard-snapshot.json` 加進專案的 `.gitignore`，那是寫程式期間的暫存照片。其他 `.specengine/` 底下的東西都要進版本控制。
 
-1. 從範本落地 `.claude/spec/architecture-manifest.md`，掃描依賴清單與目錄結構，把能找到唯一證據的欄位填入，其餘留〔待確認〕交給團隊。
-2. 在專案 `CLAUDE.md` 末尾附加 `<!-- SPECENGINE:BEGIN -->` / `<!-- SPECENGINE:END -->` 包住的路由與約束區塊。標記之外的內容不會被動到。
-3. 之後 plugin 升級或專案架構變動，再跑一次即可；版本落差會先回報，經同意才覆寫區塊。
-
-請把 `.specengine/sdd/.spec-guard-snapshot.json` 加入專案 `.gitignore`，它是 `spec-05` 的執行時態。`locks/` 與 `steps-index.json` 要進 git。
-
-專案可在 `.specengine/probes.md` 覆寫 spec-01 的高風險探測維度，例如內容型模組不需要「計算精度」但需要「權限與可見性」。
-
-## 目錄慣例（消費端專案）
+## 檔案在哪
 
 ```text
-.claude/spec/architecture-manifest.md   環境宣告
-.specengine/sdd/                        執行時態：overview.md、matrix/、overview/、flow-design/、data/、features/、parked/、resolved/、locks/、steps-index.json
-.specengine/spec/                       規格單一真實來源：terms.md、policy-defaults.md、erm.dbml、features/*.feature
+plugin 本身（這個 repo）
+├── skills/        十個指令的說明書
+├── scripts/       三支檢查腳本，只用 Node 內建功能
+├── docs/          規格的格式規範
+└── templates/     導入專案時用的範本
+
+你的專案（導入後）
+├── .claude/spec/architecture-manifest.md   環境設定檔
+└── .specengine/
+    ├── sdd/       過程中的東西：規則清單、待答的題、答完的題、流程圖、鎖
+    └── spec/      定案的規格：測試句子、資料模型、術語、慣例、刻意不做清單
 ```
 
 ## 版本與授權
 
-版本號以 `.claude-plugin/plugin.json` 的 `version` 為準。每個模組的矩陣檔記錄建立時的版本，Skill 讀到不一致時會提示。變更紀錄見 `CHANGELOG.md`。授權為 MIT，見 `LICENSE`。
+版本號在 `.claude-plugin/plugin.json`。改了什麼看 `CHANGELOG.md`。MIT 授權，見 `LICENSE`。
