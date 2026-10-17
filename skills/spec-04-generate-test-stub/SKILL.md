@@ -1,94 +1,97 @@
 ---
 name: spec-04-generate-test-stub
-description: 當使用者輸入 /spec-04 [MODULE_ID]、/spec-run,或說「產生測試骨架」「寫測試 stub」時使用，為已形式化的 Feature 檔產生測試骨架（對齊 architecture-manifest.md 技術棧與 DBML Schema，產出強型別 TDD 紅燈測試 stub）。
+description: 當使用者輸入 /spec-04 [MODULE_ID]、/spec-run，或說「產生測試骨架」「寫測試 stub」時使用。為已形式化的 Feature 檔，依 architecture-manifest.md 宣告的 BDD 框架、目錄與 Binding Layer，產出確定性紅燈的 Step Definitions、Driver 介面與 fixture 接線。
 ---
 
 # 目標
-讀取 `architecture-manifest.md` 所定義之技術棧與測試框架變數，將 Gherkin 特性檔案與 DBML 資料模型進行雙向契約綁定，自動生成具備強型別測試 Context (Custom World)、雙層 Background 作用域隔離與確定性失敗斷言之測試程式碼骨架。本專案採 Cucumber 風格（真正可執行的 Gherkin 引擎），每個 Given/When/Then 必須是真的綁定到 `.feature` 文字的 Step Definition，而非僅描述性的骨架。
+
+把 `.feature` 的每個步驟綁成真正可執行的 Step Definition，並建立 step 與被測系統之間的綁定契約（Driver 介面）。產出全部拋確定性失敗，建立 TDD 紅燈基準。spec-05 要做的事因此從「呼叫產品碼」變成「實作明確的介面」。
 
 ---
 
-# 核心行為規範與硬性約束 (Software Engineering Invariants)
+# 硬性約束
 
-1. **動態環境變數對齊 (Manifest Dynamic Alignment)**：
-   - 必須讀取 `architecture-manifest.md`，根據其定義之 `Test Root Directory`、`Step Definitions Directory`、`BDD Execution Framework` 與命名規範產生符合該技術棧規範之測試檔案與目錄。
-   - **本專案為單軌**（見 manifest 第 1、5 節）：所有 Rule 一律以 `playwright-bdd`（TypeScript）綁定，不分 UI／後端層級，不需要 Reqnroll 或其他 C# 測試框架分流。
-   - 若 manifest 該節仍標註〔待確認並實際安裝〕（`playwright-bdd` 尚未安裝、`playwright.config.ts` 尚未呼叫 `defineBddConfig()`），必須在完成彙報中明確提示此限制，並詢問是否先安裝套件與補上最小接線設定，或改採 `references/typescript-stub-example.md` 的示意骨架寫法（不可執行，僅供 review 用）；不得自行假裝套件已安裝而生成實際上會編譯失敗的 import。
-2. **DBML 實體型別符號綁定 (DBML Schema Symbol Binding)**：
-   - 所有步驟引用的資料欄位，必須顯式標註 DBML 實體與型別（例如 `@schema ImageUpload.TotalSlices: int`）。
-   - 自動將 Gherkin 中的變數，根據 manifest 命名規範轉換為強型別參數。
-3. **測試狀態隔離與 Context 封裝 (Scenario State Isolation)**：
-   - 嚴禁使用全域變數儲存跨步驟狀態。所有狀態轉移必須封裝於獨立之 Playwright fixture／自訂 World 中，確保測試場景間 100% 獨立隔離。
-4. **雙層 Background 作用域映射 (Scoped Background Hooks)**：
-   - Feature-level Background 映射為全域或 Feature 作用域之 setup 步驟。
-   - Rule-level Background 映射為特定 Rule 區塊之 setup 步驟，確保前置資料建立之順序性與隔離性。
-5. **TDD 確定性失敗契約 (Deterministic Red-Stage Assertion)**：
-   - 產出之步驟實作區塊，預設注入確定性失敗例外，確保初始狀態必定進入 Red Stage：`throw new Error("Contract Not Implemented: [Step Text]");`。
+1. **一切依 manifest**：目錄、框架、語言、命名、Binding Layer、Driver Directory 皆取自 `.claude/spec/architecture-manifest.md` 第 1、3、5 節，本 Skill 不預設任何技術棧。
+2. **框架未就緒時不假裝**：manifest「BDD Execution Framework」為〔待確認〕、或宣告的套件在依賴清單查無安裝時，在彙報中明確提示，並詢問使用者是先安裝接線還是先產不可執行的示意骨架。不得生成會編譯失敗的 import 卻宣稱可執行。
+3. **Binding Layer 未決時不猜**：manifest「Binding Layer」為〔待確認〕時，停下來請使用者在 `driver` 與 `direct` 之間選擇並填入 manifest，再繼續。這是團隊決策，不可代選。
+4. **句型即契約**：Step Definition 的句型字串必須與 `.feature` 步驟文字一致，雙引號參數一律以 `{string}` 接收（見 contract-rules 第 3.3 條）。這些字串就是 spec-05 期間 `spec-guard.js` 凍結的對象。
+5. **Step 薄、Driver 厚**（Binding Layer 為 `driver` 時）：step 函式體只做「參數型別轉換 → 呼叫 Driver 介面方法 → 斷言」，不含任何 Playwright、HTTP、ORM 細節。所有技術細節都在 Driver 實作裡。
+6. **狀態隔離**：嚴禁全域變數。跨步驟狀態放在 Driver 實例或框架的 World／fixture 裡。
+7. **確定性紅燈**：Step 與 Driver 介面方法預設皆拋 `Contract Not Implemented`（或該語言對應的例外）。
+8. **識別字與檔名語言依 manifest**：Driver 介面名、方法名、fixture 名、以及 step／driver 檔名，皆依 manifest 第 3 節「Test Identifier Language」。`en`（預設）時用英文識別字與 kebab-case 英文檔名、中文放註解；`zh-TW` 時用領域中文識別字與中文檔名。範例檔兩種都有示範。
+9. **`@binds` 必須指向真的存在的方法**：`spec-guard.js snapshot` 會逐一驗證 step 檔的 `@binds X.y` 在 Driver 介面檔中找得到 `y`，找不到會 Fail Loud，spec-05 開不了工。產出後自己先跑一次 snapshot 確認。
 
 ---
 
-# 執行步驟與檔案操作
+# 執行步驟
 
-## Step 0: 讀取架構宣告 (Load Architecture Manifest)
+## Step 0: 讀取 manifest 與前置檢查
 
-1. 載入 `architecture-manifest.md`，獲取測試目錄結構、程式語言型別系統與 BDD 框架模組名稱。
+取得 `Step Definitions Directory`、`Driver Directory`、`Binding Layer`、`BDD Execution Framework`、`Assertion Library`、`Test Data Seeding Strategy`、命名規範。檢查框架安裝狀態與 Binding Layer（硬性約束 2、3）。
 
----
+## Step 1: 讓框架列出未定義步驟
 
-## Step 1: 符號表抽離與型別定義
+優先用框架本身的 dry-run 取得未定義步驟清單與函式樣板，而非由 LLM 從 `.feature` 轉寫：
 
-1. 解析 `.specengine/spec/features/*.feature` 提取 Feature、Rule、Scenario 與 Background 階層結構。
-2. 解析 `.specengine/spec/erm.dbml` 建立實體屬性符號表 (Symbol Table)。
-3. 根據 DBML 實體定義與 manifest 命名規範，建構測試專用之強型別 Context 介面。
+- cucumber-js：`--dry-run --format snippets`（輸出會逐 Scenario 重複，先依句型去重）
+- playwright-bdd：`npx bddgen`，再執行測試取得 undefined step 報告
+- 其他框架：依 manifest 宣告的框架查其對應指令
 
----
+框架無 dry-run 能力時，才退回解析 `.feature` 自行產生。
 
-## Step 2: 雙層 Background 與 Hook 結構構建
+## Step 2: 解析來源
 
-1. **Feature Background 處理**：轉譯為測試執行前之基礎 Context 初始化步驟。
-2. **Rule Background 處理**：轉譯為對應 Rule 標籤 (`# @rule R-XXXX`) 作用域下之獨立前置步驟。
+1. 本模組 `.feature` 的 Rule／Scenario／Background 階層與 `@rule:` tag。
+2. `erm.dbml` 實體屬性表，供 `@schema` 註解。
 
----
+## Step 3: 產出 Step Definitions
 
-## Step 3: Step Definitions 轉譯與實體落盤
+每個不重複的步驟一個函式，寫入 `Step Definitions Directory`，檔名依 manifest 第 3 節。每個 Step 上方三行註解：
 
-1. 提取 Given/When/Then 步驟中的雙引號參數，自動對應為 TypeScript `{string}`/`{int}` Cucumber Expression。
-2. 注入 Schema 追溯註解與確定性失敗斷言（見上方核心行為規範 #5）。
-3. 產出程式碼結構請 Read `references/typescript-stub-example.md`（`playwright-bdd` 結構範例）——完整沿用其結構（雙層 Background、`@schema` 追溯註解、確定性紅燈斷言、Context/World 狀態隔離）。
-4. 寫入實體檔案至 manifest 指定之 `Step Definitions Directory`（`tests/steps/`）目錄下。
-5. **狀態欄寫回（見 CLAUDE.md 第 4.2 節）**：測試骨架落盤（Red Stage）後，將 `.specengine/sdd/overview.md` 中本模組對應那一列的狀態欄由 `FORMALIZED` 改寫為 `STUBBED`，不改動其他模組的列。
+```
+// @rule R-XXXX-NNN, R-XXXX-MMM（多條以逗號分隔，寫完整 ID；全模組共用的 Step 寫 R-<MODULE_ID>-*）
+// @schema Entity.column: type（無資料綁定寫 none）
+// @binds <Driver 介面>.<方法>（direct 模式寫 <Service>.<方法>）
+```
+
+函式體：`driver` 模式呼叫 Driver 介面；`direct` 模式直接拋例外，由 spec-05 接 Service。結構 Read `references/typescript-stub-example.md`，API 依 manifest 框架替換。
+
+## Step 4: 產出 Driver 層（Binding Layer 為 `driver` 時）
+
+1. **介面檔** `<Driver Directory>/<模組名稱>.driver.<副檔名>`：依 Step 3 的 `@binds` 彙整出所有方法，只有簽章與一行說明。有 interface 的語言用 interface；沒有的語言（JavaScript、Python）用「全部方法拋 `Contract Not Implemented` 的基底類別」當介面檔。檔名與識別字語言依硬性約束 8。此檔會被 spec-guard 全字節凍結。
+2. **in-process 實作** `<模組名稱>.inprocess.<副檔名>`：實作介面，每個方法拋 `Contract Not Implemented`。spec-05 的紅綠迴路用它。
+3. **第二實作**：僅當 manifest 第 2 節「UI Component Framework」或第 4 節「API Interface Standard」已填時產出 `<模組名稱>.ui.<副檔名>` 或 `.api.<副檔名>`，同樣全部拋例外。兩欄皆〔待確認〕則不產，彙報註明「僅 in-process」。
+4. **fixture 接線**：若 `<Test Root Directory>/fixtures.<副檔名>` 不存在則建立，依環境變數（例如 `BINDING=inprocess|ui`）選擇 Driver 實作並注入 step。已存在則只追加本模組的 fixture。**確認框架真的會載入它**：檢查框架設定檔（例如 cucumber 的 `require`／`import` 路徑、playwright 的 `testDir`）是否涵蓋 fixture 檔；不涵蓋就在 step 檔內 `require`／`import` 它，並在彙報註明。
+
+Binding Layer 為 `direct` 時跳過本步驟。
+
+## Step 5: 寫回狀態
+
+將 `overview.md` 本模組狀態 `FORMALIZED` → `STUBBED`。
 
 ---
 
 # 完成條件
 
-- [ ] `architecture-manifest.md` 之技術棧變數已讀取並套用
-- [ ] 每個 Step 皆標註對應的 DBML 實體與型別（`@schema`）
-- [ ] 無跨 Scenario 共用的全域變數，狀態皆封裝於 `TestContext`
-- [ ] Feature-level 與 Rule-level Background 已分層映射
-- [ ] 所有 Step 實作區塊皆為確定性失敗例外（`throw new Error(...)`），確認為 Red Stage
-- [ ] `.specengine/sdd/overview.md` 本模組狀態欄已由 `FORMALIZED` 改寫為 `STUBBED`
+- [ ] manifest 已讀取，框架安裝狀態與 Binding Layer 已確認
+- [ ] 每個 Step 句型與 `.feature` 一致，附 `@rule`、`@schema`、`@binds`
+- [ ] `driver` 模式：介面檔、至少一個實作、fixture 接線已產出；step 內不含技術細節
+- [ ] 無跨 Scenario 全域狀態
+- [ ] 所有 Step 與 Driver 方法為確定性失敗
+- [ ] `spec-guard.js snapshot` 可成功建立（@binds 全部有效）
+- [ ] 狀態欄已寫為 `STUBBED`
 
-# 完成彙報 (Terminal Output)
-
-執行完畢後，在 Terminal 印出狀態快照：
+# 完成彙報
 
 ```text
-[Phase 04: Generate Test Stub] 執行完成！
+[Phase 04: Generate Test Stub] 執行完成！模組：<MODULE_ID>
 
-1. 讀取架構宣告：architecture-manifest.md
-2. 產出檔案概況：
-   - tests/steps/[module_name].spec.ts (playwright-bdd)
-
-3. 契約綁定指標快照：
-   - 轉譯 Step 數量：X 個
-   - 對齊 DBML Table/Column 數量：Y 個
-   - TestContext 狀態欄位數：Z 個
-   - TDD 斷言覆蓋度：100% Red Stage（確定性失敗例外）
-
+1. 框架：<框架>（已安裝 ｜ 未安裝，已提示）；Binding Layer：<driver | direct>
+2. 產出：
+   - <Step Definitions Directory>/<檔名>（Step X 個）
+   - <Driver Directory>/<模組>.driver.<ext>（方法 Y 個）
+   - <Driver Directory>/<模組>.inprocess.<ext>、<模組>.ui.<ext>
+   - <Test Root>/fixtures.<ext>（新建 ｜ 追加）
+3. 對齊 DBML 欄位 Z 個，100% Red Stage
 4. 模組階段狀態：STUBBED（已寫回 .specengine/sdd/overview.md）
-```
-
-```text
-[SpecEngine] spec-04 進度：Step 3 / 3 — 已完成
 ```

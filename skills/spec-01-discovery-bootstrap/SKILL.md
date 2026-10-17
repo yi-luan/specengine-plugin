@@ -1,123 +1,78 @@
 ---
 name: spec-01-discovery-bootstrap
-description: 當使用者輸入 /spec-01、/spec-run，或說「冷啟動」「掃需求」「幫我分析這個需求」時使用，對新需求/新模組進行雙軌冷啟動（無互動靜態掃描需求、鎖定核心業務切片、抽取行為矩陣與 DBML 草稿、以高風險工程探測清單找盲點）。純掃描器角色，不會向使用者提問。
+description: 當使用者輸入 /spec-01 [path]、/spec-run，或說「冷啟動」「掃需求」「幫我分析這個需求」時使用。對新需求靜態掃描：鎖定核心業務切片、抽取行為矩陣與 DBML 草稿、初始化術語表、套用既有組織慣例、以高風險探測清單找盲點並轉成 MCQ 佇列。純掃描器角色，唯一允許問的是「這屬於哪個模組」。
 ---
 
 # 目標
-靜態掃描原始需求與現有 `.specengine/spec/`，零腦補地解構為核心業務切片 (Core Business Slice)、行為矩陣與 DBML 資料模型草稿。
-套用「高風險工程探測清單」發掘隱含的架構與業務邊界盲點；優先比對 `.specengine/spec/policy-defaults.md` 既有組織慣例自動套用，剩下無法套用的才轉換為低認知負擔的「多選題 (MCQ)」並更新至 `.specengine/sdd/` 狀態機佇列中。
 
-# 核心行為規範 (Hard Constraints)
+靜態掃描原始需求與現有 `.specengine/spec/`，零腦補地解構為核心業務切片、行為矩陣、DBML 草稿與術語表。先比對 `policy-defaults.md` 自動套用既有慣例，剩下無法套用的盲點才轉成 MCQ 推入佇列。
 
-1. **純掃描器角色 (Pure Scanner)**：
-   - 本階段【嚴禁】向使用者提出任何詢問或開啟對話。
-   - 所有工作必須在背景完成檔案讀寫與 `.specengine/sdd/` 佇列初始化。
-2. **零腦補原則 (Zero Hallucination)**：
-   - 需求未提及的商業邏輯與邊界，【絕對不可】自行代為決定。
-   - 確定事項進入模組矩陣與 `erm.dbml`，不確定事項一律推入 `.specengine/sdd/` 多選題佇列。
-3. **歷史去重防範 (Anti-Duplicate Check)**：
-   - 在建立新的多選題前，必須掃描 `.specengine/sdd/resolved/data/` 與 `.specengine/sdd/resolved/features/`。
-   - 若問題已在 `resolved/` 歷史記錄中決策完成，絕不重複發問。
-4. **模組識別與命名空間隔離 (Module Namespacing)**：
-   - 每次冷啟動必須先從需求中提煉出唯一的 `MODULE_ID`（全大寫 SNAKE_CASE，例如 `POINTS_REDEMPTION`）。
-   - 所有本次產出的矩陣檔、總覽檔皆以此 `MODULE_ID` 命名，嚴禁寫入或覆蓋其他模組的矩陣檔，確保多位使用者同時對不同模組執行 `spec 01` 時不會互相覆寫。
-   - `.specengine/spec/erm.dbml`、`.specengine/spec/terms.md`、`.specengine/spec/policy-defaults.md` 為跨模組共用之單一真實來源，本規則不適用（這三者本來就該全域共用，允許增量擴充）。
+# 硬性約束
+
+1. **純掃描器**：不向使用者提問，唯一例外是需求無法唯一對應到一個 `MODULE_ID` 時可以問一題。其餘一律落盤成 MCQ。
+2. **零腦補**：需求未提及的邏輯與邊界【絕對不可】自行決定。確定事項進矩陣與 `erm.dbml`，不確定事項進 MCQ 佇列。
+3. **歷史去重**：建立 MCQ 前掃描 `resolved/` 與 `parked/`，已決策或已掛起的問題不重複發問。
+4. **模組命名空間**：`MODULE_ID` 為全大寫 SNAKE_CASE。`erm.dbml`、`terms.md`、`policy-defaults.md`、`exclusions.md` 為跨模組共用，允許增量擴充。
+5. **格式依 contract-rules**：矩陣結構（第 1.6 節）、DBML（第 2 節）、terms.md（第 5.2 節）、exclusions.md（第 5.4 節）、overview.md（第 5.1 節）皆依 `${CLAUDE_PLUGIN_ROOT}/docs/contract-rules.md`，不自創格式。落盤後執行 `node "${CLAUDE_PLUGIN_ROOT}/scripts/feature-lint.js"` 驗矩陣結構，未通過不得進入完成彙報。
 
 ---
 
-# 輸入 (Inputs)
-1. 原始需求文字 (`<raw_requirement>`) 或 `.specengine/spec/` 舊規格
-2. 現有 `.specengine/spec/terms.md`（若存在）
-3. 現有 `.specengine/spec/policy-defaults.md`（組織慣例字典，若存在）
-4. 歷史決策紀錄 `.specengine/sdd/resolved/`（若存在）
-5. `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` 之 `version` 欄位（範本版本號）
-6. `.claude/spec/architecture-manifest.md`（第 3 節命名語法規範，供 `erm.dbml` 之 Table/Column 命名對齊；本專案 Database Tables & Columns 為 `PascalCase`，見該節說明）
+# 輸入
+
+1. 原始需求文字或檔案
+2. `${CLAUDE_PLUGIN_ROOT}/docs/contract-rules.md`（必讀，格式依據）
+3. `.specengine/spec/terms.md`、`policy-defaults.md`、`exclusions.md`、`erm.dbml`（若存在）
+4. `.specengine/sdd/resolved/`、`parked/`（若存在）
+5. `.claude/spec/architecture-manifest.md` 第 3 節命名規範；待確認時依 contract-rules 第 2.4 節 fallback
+6. 探測清單：專案 `.specengine/probes.md` 優先，否則 `references/devil-probes.md`
+7. `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` 的 `version`
 
 ---
 
-# 執行步驟與檔案操作
+# 執行步驟
 
-## Step 0: 鎖定核心業務切片 (Core Business Slice) 與模組識別
+## Step 0: 鎖定核心業務切片與模組識別
 
-1. **模組識別**：從需求中提煉 `MODULE_ID`。若 `.specengine/sdd/overview.md` 全域索引中已存在同名模組且狀態非 `DEPRECATED`，視為對既有模組的增量擴充，不建立新模組。
-2. **主幹 Flow**：完成該業務目標的最簡 Happy Path（不含任何例外與邊界），作為 `.specengine/sdd/matrix/<MODULE_ID>.json` 的第 0 號 Rule。
-3. **骨架 Schema**：支撐此最簡 Flow 運作的最小 Table & 外鍵關係 (FK)，作為 `.specengine/spec/erm.dbml` 的基礎架構。
+1. 從需求提煉 `MODULE_ID`。`.specengine/sdd/matrix/` 已有同名模組 → 增量擴充。無法唯一判定 → 問一題。
+2. **主幹 Flow**：最簡 Happy Path，作為 `R-<MODULE_ID>-000`，`type: main_flow`。
+3. **骨架 Schema**：支撐主幹的最小 Table 與 FK。
 
-所有 Step 2 掃出的邊界問題（小數點、併發、重複取消），必須全部「掛載」在此核心業務切片的特定節點上。
+## Step 1: 矩陣、DBML、術語表
 
----
+1. **`.specengine/sdd/matrix/<MODULE_ID>.json`**：100% 確定的行為拆成 `rules`，每條 `type` 為 `main_flow` 或 `edge_case`。需求明寫「不做 X」「不支援 Y」的，**不進矩陣**，記入 `exclusions.md`（類型「不提供功能」）。
+2. **`.specengine/spec/erm.dbml`**：實體與屬性，依 contract-rules 第 2 節（每欄 note、底部 Ref、status 枚舉、命名 fallback）。
+3. **`.specengine/spec/terms.md`**：不存在則建立；收錄需求中出現的領域名詞與其對應欄位。spec-02 的白話轉譯依賴此檔。
 
-## Step 1: 雙軌矩陣與 DBML 草稿冷啟動
+## Step 2: 套用慣例，再掃盲點
 
-1. **行為矩陣抽取 (`.specengine/sdd/matrix/<MODULE_ID>.json`)**：
-   - 解析需求中 100% 確定的行為，拆解為 `rules` (Happy Path / Edge Cases)。
-   - 填寫槽位：`rule_id`, `type`, `actor`, `pre_conditions`, `trigger_event`, `post_assertions`。
-   - 檔案頂層必須包含 `"spec_engine_version"` 欄位，值取自 `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` 之 `version` 欄位。
-2. **資料模型草稿 (`.specengine/spec/erm.dbml`)**：
-   - 提取需求涉及的實體與屬性，Table/Column 命名依 `architecture-manifest.md` 第 3 節宣告之規範（本專案為 `PascalCase`）。
-   - 若 `.specengine/spec/erm.dbml` 不存在則建立 Initial Draft；若存在則增量擴充 Table/Column/Type 與 `note`。
+1. 讀 `policy-defaults.md`。每類潛在盲點先查是否命中慣例：命中則直接寫入矩陣或 dbml，**不建 MCQ**，並在模組總覽列出套用的 POLICY ID。
+2. 讀探測清單，逐維度壓力測試。
 
----
+## Step 3: MCQ 包裝與落盤
 
-## Step 2: 套用組織慣例，再以高風險工程探測清單掃描剩餘盲點
-
-1. **優先套用既有慣例**：讀取 `.specengine/spec/policy-defaults.md`。針對每一類潛在盲點，先檢查是否已有命中的慣例條目：
-   - 若命中，直接依該慣例決策寫入矩陣與 `erm.dbml`，**不建立 MCQ**，並將該慣例條目的「套用次數」+1。
-   - 若未命中，才進入以下探測清單掃描。
-2. **高風險工程探測清單**：Read `references/devil-probes.md`，取得 5 個高風險工程維度的完整檢查清單，逐一針對需求執行「極限壓力測試」，找出隱含缺失。
-
----
-
-## Step 3: 多選題 (MCQ) 包裝與 `.specengine/sdd/` 佇列落盤
-
-針對 Step 2 未被既有慣例覆蓋的每一個盲點，Read `references/mcq-file-format.md`，依其定義的選項品質規範、可複用慣例候選判定邏輯與統一問題檔案格式，將其封裝為**具備真實工程 Trade-off 的多選題**：
-
-1. **建立獨立問題檔**：
-   - 資料模型類 ➔ `.specengine/sdd/data/<Entity>_<問題摘要>.md`
-   - 流程行為類 ➔ `.specengine/sdd/features/<Feature>_<問題摘要>.md`
-2. **產出模組總覽文件 (`.specengine/sdd/overview/<MODULE_ID>.md`)**：
-   - 彙整當前模組問題統計（資料數 / 功能數）。
-   - 依優先級排序，提供建議的提問順序策略（先核心資料模型，後邊界行為）。
-   - 列出本輪自動套用的既有慣例清單（來源慣例 ID + 套用位置）。
-3. **附加更新全域索引 (`.specengine/sdd/overview.md`)**：
-   - 僅新增或更新本模組對應的那一列（狀態、待釐清數、範本版本），不改動其他模組的列。
-   - **狀態欄寫回（見 CLAUDE.md 第 4.2 節「模組階段狀態機」）**：本輪掃描結束後，若 `.specengine/sdd/` 佇列（`data/`、`features/`）中該模組仍有 High/Medium 未決問題，寫入 `CLARIFYING`；若本輪套用既有慣例後佇列剛好淨空（無需任何 MCQ），直接寫入 `CLARIFIED`。新增列時 `範本版本` 欄填入 `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` 之 `version` 當前值。
+1. 依 `references/mcq-file-format.md` 建檔：資料模型類 → `data/`，流程行為類 → `features/`。「定位」含 `MODULE_ID`，「來源」填 `spec-01`。
+2. **`.specengine/sdd/overview/<MODULE_ID>.md`**：問題統計、建議提問順序、本輪套用的慣例清單。
+3. **`.specengine/sdd/overview.md`**：依第 5.1 節格式新增或更新本模組列，狀態欄填 `spec-status.js` 的推導結果。
+4. `node "${CLAUDE_PLUGIN_ROOT}/scripts/feature-lint.js"`。
 
 ---
 
 # 完成條件
 
-- [ ] `MODULE_ID` 已鎖定，核心業務切片（最簡 Happy Path + 核心 FK Schema）已完成
-- [ ] `.specengine/sdd/matrix/<MODULE_ID>.json` 已產出，含 `spec_engine_version` 欄位
-- [ ] `.specengine/spec/erm.dbml` 已更新（新建或增量擴充）
-- [ ] 已比對 `.specengine/spec/policy-defaults.md`，命中的慣例已直接套用、未重複發問
-- [ ] Step 2 未被慣例覆蓋的盲點，皆已轉為符合格式的 MCQ 問題檔並去重
-- [ ] `.specengine/sdd/overview/<MODULE_ID>.md` 與 `.specengine/sdd/overview.md` 已更新，狀態欄已依佇列現況寫入 `CLARIFYING` 或 `CLARIFIED`
-- [ ] 全程未向使用者提出任何詢問
+- [ ] `MODULE_ID` 已鎖定，核心切片已完成
+- [ ] 矩陣已產出並通過 lint，`type` 皆為合法值
+- [ ] `erm.dbml` 依第 2 節；`terms.md` 已建立或擴充
+- [ ] 需求明寫的「不做」已進 `exclusions.md`
+- [ ] 命中的慣例已套用，其餘盲點已轉為 MCQ 並去重
+- [ ] 兩份 overview 已依格式更新
+- [ ] 除模組歸屬外未向使用者提問
 
-# 輸出彙報合約 (Terminal Output)
-
-執行完畢後，在 Terminal 印出簡潔摘要：
+# 完成彙報
 
 ```text
 [Phase 01: Discovery Bootstrap] 執行完成！模組：<MODULE_ID>
 
-1. 業務切片與雙軌產出概況：
-   - 核心業務切片 (Core Business Slice)：已鎖定最簡貫穿 Happy Path 與核心 FK Schema
-   - 行為矩陣：.specengine/sdd/matrix/<MODULE_ID>.json (共 X 條確定 Rules)
-   - 資料模型：.specengine/spec/erm.dbml (共 Y 個 Tables 草稿)
-
-2. 組織慣例套用概況：
-   - 自動套用既有慣例：N 項（無需發問，見 .specengine/spec/policy-defaults.md）
-
-3. .specengine/sdd/ 盲點佇列初始化：
-   - 待釐清總數：Z 項
-   - 優先級分佈：High (A) | Medium (B) | Low (C)
-   - 可複用慣例候選：M 項
-
-4. 模組階段狀態：<CLARIFYING | CLARIFIED>（已寫回 .specengine/sdd/overview.md）
-```
-
-```text
-[SpecEngine] spec-01 進度：Step 3 / 3 — 已完成，MODULE_ID=<MODULE_ID>
+矩陣：X 條 Rules ｜ erm.dbml：Y 個 Tables ｜ terms.md：N 個術語 ｜ exclusions：E 條 ｜ 套用慣例：P 項
+待答：Z 題（High A ｜ Medium B ｜ Low C）
+階段：<CLARIFYING ｜ CLARIFIED>
 ```

@@ -1,92 +1,82 @@
 ---
 name: spec-06-drift-audit
-description: 當使用者輸入 /spec-06,或說「巡檢」「規格漂移」「檢查跟現實有沒有脫鉤」時使用，比對 .specengine/spec/erm.dbml 與實際資料庫 Schema、比對 Rule 覆蓋率與測試結果找出漂移。純唯讀巡檢，不自動修正任何一邊。建議每個 Sprint 或每次上線後手動執行一次，不屬於 spec-run 的線性串接範圍。
+description: 當使用者輸入 /spec-06，或說「巡檢」「規格漂移」「檢查跟現實有沒有脫鉤」時使用。比對 .specengine/spec/erm.dbml 與實際資料庫 Schema、比對 Rule 覆蓋率與測試結果，找出漂移並推入佇列。純唯讀巡檢，不自動修正任一邊。不屬於 spec-run 串接範圍。
 ---
 
 # 目標
-Phase 01~05 是單向流程：`.specengine/spec/` → `src/`。但正式上線後常見的情況是 `src/` 因為 hotfix、緊急上線而偷偷跟 `.specengine/spec/` 脫鉤，或是 DB 被手動改過 migration 而沒回寫 `erm.dbml`。本階段是唯一「反向巡檢」的環節，定期（建議每個 Sprint 或每次上線後）手動執行 `spec 06`，找出落差並提報，**絕不自動修正任一邊**——因為漂移本身就是一個未界定的狀態，必須交由人工決定「現實是對的、規格該更新」還是「規格是對的、程式碼該修正」。
+
+spec 01~05 是單向流程：規格 → 程式碼。上線後常見程式碼因 hotfix 偷偷脫鉤，或 DB 被手動改過沒回寫 `erm.dbml`。本階段是唯一的反向巡檢，定期執行找出落差並提報，**絕不自動修正**：漂移是未界定狀態，必須由人決定「現實對、規格該更新」還是「規格對、程式碼該修」。
 
 ---
 
-# 核心行為規範 (Hard Constraints)
+# 硬性約束
 
-1. **零自動修復原則 (No Auto-Fix)**：
-   - 偵測到任何落差，僅可寫入 `.specengine/sdd/data/` 或 `.specengine/sdd/features/` 作為新的待決問題，嚴禁自動覆寫 `.specengine/spec/erm.dbml`、`.feature` 或 `src/` 任何一邊來「消除」落差。
-2. **只讀巡檢 (Read-Only Audit)**：
-   - 本階段對 `.specengine/spec/`、`src/`、`tests/` 皆為只讀，唯一的寫入目標是 `.specengine/sdd/`。
-3. **可重複執行 (Idempotent)**：
-   - 重複執行本階段若落差未變，不得產生重複的問題檔（比照 Phase 01 的歷史去重防範，掃描 `.specengine/sdd/resolved/` 與現有 `.specengine/sdd/data|features/` 是否已有同一落差的追蹤中問題）。
+1. **零自動修復**：落差只寫入 `.specengine/sdd/data/` 或 `features/` 作為新問題，嚴禁改 `erm.dbml`、`.feature` 或產品代碼。
+2. **只讀巡檢**：對 `.specengine/spec/`、產品代碼、測試目錄皆只讀，唯一寫入目標是 `.specengine/sdd/`。
+3. **冪等**：重複執行若落差未變，不產生重複問題檔（比對 `resolved/` 與現有 `data/`、`features/`）。
 
 ---
 
-# 輸入 (Inputs)
-1. `.specengine/spec/erm.dbml`（單一真實來源的資料模型）
-2. 實際持久化層 Schema（依 `.claude/spec/architecture-manifest.md` 宣告：本專案為 EF Core 多 Provider 並存，無單一固定 Schema 檔，需依實際部署 Provider 執行對應之 `dotnet ef dbcontext scaffold` 或直接對資料庫執行 introspection）
-3. `.specengine/sdd/matrix/*.json` 之全部模組矩陣（含 `@rule` ID 清單）
-4. `.specengine/spec/features/*.feature` 之 `@rule` 標籤
-5. 最近一次測試 Runner 執行結果（例如 `npm test` 的報告）
+# 輸入
+
+1. `.specengine/spec/erm.dbml`
+2. 實際持久化層 Schema：依 manifest 第 5 節 `Schema Introspection Command` 取得；若該欄位為〔待確認〕，在彙報中提示並略過 Step 1。
+3. `.specengine/sdd/matrix/*.json` 全部模組的 `rule_id`
+4. `.specengine/spec/features/*.feature` 的 `@rule:` tag
+5. 最近一次測試報告：manifest 第 5 節 `Test Report Path` 指向的 JSON／JUnit 檔。報告中每個 Scenario 帶有 `@rule:R-XXXX` tag，覆蓋率直接從報告統計，不比對文字。報告不存在時先執行 `Test Execution Command` 產生。
 
 ---
 
-# 執行步驟與檔案操作
+# 執行步驟
 
-## Step 1: 資料模型漂移偵測 (Schema Drift Detection)
+## Step 0: lock 比對（規格與句型是否被事後偷改）
 
-1. 解析 `.specengine/spec/erm.dbml` 的 Table / Column / Type / 約束。
-2. 解析實際持久化層 Schema（依 manifest 宣告的 ORM schema 檔案或 introspection 結果）。
-3. 逐一比對：
-   - Column 存在於現實但 `erm.dbml` 未記載 → 落差類型 `UNDOCUMENTED_COLUMN`。
-   - Column 存在於 `erm.dbml` 但現實已移除 → 落差類型 `MISSING_COLUMN`。
-   - 型別或約束不一致 → 落差類型 `TYPE_MISMATCH`。
-4. 每一項落差建立 `.specengine/sdd/data/<Entity>_drift_<落差類型>.md`，格式沿用 Phase 01 的 MCQ 問題檔格式，選項固定為：
-   - `A.` 現實為準，更新 `.specengine/spec/erm.dbml` 覆寫舊敘述
-   - `B.` 規格為準，回報需修正 `src/`／實際 Schema
-   - `Short` 自訂決策
+執行 `node "${CLAUDE_PLUGIN_ROOT}/scripts/spec-guard.js" audit`。它會拿每個 IMPLEMENTED 模組的 `.specengine/sdd/locks/<ID>.lock.json` 與現況比對 feature 雜湊、Step 句型、Driver 介面。有差異即為 `LOCK_DRIFT`：這些改動沒走過 spec 02～05。每個有 drift 的模組建一個問題檔 `.specengine/sdd/features/<ID>_drift_LOCK_DRIFT.md`，選項固定：
 
----
+- `A.` 改動是合法的規格變更，重跑對應階段後重新 lock
+- `B.` 改動不該發生，回滾到 lock 的版本
+- `Short` 自訂
 
-## Step 2: 規則覆蓋率巡檢 (Rule Coverage Regression)
+## Step 1: 資料模型漂移
 
-1. 彙整 `.specengine/sdd/matrix/*.json` 中所有 `rule_id`。
-2. 交叉比對 `.specengine/spec/features/*.feature` 的 `@rule` 標籤與最近一次測試結果：
-   - 存在於矩陣但找不到對應 `.feature` Rule 區塊 → 標記 `MISSING_FORMALIZATION`。
-   - 存在對應 Scenario 但測試結果為 FAIL 或找不到執行記錄 → 標記 `COVERAGE_REGRESSION`。
-3. 將結果彙整進本次巡檢報告（不逐條建立問題檔，除非該 Rule 同時被標記為模組仍在 `IMPLEMENTED` 狀態卻回歸失敗——此時視為嚴重落差，依 Step 1 格式建立問題檔）。
+1. 解析 `erm.dbml` 的 Table／Column／Type／約束。
+2. 取得實際 Schema。
+3. 逐一比對：現實有但 dbml 未記載 → `UNDOCUMENTED_COLUMN`；dbml 有但現實已移除 → `MISSING_COLUMN`；型別或約束不一致 → `TYPE_MISMATCH`。
+4. 每項落差建 `.specengine/sdd/data/<Entity>_drift_<類型>.md`，沿用 MCQ 格式，選項固定：
+   - `A.` 現實為準，更新 `erm.dbml`
+   - `B.` 規格為準，需修正程式碼／Schema
+   - `Short` 自訂
 
----
+## Step 2: Rule 覆蓋率
 
-## Step 3: 彙整巡檢報告
+1. 彙整所有矩陣的 `rule_id`。
+2. 從 `.feature` 抓出所有 `@rule:` tag；從測試報告抓出每個 Scenario 的 tag 與結果。
+3. 三方比對：矩陣有但 `.feature` 無 → `MISSING_FORMALIZATION`；`.feature` 有但報告中無任何該 tag 的 Scenario → `NOT_EXECUTED`；報告中該 tag 有 FAIL → `COVERAGE_REGRESSION`。
+4. 彙整進報告。僅當模組狀態為 `IMPLEMENTED` 卻 `COVERAGE_REGRESSION` 時，視為嚴重落差，依 Step 1 格式建問題檔。
 
-於 `.specengine/sdd/overview.md` 全域索引下方新增一個巡檢紀錄區塊（附加寫入，不覆蓋既有模組列），內容包含本次巡檢時間、發現落差數、已存在待決問題數（去重後）。
+## Step 3: 巡檢紀錄
+
+在 `.specengine/sdd/overview.md` 下方附加一個巡檢紀錄區塊（不覆蓋模組列）：時間、發現落差數、去重後新建問題數。
 
 ---
 
 # 完成條件
 
-- [ ] `.specengine/spec/erm.dbml` 已與實際持久化層 Schema 逐欄比對
-- [ ] 所有新發現落差皆已建立問題檔，且與 `.specengine/sdd/resolved/` 及既有 `.specengine/sdd/data|features/` 去重
-- [ ] `.specengine/sdd/matrix/*.json` 之 `rule_id` 已與 `.feature` 標籤及最近測試結果交叉比對
-- [ ] `.specengine/sdd/overview.md` 已附加本次巡檢紀錄
-- [ ] 全程對 `.specengine/spec/`、`src/`、`tests/` 保持唯讀，未自動修正任何一邊
+- [ ] `spec-guard.js audit` 已執行，LOCK_DRIFT 已建問題檔
+- [ ] `erm.dbml` 已與實際 Schema 逐欄比對（或已提示 introspection 指令未填）
+- [ ] 新落差已建檔並去重
+- [ ] `rule_id` 已與 `.feature` 與測試結果交叉比對
+- [ ] 巡檢紀錄已附加
+- [ ] 全程唯讀，未自動修正
 
-# 完成彙報 (Terminal Output)
+# 完成彙報
 
 ```text
 [Phase 06: Drift Audit] 執行完成！
 
-1. 資料模型漂移：
-   - 已比對 Table 數：X 個
-   - 發現落差：Y 項（UNDOCUMENTED_COLUMN: a｜MISSING_COLUMN: b｜TYPE_MISMATCH: c）
-   - 新建問題檔：Z 項（已去重，historical 中重複的落差未重複建檔）
+0. lock 比對：IMPLEMENTED 模組 N 個 ｜ LOCK_DRIFT M 個（<模組清單>）
+1. 資料模型漂移：比對 Table X 個 ｜ 落差 Y 項（UNDOCUMENTED a ｜ MISSING b ｜ TYPE_MISMATCH c）｜ 新建問題檔 Z 項（已去重）
+2. Rule 覆蓋率（來源：<Test Report Path>）：矩陣 Rule X 個 ｜ MISSING_FORMALIZATION Y ｜ NOT_EXECUTED W ｜ COVERAGE_REGRESSION Z
 
-2. 規則覆蓋率：
-   - 矩陣 Rule 總數：X 個
-   - 未形式化 (MISSING_FORMALIZATION)：Y 個
-   - 覆蓋率回歸 (COVERAGE_REGRESSION)：Z 個
-
-所有落差已推入 .specengine/sdd/ 佇列待人工決策，本階段未自動修改 .specengine/spec/ 或 src/ 任何內容。
-```
-
-```text
-[SpecEngine] spec-06 進度：Step 3 / 3 — 已完成
+所有落差已推入 .specengine/sdd/ 佇列待人工決策，未修改規格或程式碼。
 ```

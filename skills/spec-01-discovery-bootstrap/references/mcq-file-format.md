@@ -34,4 +34,9 @@
 
 # 可複用慣例候選 (Reusable Policy Candidate)
 <Yes / No>
+
+# 來源
+<spec-01 / spec-flow-align / spec-05 / spec-06；由哪個階段發現這個問題>
 ```
+
+「定位」欄必須含 `MODULE_ID`，`spec-status.js` 靠它把問題歸到模組。
