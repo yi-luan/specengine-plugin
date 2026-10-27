@@ -1,11 +1,27 @@
 # Changelog
 
-## 2.1.0-exp（實驗分支，未發布）
+## 2.1.0
 
-- 新增 `spec-change` Skill 與 `scripts/spec-change.js`：已上鎖模組的需求變更依腳本分類（PARAMETER／BEHAVIOR／NEW_RULE）只走必要的站；核准經 `apply` 寫回矩陣；`close` 檢查重新上鎖且未受影響 Rule 逐字未動。
-- `spec-guard.js lock` 額外記錄行為矩陣雜湊，`audit` 一併比對；有進行中變更時在報告中註明。
-- `spec-status.js` 新增 CHANGING 階段（下一步 `spec change`），並警告「矩陣在 lock 後被改動但無變更紀錄」。
-- spec-run Step 00 與 CLAUDE.md 路由表接上 `spec change`。
+新增「已完工模組的需求變更」流程。既有專案執行 `spec-manifest-sync` 會回報 CLAUDE.md 區塊版本落差，同步後路由表多出 `spec change`。舊 lock 沒有矩陣與共用規格雜湊，下一次重新 lock 後才會受保護。
+
+### 新增：spec change
+
+- 新增 `spec-change` Skill 與 `scripts/spec-change.js`（start／classify／apply／amend／close／status）。已上鎖模組的變更由腳本比對新舊矩陣，分成 PARAMETER（只改數字）、BEHAVIOR（改既有行為）、NEW_RULE（新增規則），只走該級需要的站。
+- 改規格一律經使用者核准：`apply` 檢查 change.md 已寫入核准原文才把 proposed 寫回矩陣；核准後要再改矩陣須走 `amend`，分類不得升級。
+- 受影響範圍 = 矩陣有差異的 Rule ＋ `classify --also` 宣告的連帶受影響 Rule（矩陣文字沒變但 Examples 會變者）；`--also` 的每條 Rule 必須出現在核准原文。舊版 type 值遷移到 main_flow／edge_case 視為格式遷移，不計入範圍。
+- `close` 檢查：已重新 lock、現行矩陣等於最後核准版本、範圍外 Rule 的 .feature 區塊逐字未動；結果自動寫入 change.md。
+- 變更紀錄目錄 `.specengine/sdd/changes/<ID>/` 格式見 contract-rules 5.8。
+
+### 改動
+
+- `spec-guard.js lock` 記錄行為矩陣雜湊，並另寫 `locks/_shared.json` 記錄共用規格（terms、erm、policy、exclusions）雜湊；`audit` 一併比對。修掉「改了矩陣或 terms.md，audit 仍通過」。
+- `spec-guard.js`、`spec-change.js`、`spec-status.js` 雜湊前把 CRLF 統一為 LF，修掉 Windows git autocrlf 重新 checkout 後 audit 誤報 LOCK_DRIFT。
+- `spec-status.js` 新增 CHANGING 階段（下一步 `spec change`）；矩陣在 lock 後被改動且沒有變更紀錄時警告。
+- spec-run Step 00、CLAUDE.md 範本路由表、階段表與目錄結構接上 `spec change`。
+
+### 實測（2026-10-22）
+
+在 T1 點數折抵、T2 訂單狀態機、T3 多租戶優惠券與一個 driver 模式的舊格式專案上，跑參數變更、行為變更、新增規則、模糊需求、偽裝成小調整的行為變更、中斷後新 session 續跑共 13 組，隱藏驗收全部通過。同條件下 2.0.0 對照組會在變更單寫「其他規則不變」時不經使用者核准直接改規格。
 
 ## 2.0.0
 

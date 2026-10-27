@@ -1,7 +1,7 @@
 {
   "name": "specengine",
   "displayName": "SpecEngine",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "狀態驅動的 BDD 規格治理框架：需求冷啟動、互動釐清、流程圖對齊、Gherkin 形式化、測試骨架、TDD 實作、規格漂移巡檢與狀態查詢，共 10 個 Skill。技術棧、目錄、指令皆由各專案的 architecture-manifest.md 宣告，plugin 本身不綁定任何框架。",
   "author": {
     "name": "Allen Tsai",
