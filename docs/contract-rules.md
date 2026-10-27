@@ -165,3 +165,17 @@ spec-01 建立並收錄需求中的名詞；spec-02 的命名類決策與使用�
 ## 5.7 MCQ 問題檔
 
 見 `skills/spec-01-discovery-bootstrap/references/mcq-file-format.md`。「定位」欄必須含 `MODULE_ID`，「來源」欄記發現階段。
+
+## 5.8 `.specengine/sdd/changes/<MODULE_ID>/<YYYYMMDD-HHMM>-<slug>/`（需求變更紀錄）
+
+由 `spec-change.js start` 建立，整個目錄進 git。內容：
+
+| 檔案 | 寫入者 | 說明 |
+| :--- | :--- | :--- |
+| `change.md` | 腳本建骨架，執行者填 | 第一行為狀態行 `> 狀態：草稿｜已核准｜已完成｜已撤回`，由腳本維護；其下依序為「變更單原文」「分類」「使用者核准」「異動檔案」「收尾」 |
+| `base.matrix.json` | 腳本 | 變更前矩陣，不得修改 |
+| `proposed.matrix.json` | 執行者 | 變更後矩陣草稿；核准後由 `apply` 寫回 `matrix/<ID>.json` |
+| `base.features/` | 腳本 | 變更前 `.feature` 備份，`close` 用來逐字比對未受影響的 Rule |
+| `classification.json`、`approved.json` | 腳本 | 分類結果與核准時間、受影響 Rule 清單 |
+
+`flow-design/<MODULE_ID>.md` 末尾的「變更紀錄」每行格式：`- <YYYY-MM-DD HH:MM> ｜ <分類> ｜ <change.md 相對路徑> ｜ <一句說明>`。

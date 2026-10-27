@@ -16,7 +16,7 @@
  * 僅用 Node.js 內建模組。請在專案根目錄執行：
  *   node "${CLAUDE_PLUGIN_ROOT}/scripts/spec-guard.js" snapshot          # spec 05 開工前（同時檢查 @binds 指向真實的 Driver 方法）
  *   node "${CLAUDE_PLUGIN_ROOT}/scripts/spec-guard.js" verify            # spec 05 收工前
- *   node "${CLAUDE_PLUGIN_ROOT}/scripts/spec-guard.js" lock <MODULE_ID>  # verify 通過後，寫入該模組的 lock（進 git，IMPLEMENTED 的證據）
+ *   node "${CLAUDE_PLUGIN_ROOT}/scripts/spec-guard.js" lock <MODULE_ID>  # verify 通過後，寫入該模組的 lock（進 git，IMPLEMENTED 的證據；含行為矩陣雜湊）
  *   node "${CLAUDE_PLUGIN_ROOT}/scripts/spec-guard.js" audit             # spec 06 執行，比對所有 lock 與現況，抓事後偷改
  * 路徑加雙引號，避免 Windows 反斜線在 bash 中被跳脫。
  *
@@ -33,6 +33,7 @@ const SPEC_DIR = path.join('.specengine', 'spec');
 const MANIFEST_PATH = path.join('.claude', 'spec', 'architecture-manifest.md');
 const SNAPSHOT_PATH = path.join(ROOT, '.specengine', 'sdd', '.spec-guard-snapshot.json');
 const LOCKS_DIR = path.join(ROOT, '.specengine', 'sdd', 'locks');
+const SHARED_LOCK_PATH = path.join(LOCKS_DIR, '_shared.json');
 
 // 匹配 Given('...', ...) / When("...", ...) / Then(`...`, ...) 第一個參數的句型字串
 const STEP_PATTERN_RE = /\b(Given|When|Then)\(\s*(['"`])((?:\\.|(?!\2).)*)\2/g;
@@ -87,8 +88,10 @@ function listFiles(relDir) {
   return out.sort();
 }
 
+/** 雜湊前把 CRLF 統一為 LF：Windows 的 git autocrlf 重新 checkout 不應被當成規格改動。 */
 function hashFile(relPath) {
-  return crypto.createHash('sha256').update(fs.readFileSync(path.join(ROOT, relPath))).digest('hex');
+  const text = fs.readFileSync(path.join(ROOT, relPath), 'utf8').replace(/\r\n/g, '\n');
+  return crypto.createHash('sha256').update(text).digest('hex');
 }
 
 function extractStepSignatures(relPath) {
@@ -201,6 +204,12 @@ function buildSnapshot({ stepDirs, driverDirs }) {
   return snapshot;
 }
 
+function openChangesOf(id) {
+  try {
+    return require('./spec-change.js').openChanges(id).map((d) => path.relative(ROOT, d).split(path.sep).join('/'));
+  } catch { return []; }
+}
+
 function fail(message, code = 2) {
   console.error(`[spec-guard] Fail Loud：${message}`);
   process.exit(code);
@@ -278,10 +287,17 @@ function cmdLock(id) {
   const now = new Date();
   const pad = (n) => String(n).padStart(2, '0');
   const local = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
-  const lock = { module: id, lockedAt: now.toISOString(), lockedAtLocal: local, ...artifacts };
+  const matrixRel = path.join('.specengine', 'sdd', 'matrix', `${id}.json`).split(path.sep).join('/');
+  const matrix = fs.existsSync(path.join(ROOT, matrixRel)) ? { [matrixRel]: hashFile(matrixRel) } : {};
+  const lock = { module: id, lockedAt: now.toISOString(), lockedAtLocal: local, matrix, ...artifacts };
   fs.mkdirSync(LOCKS_DIR, { recursive: true });
   const file = path.join(LOCKS_DIR, `${id}.lock.json`);
   fs.writeFileSync(file, JSON.stringify(lock, null, 2) + '\n', 'utf8');
+  // 共用規格（terms、erm、policy、exclusions 等，不含 features/）不屬於單一模組：
+  // 每次任一模組合法上鎖時一併記錄，audit 用它抓「沒經過任何模組流程」的共用規格改動。
+  const shared = {};
+  for (const f of listFiles(SPEC_DIR)) if (!f.startsWith(`${SPEC_DIR.split(path.sep).join('/')}/features/`)) shared[f] = hashFile(f);
+  fs.writeFileSync(SHARED_LOCK_PATH, JSON.stringify({ lockedAt: now.toISOString(), lockedBy: id, files: shared }, null, 2) + '\n', 'utf8');
   console.log(`[spec-guard] 已建立 lock：${path.relative(ROOT, file).split(path.sep).join('/')}（feature ${Object.keys(artifacts.features).length} 個、Step 檔 ${Object.keys(artifacts.stepSignatures).length} 個、Driver 介面 ${Object.keys(artifacts.driverInterfaces).length} 個）。此檔應進 git。`);
 }
 
@@ -309,7 +325,20 @@ function cmdAudit() {
       [...after].filter((s) => !before.has(s)).forEach((s) => v.push(`[Step 句型新增] ${f} :: ${s}`));
     }
     diffHashes('Driver 介面', lock.driverInterfaces, now.driverInterfaces, v);
+    if (lock.matrix) {
+      const nowMatrix = {};
+      for (const f of Object.keys(lock.matrix)) if (fs.existsSync(path.join(ROOT, f))) nowMatrix[f] = hashFile(f);
+      diffHashes('行為矩陣', lock.matrix, nowMatrix, v);
+    }
     if (v.length) drifts.push({ module: lock.module, lockedAt: lock.lockedAt, lockedAtLocal: lock.lockedAtLocal, violations: v });
+  }
+  if (fs.existsSync(SHARED_LOCK_PATH)) {
+    const sharedLock = JSON.parse(fs.readFileSync(SHARED_LOCK_PATH, 'utf8'));
+    const now = {};
+    for (const f of listFiles(SPEC_DIR)) if (!f.startsWith(`${SPEC_DIR.split(path.sep).join('/')}/features/`)) now[f] = hashFile(f);
+    const v = [];
+    diffHashes('共用規格', sharedLock.files || {}, now, v);
+    if (v.length) drifts.push({ module: '（共用規格）', lockedAt: sharedLock.lockedAt, lockedAtLocal: `${sharedLock.lockedAt}，最後由 ${sharedLock.lockedBy} 上鎖時記錄`, violations: v });
   }
   if (!drifts.length) {
     console.log('[spec-guard] audit 通過：所有 IMPLEMENTED 模組的規格、句型與 Driver 介面自 lock 以來未被改動。');
@@ -319,6 +348,8 @@ function cmdAudit() {
   for (const d of drifts) {
     console.error(`  模組 ${d.module}（lock 於 ${d.lockedAtLocal || d.lockedAt}）：`);
     d.violations.forEach((x) => console.error(`    - ${x}`));
+    const open = openChangesOf(d.module);
+    if (open.length) console.error(`    （此模組有進行中的需求變更：${open.join('、')}；若改動屬於該變更，完成 spec change 並重新 lock 後即消失）`);
   }
   console.error('這些改動沒有經過 spec 02～05 流程。請由人決定：是合法的規格變更（重跑對應階段並重新 lock），還是該回滾。');
   process.exit(1);

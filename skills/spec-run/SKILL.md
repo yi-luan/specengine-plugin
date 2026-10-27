@@ -26,7 +26,7 @@ description: 當使用者輸入 /spec-run [path] [MODULE_ID]，或說「spec run
 1. 執行 `node "${CLAUDE_PLUGIN_ROOT}/scripts/spec-status.js" --json`（指定模組時加 `--module <MODULE_ID>`）。
 2. exit code 2（沒有任何矩陣）或 3（指定模組不存在）→ 起點為 spec-01。
 3. 未指定 `MODULE_ID` 且有多個模組 → 列出候選請使用者指定，不猜。
-4. 依該模組的 `next` 欄位決定起點：`spec 02`、`spec flow-align`、`spec 03`、`spec 04`、`spec 05`。`next` 為「已完工」→ 不執行任何階段，回報現況後結束。
+4. 依該模組的 `next` 欄位決定起點：`spec 02`、`spec flow-align`、`spec 03`、`spec 04`、`spec 05`。`next` 為「已完工」→ 若使用者這次帶來的是對該模組的需求變更，改用 Skill 工具執行 `spec-change`；否則不執行任何階段，回報現況後結束。`next` 為 `spec change`（階段 CHANGING）→ 用 Skill 工具執行 `spec-change` 續跑。
 5. 腳本回報的 `warnings`（例如「有 Step 但找不到 .feature」「缺流程對齊證明」）原樣轉述給使用者，並暫停本次 spec-run，由使用者裁示。【嚴禁】自行補建產物或改狀態欄。唯一例外是「overview.md 狀態欄與推導不符」，這只是快取過期，照推導結果繼續即可。
 6. 使用者明確要求「從頭跑」「重新冷啟動」→ 忽略推導結果，起點為 spec-01。
 

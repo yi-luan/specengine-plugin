@@ -11,6 +11,7 @@
  *   .specengine/spec/features/ 中有含 `@rule:R-<ID>-` 的檔案 → FORMALIZED
  *   .specengine/sdd/data|features/ 中有屬於 <ID> 的問題檔  → CLARIFYING
  *   只有 matrix/<ID>.json                                → CLARIFIED
+ *   有 lock 且 .specengine/sdd/changes/<ID>/ 有進行中的變更 → CHANGING（下一步 spec change）
  *
  * 另外回報：佇列是否非空（不論階段，有待答題就該回 spec 02）、流程對齊是否通過（索引檔含「狀態：已通過」）、
  * 低層產物缺漏（例如有 Step 但沒有 .feature）、以及 overview.md 狀態欄與推導結果不符。
@@ -23,6 +24,9 @@
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+let openChanges = () => [];
+try { ({ openChanges } = require('./spec-change.js')); } catch { /* 舊版無 spec-change */ }
 
 const ROOT = process.cwd();
 const SDD = path.join(ROOT, '.specengine', 'sdd');
@@ -91,23 +95,41 @@ function deriveModule(id, stepDirs) {
   const steps = stepDirs.flatMap((d) => filesContaining(path.join(ROOT, d), `@rule R-${id}-`));
   const locked = fs.existsSync(path.join(SDD, 'locks', `${id}.lock.json`));
 
+  const changing = locked ? openChanges(id) : [];
+  let matrixDriftNoChange = false;
+  if (locked && !changing.length) {
+    try {
+      const lock = JSON.parse(fs.readFileSync(path.join(SDD, 'locks', `${id}.lock.json`), 'utf8'));
+      const mrel = `.specengine/sdd/matrix/${id}.json`;
+      if (lock.matrix && lock.matrix[mrel]) {
+        const cur = crypto.createHash('sha256').update(fs.readFileSync(path.join(ROOT, mrel), 'utf8').replace(/\r\n/g, '\n')).digest('hex');
+        matrixDriftNoChange = cur !== lock.matrix[mrel];
+      }
+    } catch { /* 無法讀 lock 時不判定 */ }
+  }
+
   let stage;
-  if (locked) stage = 'IMPLEMENTED';
+  if (changing.length) stage = 'CHANGING';
+  else if (locked) stage = 'IMPLEMENTED';
   else if (steps.length) stage = 'STUBBED';
   else if (features.length) stage = 'FORMALIZED';
   else if (pending.length) stage = 'CLARIFYING';
   else stage = 'CLARIFIED';
 
   const warnings = [];
-  if (pending.length && stage !== 'CLARIFYING') warnings.push(`佇列仍有 ${pending.length} 題待答，視同 CLARIFYING`);
+  if (pending.length && stage === 'CHANGING') warnings.push(`變更中有 ${pending.length} 題待答，由 spec change 在核准時一起問`);
+  else if (pending.length && stage !== 'CLARIFYING') warnings.push(`佇列仍有 ${pending.length} 題待答，視同 CLARIFYING`);
   if (['FORMALIZED', 'STUBBED', 'IMPLEMENTED'].includes(stage) && !flowAligned) warnings.push('缺流程對齊證明 flow-design/<ID>.md');
   if (steps.length && !features.length) warnings.push('有 Step Definitions 但找不到對應 .feature');
   if (locked && !steps.length) warnings.push('有 lock 但找不到 Step Definitions');
+  if (matrixDriftNoChange) warnings.push('行為矩陣在 lock 之後被改動，但沒有進行中的需求變更紀錄（未經 spec change）');
+  if (changing.length > 1) warnings.push(`有 ${changing.length} 份進行中的需求變更，一次只能一份`);
   const cached = overviewStatus(id);
   if (cached && cached !== stage) warnings.push(`overview.md 狀態欄為 ${cached}，與推導結果 ${stage} 不符（狀態欄僅為快取）`);
 
   let next;
-  if (pending.length) next = 'spec 02';
+  if (changing.length) next = 'spec change';
+  else if (pending.length) next = 'spec 02';
   else if (stage === 'CLARIFIED') next = flowAligned ? 'spec 03' : 'spec flow-align';
   else if (stage === 'FORMALIZED') next = 'spec 04';
   else if (stage === 'STUBBED') next = 'spec 05';
@@ -119,6 +141,7 @@ function deriveModule(id, stepDirs) {
     module: id, stage, next, flowAligned,
     pending: pending.length, pendingByPriority: byPriority, parked: parked.length,
     artifacts: { features: features.map(rel), steps: steps.map(rel), locked },
+    changes: changing.map(rel),
     warnings,
   };
 }

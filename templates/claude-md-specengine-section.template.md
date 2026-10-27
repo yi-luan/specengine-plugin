@@ -33,6 +33,7 @@
 | `spec 04 [MODULE_ID]` | `spec-04-generate-test-stub` | 依 manifest 產出紅燈 Step、Driver 介面與 fixture。 |
 | `spec 05 [MODULE_ID]` | `spec-05-coder-implement` | TDD 紅轉綠；形式化錯誤自修、規格瑕疵中止；verify、lock。 |
 | `spec 06` | `spec-06-drift-audit` | lock audit、Schema 漂移、Rule 覆蓋率，漂移回寫佇列。 |
+| `spec change [MODULE_ID]` | `spec-change` | 已完工模組的需求變更：腳本分成只改參數／改行為／新增規則三級，只走該級需要的站，核准一次、重新上鎖。 |
 | `spec manifest sync` | `spec-manifest-sync` | 建立或核實 manifest 與本區塊，一次問完必填欄位。 |
 | `spec run [path] [MODULE_ID]` | `spec-run` | 以 `spec status` 判定起點，串接 01 → 02 → flow-align → 03 → 04 → 05。 |
 
@@ -55,6 +56,8 @@ BDD 三階段對應：Discovery = spec 01 + 02 + flow-align；Formulation = spec
     │   ├── parked/                         # 掛起
     │   ├── resolved/                       # 已答歸檔；resolved/fixes/ 為形式化錯誤自修紀錄
     │   ├── locks/<MODULE_ID>.lock.json     # IMPLEMENTED 證據，進 git
+    │   ├── locks/_shared.json              # 共用規格（terms、erm、policy、exclusions）雜湊，任一模組上鎖時更新，進 git
+    │   ├── changes/<MODULE_ID>/<時間>-<slug>/ # 需求變更紀錄（spec change），進 git
     │   ├── steps-index.json                # 既有句型索引，進 git
     │   └── .spec-guard-snapshot.json       # spec 05 執行時態，加入 .gitignore
     └── spec/                               # 單一真實來源，spec 05 期間凍結
@@ -79,9 +82,10 @@ BDD 三階段對應：Discovery = spec 01 + 02 + flow-align；Formulation = spec
 | `CLARIFIED` | 只有矩陣，佇列空 | flow-design 索引不存在或「未通過」→ spec flow-align；「已通過」→ spec 03 |
 | `FORMALIZED` | `.feature` 中有 `@rule:R-<ID>-` | spec 04 |
 | `STUBBED` | Step Definitions 中有 `@rule R-<ID>-` | spec 05 |
-| `IMPLEMENTED` | `locks/<ID>.lock.json` 存在 | 完工；spec 06 定期巡檢 |
+| `IMPLEMENTED` | `locks/<ID>.lock.json` 存在 | 完工；spec 06 定期巡檢；需求變更走 spec change |
+| `CHANGING` | 有 lock，且 `changes/<ID>/` 有狀態不是「已完成／已撤回」的變更 | spec change（續跑） |
 
-取最高一層存在的產物。不論階段，佇列有題就先回 spec 02。低層產物缺漏由腳本以警告回報，交人裁示。問題檔只有兩種結局：答了（`resolved/`）或掛起（`parked/`）。
+取最高一層存在的產物。除了 CHANGING（變更中的題由 spec change 在核准時一起問），不論階段，佇列有題就先回 spec 02。低層產物缺漏由腳本以警告回報，交人裁示。問題檔只有兩種結局：答了（`resolved/`）或掛起（`parked/`）。
 
 ---
 

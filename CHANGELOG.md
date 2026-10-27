@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.0-exp（實驗分支，未發布）
+
+- 新增 `spec-change` Skill 與 `scripts/spec-change.js`：已上鎖模組的需求變更依腳本分類（PARAMETER／BEHAVIOR／NEW_RULE）只走必要的站；核准經 `apply` 寫回矩陣；`close` 檢查重新上鎖且未受影響 Rule 逐字未動。
+- `spec-guard.js lock` 額外記錄行為矩陣雜湊，`audit` 一併比對；有進行中變更時在報告中註明。
+- `spec-status.js` 新增 CHANGING 階段（下一步 `spec change`），並警告「矩陣在 lock 後被改動但無變更紀錄」。
+- spec-run Step 00 與 CLAUDE.md 路由表接上 `spec change`。
+
 ## 2.0.0
 
 通用化、精簡，並明確化 Step 到產品代碼的綁定。CLAUDE.md 區塊格式與 `.feature` 的 Rule 標記形式皆有變，既有專案執行 `spec-manifest-sync` 會回報版本落差，既有 `.feature` 需把 `# @rule` 註解改為 `@rule:` tag 才能通過 lint。
