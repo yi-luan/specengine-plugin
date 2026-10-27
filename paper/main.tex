@@ -26,12 +26,12 @@
 
 \title{Constraining LLM-Assisted Behavior-Driven Development with Externally Enforced Specification Contracts: Design and Case Study of SpecEngine}
 
-% TODO(author): fill in department, university, city and e-mail before submission.
 \author{\IEEEauthorblockN{Allen Tsai}
-\IEEEauthorblockA{\textit{Department of [Department]}\\
-\textit{[University]}\\
-[City], Taiwan\\
-[e-mail]}}
+\IEEEauthorblockA{\textit{In-Service Master's Program in Artificial Intelligence and Information Systems}\\
+\textit{Department of Computer Science and Information Engineering}\\
+\textit{National Cheng Kung University}\\
+Tainan, Taiwan\\
+\href{mailto:p77151150@gs.ncku.edu.tw}{p77151150@gs.ncku.edu.tw}}}
 
 \maketitle
 
@@ -106,7 +106,7 @@ The design must balance the five forces listed in Table~\ref{tab:forces}. Curren
 \begin{table}[t]
 \caption{Forces and the Proposed Responses}\label{tab:forces}
 \centering\footnotesize
-\begin{tabularx}{\columnwidth}{@{}l>{\raggedright\arraybackslash}p{0.27\columnwidth}L@{}}
+\begin{tabularx}{\columnwidth}{@{}l>{\raggedright\arraybackslash}p{0.44\columnwidth}L@{}}
 \toprule
  & Force (conflict) & Response in SpecEngine \\
 \midrule
@@ -163,29 +163,29 @@ Module state is not a first-class entity but a function of which entities exist.
 % frozen band
 \fill[black!4,rounded corners=4pt] (24,318) rectangle (736,442);
 \draw[gray!60,rounded corners=4pt] (24,318) rectangle (736,442);
-\node[lbl,anchor=west] at (34,331) {Frozen during P6 (I1); hashed into the Lock and audited};
+\node[lbl,anchor=east] at (728,331) {Frozen during P6 (I1); hashed into the Lock and audited};
 % nodes
 \node[box,minimum width=34.2mm] at (380,80) {\textbf{Requirement}\\natural language from $S$};
 \node[box,minimum width=32.3mm] at (190,172) {\textbf{Decision}\\only $S$ answers (I4)};
 \node[box,minimum width=32.3mm] at (570,172) {\textbf{Rule}\\$\{P\}\,C\,\{Q\}$};
 \node[box,minimum width=32.3mm] at (190,262) {\textbf{Exclusion}\\no branch, no test};
 \node[frz,minimum width=41.8mm] at (190,388) {\textbf{Specification Contract}\\Gherkin, data model, glossary};
-\node[frz,minimum width=32.3mm] at (440,388) {\textbf{Step Sentence}\\Given/When/Then strings};
-\node[frz,minimum width=30.4mm] at (650,388) {\textbf{Driver Interface}\\signatures only};
-\node[free,minimum width=32.3mm] at (440,492) {Step function body\\free in P6};
-\node[free,minimum width=30.4mm] at (650,492) {Driver implementation\\in-process / UI / API};
-\node[free,minimum width=30.4mm] at (650,578) {Product code\\free in P6};
+\node[frz,minimum width=28.5mm] at (440,388) {\textbf{Step Sentence}\\Given/When/Then strings};
+\node[frz,minimum width=28.5mm] at (650,388) {\textbf{Driver Interface}\\signatures only};
+\node[free,minimum width=28.5mm] at (440,492) {Step function body\\free in P6};
+\node[free,minimum width=28.5mm] at (650,492) {Driver implementation\\in-process / UI / API};
+\node[free,minimum width=28.5mm] at (650,578) {Product code\\free in P6};
 % edges
 \draw[edge] (380,108) -- (380,126) -- (190,126) -- (190,144);
 \draw[edge] (380,108) -- (380,126) -- (570,126) -- (570,144);
 \draw[edge] (275,172) -- (485,172);
 \draw[edge] (190,200) -- (190,234);
 \draw[edge] (570,200) -- (570,304) -- (190,304) -- (190,360);
-\draw[edge] (300,388) -- (355,388);
-\draw[edge] (525,388) -- (570,388);
+\draw[edge] (300,388) -- (365,388);
+\draw[edge] (515,388) -- (575,388);
 \draw[edge,dashed] (440,416) -- (440,464);
 \draw[edge,dashed] (650,416) -- (650,464);
-\draw[edge] (525,492) -- (570,492);
+\draw[edge] (515,492) -- (575,492);
 \draw[edge,dashed] (650,520) -- (650,550);
 % labels
 \node[lbl] at (262,116) {undefined $\rightarrow$ question};
@@ -193,11 +193,11 @@ Module state is not a first-class entity but a function of which entities exist.
 \node[lbl] at (380,162) {answer written to Rule};
 \node[lbl,anchor=west] at (196,217) {deliberately not done};
 \node[lbl] at (380,294) {P4 compiles to Gherkin};
-\node[lbl] at (327,377) {key};
-\node[lbl] at (547,372) {\code{@binds}};
+\node[lbl] at (332,377) {key};
+\node[lbl] at (545,377) {\code{@binds}};
 \node[lbl,anchor=west] at (446,446) {implements};
 \node[lbl,anchor=west] at (656,446) {implements};
-\node[lbl] at (547,481) {calls};
+\node[lbl] at (545,481) {calls};
 \end{tikzpicture}
 \caption{Conceptual model. Shaded boxes are frozen during implementation and recorded in the Lock; dashed boxes may change freely.}\label{fig:model}
 \end{figure*}
@@ -457,8 +457,6 @@ What this paper puts forward is a mechanism and a testable hypothesis: for an un
 
 The plugin source code, the case-study project with all of its artifacts and the Lock file, and the \LaTeX{} source of this paper are available at \url{https://github.com/yi-luan/specengine-plugin}, tag \code{arxiv-v1}. The release described in Section~\ref{sec:method} is tag \code{v2.0.0}. The executor's per-round reports are available from the author on request.
 
-% TODO(author): confirm this disclosure. arXiv requires authors to take full
-% responsibility for the content and expects use of generative AI to be reported.
 \section*{Acknowledgment}
 
 Generative AI assistance (Claude, Anthropic) was used in drafting and translating this manuscript; the author reviewed and takes full responsibility for its content. The case study itself used Claude Code as the agent under study, as described in Section~\ref{sec:case}.
