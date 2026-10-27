@@ -1,0 +1,202 @@
+{
+  "module_id": "POINTS_REDEMPTION",
+  "module_name": "點數折抵",
+  "spec_engine_version": "2.0.0",
+  "source": "inbox/需求.md",
+  "rules": [
+    {
+      "rule_id": "R-POINTS_REDEMPTION-000",
+      "type": "happy_path",
+      "actor": "會員",
+      "pre_conditions": [
+        "會員已登入並位於結帳頁面",
+        "訂單尚未送出",
+        "訂單尚無生效中的折抵",
+        "會員點數餘額 >= 欲折抵點數",
+        "欲折抵點數 <= 訂單金額",
+        "欲折抵點數為正整數"
+      ],
+      "trigger_event": "會員輸入欲折抵點數並確認折抵",
+      "post_assertions": [
+        "會員點數餘額減少等同折抵點數的數值",
+        "訂單應付金額減少等同折抵點數的數值（1 點折 1 元）",
+        "訂單記錄本次折抵點數",
+        "扣點與減價在同一交易（Transaction）內完成"
+      ],
+      "resolved_by": ".specengine/sdd/resolved/features/點數折抵_重複折抵同一訂單.md；.specengine/sdd/resolved/features/點數折抵_扣點與減價的原子性.md"
+    },
+    {
+      "rule_id": "R-POINTS_REDEMPTION-001",
+      "type": "constraint",
+      "actor": "會員",
+      "pre_conditions": [
+        "會員位於結帳頁面",
+        "訂單尚未送出",
+        "欲折抵點數 <= 會員目前點數餘額",
+        "欲折抵點數 > 訂單金額"
+      ],
+      "trigger_event": "會員輸入欲折抵點數並確認折抵",
+      "post_assertions": [
+        "折抵被拒絕，回報錯誤訊息「折抵點數超過訂單金額」",
+        "會員點數餘額不變",
+        "訂單應付金額不變"
+      ],
+      "resolved_by": ".specengine/sdd/resolved/features/點數折抵_超過上限時的系統反應.md"
+    },
+    {
+      "rule_id": "R-POINTS_REDEMPTION-002",
+      "type": "constraint",
+      "actor": "會員",
+      "pre_conditions": [
+        "會員位於結帳頁面",
+        "訂單尚未送出",
+        "欲折抵點數 > 會員目前點數餘額（不論是否同時超過訂單金額；兩者皆超過時以餘額為準）"
+      ],
+      "trigger_event": "會員輸入欲折抵點數並確認折抵",
+      "post_assertions": [
+        "折抵被拒絕，回報錯誤訊息「折抵點數超過餘額」",
+        "會員點數餘額不變",
+        "訂單應付金額不變"
+      ],
+      "resolved_by": ".specengine/sdd/resolved/features/點數折抵_超過上限時的系統反應.md"
+    },
+    {
+      "rule_id": "R-POINTS_REDEMPTION-003",
+      "type": "boundary",
+      "actor": "會員",
+      "pre_conditions": [
+        "會員位於結帳頁面",
+        "訂單尚未送出",
+        "欲折抵點數「剛好等於」可折抵上限；上限 = 可用餘額與訂單金額取較小者",
+        "可用餘額：首次折抵時為會員目前點數餘額；重複折抵（R-006）時為退回舊折抵後的餘額"
+      ],
+      "trigger_event": "會員輸入欲折抵點數並確認折抵",
+      "post_assertions": [
+        "折抵成功（「不能超過」意指等於上限可接受），首次折抵與重複折抵皆適用",
+        "會員點數餘額減少等同折抵點數（重複折抵時為淨變動）",
+        "訂單應付金額減少等同折抵點數（可降為 0）"
+      ],
+      "resolved_by": ".specengine/sdd/resolved/features/點數折抵_重複折抵時剛好等於上限.md"
+    },
+    {
+      "rule_id": "R-POINTS_REDEMPTION-004",
+      "type": "happy_path",
+      "actor": "會員",
+      "pre_conditions": [
+        "訂單已有一筆生效中的折抵",
+        "訂單尚未送出"
+      ],
+      "trigger_event": "會員取消折抵（整筆取消，不可指定點數）",
+      "post_assertions": [
+        "已扣除的點數全數退回會員點數餘額",
+        "訂單應付金額恢復為折抵前金額（= 訂單金額）",
+        "訂單不再記錄生效中的折抵",
+        "不提供部分取消；要改折抵點數一律重新折抵以新換舊（R-006）"
+      ],
+      "resolved_by": ".specengine/sdd/resolved/features/點數折抵_部分取消.md"
+    },
+    {
+      "rule_id": "R-POINTS_REDEMPTION-005",
+      "type": "constraint",
+      "actor": "會員",
+      "pre_conditions": [
+        "訂單已有一筆生效中的折抵",
+        "訂單已送出"
+      ],
+      "trigger_event": "會員取消折抵",
+      "post_assertions": [
+        "取消折抵被拒絕，回報錯誤訊息「訂單已送出，無法取消折抵」",
+        "會員點數餘額不變",
+        "訂單應付金額不變"
+      ],
+      "resolved_by": ".specengine/sdd/resolved/features/點數折抵_非預期狀態下取消.md"
+    },
+    {
+      "rule_id": "R-POINTS_REDEMPTION-006",
+      "type": "happy_path",
+      "actor": "會員",
+      "pre_conditions": [
+        "訂單尚未送出",
+        "訂單已有一筆生效中的折抵",
+        "新的欲折抵點數為正整數",
+        "新的欲折抵點數 <= 訂單金額",
+        "新的欲折抵點數 <= 退回舊折抵後的會員點數餘額"
+      ],
+      "trigger_event": "會員再次輸入欲折抵點數並確認折抵（含快速連點）",
+      "post_assertions": [
+        "舊折抵自動取消：舊折抵點數退回會員點數餘額",
+        "新折抵生效：扣除新折抵點數",
+        "訂單只記錄最新一筆折抵，應付金額 = 訂單金額 - 新折抵點數",
+        "上限檢查（R-001／R-002）以退回舊折抵後的餘額為準；新折抵點數剛好等於上限時可折（R-003）"
+      ],
+      "resolved_by": ".specengine/sdd/resolved/features/點數折抵_重複折抵同一訂單.md；.specengine/sdd/resolved/features/點數折抵_重複折抵時剛好等於上限.md"
+    },
+    {
+      "rule_id": "R-POINTS_REDEMPTION-007",
+      "type": "error_recovery",
+      "actor": "系統",
+      "pre_conditions": [
+        "會員發起一筆原本符合條件的折抵",
+        "扣點或減價其中一步在寫入時失敗"
+      ],
+      "trigger_event": "折抵交易中任一步寫入失敗",
+      "post_assertions": [
+        "整筆交易回滾：會員點數餘額不變",
+        "訂單應付金額不變，訂單不記錄折抵",
+        "對會員回報「折抵失敗」"
+      ],
+      "resolved_by": ".specengine/sdd/resolved/features/點數折抵_扣點與減價的原子性.md"
+    },
+    {
+      "rule_id": "R-POINTS_REDEMPTION-008",
+      "type": "validation",
+      "actor": "會員",
+      "pre_conditions": [
+        "會員位於結帳頁面",
+        "訂單尚未送出",
+        "欲折抵點數為 0 或空白"
+      ],
+      "trigger_event": "會員確認折抵",
+      "post_assertions": [
+        "折抵被拒絕，回報錯誤訊息「折抵點數必須大於 0」",
+        "會員點數餘額不變",
+        "訂單應付金額不變",
+        "訂單既有折抵（若有）不受影響"
+      ],
+      "resolved_by": ".specengine/sdd/resolved/features/點數折抵_折抵零點.md"
+    },
+    {
+      "rule_id": "R-POINTS_REDEMPTION-009",
+      "type": "known_tradeoff",
+      "actor": "系統",
+      "pre_conditions": [
+        "訂單已有一筆生效中的折抵",
+        "訂單尚未送出",
+        "會員離開結帳頁面、逾時或未再操作"
+      ],
+      "trigger_event": "時間經過／會員離開（無任何會員主動操作）",
+      "post_assertions": [
+        "系統不自動退回點數：會員點數餘額維持扣除後的數值",
+        "訂單應付金額與折抵記錄維持不變",
+        "直到會員回來取消折抵（R-004）或送出訂單為止"
+      ],
+      "resolved_by": ".specengine/sdd/resolved/features/點數折抵_未結帳離開時的點數處置.md"
+    },
+    {
+      "rule_id": "R-POINTS_REDEMPTION-010",
+      "type": "validation",
+      "actor": "會員",
+      "pre_conditions": [
+        "訂單尚未送出",
+        "訂單沒有任何生效中的折抵"
+      ],
+      "trigger_event": "會員取消折抵",
+      "post_assertions": [
+        "取消折抵被拒絕，回報錯誤訊息「沒有可取消的折抵」",
+        "會員點數餘額不變",
+        "訂單應付金額不變"
+      ],
+      "resolved_by": ".specengine/sdd/resolved/features/點數折抵_非預期狀態下取消.md"
+    }
+  ]
+}

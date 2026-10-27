@@ -1,0 +1,74 @@
+{
+  "折抵交易寫入時將發生失敗": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/點數折抵.feature"
+    ]
+  },
+  "會員取消折抵": {
+    "count": 3,
+    "files": [
+      ".specengine/spec/features/點數折抵.feature"
+    ]
+  },
+  "會員已成功折抵 {string} 點": {
+    "count": 7,
+    "files": [
+      ".specengine/spec/features/點數折抵.feature"
+    ]
+  },
+  "會員輸入折抵點數 {string}": {
+    "count": 10,
+    "files": [
+      ".specengine/spec/features/點數折抵.feature"
+    ]
+  },
+  "會員離開結帳頁面且逾時": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/點數折抵.feature"
+    ]
+  },
+  "會員點數餘額應為 {string}": {
+    "count": 14,
+    "files": [
+      ".specengine/spec/features/點數折抵.feature"
+    ]
+  },
+  "會員點數餘額為 {string}": {
+    "count": 14,
+    "files": [
+      ".specengine/spec/features/點數折抵.feature"
+    ]
+  },
+  "系統回傳結果 {string}": {
+    "count": 13,
+    "files": [
+      ".specengine/spec/features/點數折抵.feature"
+    ]
+  },
+  "訂單上的折抵點數應為 {string}": {
+    "count": 14,
+    "files": [
+      ".specengine/spec/features/點數折抵.feature"
+    ]
+  },
+  "訂單已送出": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/點數折抵.feature"
+    ]
+  },
+  "訂單應付金額應為 {string}": {
+    "count": 14,
+    "files": [
+      ".specengine/spec/features/點數折抵.feature"
+    ]
+  },
+  "訂單金額為 {string}": {
+    "count": 14,
+    "files": [
+      ".specengine/spec/features/點數折抵.feature"
+    ]
+  }
+}

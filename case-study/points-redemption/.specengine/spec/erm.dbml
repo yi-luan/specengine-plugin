@@ -1,0 +1,21 @@
+// SpecEngine erm.dbml — 跨模組共用，增量擴充
+// 命名：manifest 第 3 節「Database Tables & Columns」仍為〔待確認〕，本草稿暫採 snake_case，待 manifest 確認後對齊。
+// 模組 POINTS_REDEMPTION（點數折抵）Schema
+// 決策：金額與點數皆為整數（新台幣整數元，1 點 = 1 元，無取整問題）— resolved/data/Order_金額與點數的數值型別.md
+// 決策：不建立點數流水表（point_transactions），只維護當前餘額與訂單上的折抵點數，取消後不留痕 — resolved/data/PointTransaction_是否保留折抵歷史.md
+
+Table members {
+  id int [pk, note: '會員識別碼']
+  points_balance int [not null, default: 0, note: '會員目前可用點數餘額（整數點），必須 >= 0；1 點折 1 元']
+}
+
+Table orders {
+  id int [pk, note: '訂單識別碼']
+  member_id int [not null, note: '下單會員，對應 members.id']
+  total_amount int [not null, note: '訂單原始金額（折抵前，新台幣整數元），必須 >= 0']
+  redeemed_points int [not null, default: 0, note: '目前生效中的折抵點數（整數點），必須 >= 0 且 <= total_amount；0 表示無折抵。一張訂單同時只有一筆折抵，再次折抵以新換舊（決策：resolved/features/點數折抵_重複折抵同一訂單.md）']
+  payable_amount int [not null, note: '應付金額（新台幣整數元）= total_amount - redeemed_points，必須 >= 0']
+  status varchar [not null, note: '狀態: 未送出 | 已送出（需求僅涉及此兩態）；取消折抵僅限未送出，已送出時拒絕；未送出期間不因逾時或離開自動退點（決策：resolved/features/點數折抵_未結帳離開時的點數處置.md）']
+}
+
+Ref: orders.member_id > members.id

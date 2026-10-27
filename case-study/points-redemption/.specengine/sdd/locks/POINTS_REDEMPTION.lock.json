@@ -1,0 +1,26 @@
+{
+  "module": "POINTS_REDEMPTION",
+  "lockedAt": "2026-10-17T16:42:39.816Z",
+  "features": {
+    ".specengine/spec/features/點數折抵.feature": "f3eea928459a36f1ca75113fb787517ec6a615c6d22986fcb2dc8b414eca6e45"
+  },
+  "stepSignatures": {
+    "tests/steps/points-redemption.steps.js": [
+      "Given::折抵交易寫入時將發生失敗",
+      "Given::會員已成功折抵 {string} 點",
+      "Given::會員點數餘額為 {string}",
+      "Given::訂單已送出",
+      "Given::訂單金額為 {string}",
+      "Then::會員點數餘額應為 {string}",
+      "Then::系統回傳結果 {string}",
+      "Then::訂單上的折抵點數應為 {string}",
+      "Then::訂單應付金額應為 {string}",
+      "When::會員取消折抵",
+      "When::會員輸入折抵點數 {string}",
+      "When::會員離開結帳頁面且逾時"
+    ]
+  },
+  "driverInterfaces": {
+    "tests/drivers/points-redemption.driver.js": "3997d059652488053c4416b43c82ffce03372ce2b828328ceb6d3e5305eab564"
+  }
+}

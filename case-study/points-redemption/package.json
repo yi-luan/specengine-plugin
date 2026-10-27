@@ -1,0 +1,12 @@
+{
+  "name": "demo-points",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "cucumber-js --config cucumber.js"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^13.3.0"
+  }
+}
