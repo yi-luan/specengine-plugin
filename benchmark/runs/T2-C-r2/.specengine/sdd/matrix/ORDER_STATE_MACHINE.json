@@ -1,0 +1,320 @@
+{
+  "spec_engine_version": "2.0.0",
+  "rules": [
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-000",
+      "type": "main_flow",
+      "actor": "客戶",
+      "pre_conditions": [
+        "訂單金額 > 0（整數元）"
+      ],
+      "trigger_event": "建立訂單 createOrder(id, amount)",
+      "post_assertions": [
+        "回傳 ok=true 與新訂單",
+        "訂單 id 與傳入相同",
+        "訂單狀態為 CREATED（已建立）",
+        "訂單金額 amount 等於傳入金額",
+        "已付金額 paidAmount = 0",
+        "累計退款金額 refundedAmount = 0"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-001",
+      "type": "edge_case",
+      "actor": "客戶",
+      "pre_conditions": [
+        "訂單金額 ≤ 0"
+      ],
+      "trigger_event": "建立訂單 createOrder(id, amount)",
+      "post_assertions": [
+        "回傳 ok=false，reason = INVALID_AMOUNT",
+        "不產生訂單"
+      ],
+      "resolved_by": "resolved/features/訂單狀態機_失敗原因格式與多重錯誤優先序.md"
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-002",
+      "type": "edge_case",
+      "actor": "客戶",
+      "pre_conditions": [
+        "訂單狀態為 CREATED（已建立）",
+        "付款金額等於訂單金額"
+      ],
+      "trigger_event": "付款 pay(order, amount)",
+      "post_assertions": [
+        "回傳 ok=true 與更新後的新訂單物件",
+        "訂單狀態為 PAID（已付款）",
+        "已付金額 paidAmount 等於訂單金額",
+        "傳入的 order 不被修改（純函式）"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-003",
+      "type": "edge_case",
+      "actor": "客戶",
+      "pre_conditions": [
+        "訂單狀態為 CREATED（已建立）",
+        "付款金額 > 0 且不等於訂單金額（少付或多付皆是；不允許部分付款）"
+      ],
+      "trigger_event": "付款 pay(order, amount)",
+      "post_assertions": [
+        "回傳 ok=false，reason = AMOUNT_MISMATCH",
+        "傳入的 order 不被修改（純函式）"
+      ],
+      "resolved_by": [
+        "resolved/features/訂單狀態機_失敗原因格式與多重錯誤優先序.md",
+        "resolved/features/訂單狀態機_付款金額不符的處理.md",
+        "resolved/features/訂單狀態機_付款金額為零或負數的失敗代碼.md"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-004",
+      "type": "edge_case",
+      "actor": "商家",
+      "pre_conditions": [
+        "訂單狀態為 PAID（已付款）"
+      ],
+      "trigger_event": "出貨 ship(order)",
+      "post_assertions": [
+        "回傳 ok=true 與更新後的新訂單物件",
+        "訂單狀態為 SHIPPED（已出貨）",
+        "paidAmount 與 refundedAmount 不變",
+        "傳入的 order 不被修改（純函式）"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-005",
+      "type": "edge_case",
+      "actor": "客戶",
+      "pre_conditions": [
+        "訂單狀態為 CREATED（已建立）"
+      ],
+      "trigger_event": "取消 cancel(order)",
+      "post_assertions": [
+        "回傳 ok=true 與更新後的新訂單物件",
+        "訂單狀態為 CANCELLED（已取消）",
+        "已付金額 paidAmount = 0",
+        "累計退款金額 refundedAmount = 0",
+        "傳入的 order 不被修改（純函式）"
+      ],
+      "resolved_by": "resolved/features/訂單狀態機_已建立訂單取消後的金額欄位.md"
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-006",
+      "type": "edge_case",
+      "actor": "客戶",
+      "pre_conditions": [
+        "訂單狀態為 PAID（已付款）"
+      ],
+      "trigger_event": "取消 cancel(order)",
+      "post_assertions": [
+        "回傳 ok=true 與更新後的新訂單物件",
+        "訂單狀態為 CANCELLED（已取消）",
+        "系統退還全部已付金額：累計退款金額 refundedAmount = 已付金額 paidAmount",
+        "已付金額 paidAmount 維持不變",
+        "傳入的 order 不被修改（純函式）"
+      ],
+      "resolved_by": "resolved/features/訂單狀態機_已付款訂單取消退還後的狀態與累計退款金額.md"
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-007",
+      "type": "edge_case",
+      "actor": "客戶",
+      "pre_conditions": [
+        "訂單狀態為 SHIPPED（已出貨）",
+        "累計退款金額 + 本次退款金額 < 已付金額"
+      ],
+      "trigger_event": "申請退款 refund(order, amount)",
+      "post_assertions": [
+        "回傳 ok=true 與更新後的新訂單物件",
+        "訂單狀態維持 SHIPPED（已出貨）",
+        "累計退款金額 refundedAmount 累加本次退款金額",
+        "傳入的 order 不被修改（純函式）"
+      ],
+      "resolved_by": "resolved/features/訂單狀態機_部分退款後的訂單狀態.md"
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-008",
+      "type": "edge_case",
+      "actor": "客戶",
+      "pre_conditions": [
+        "訂單狀態為 SHIPPED（已出貨）",
+        "累計退款金額 + 本次退款金額 > 已付金額"
+      ],
+      "trigger_event": "申請退款 refund(order, amount)",
+      "post_assertions": [
+        "回傳 ok=false，reason = REFUND_EXCEEDS_PAID（整筆拒絕，不截斷至剩餘可退金額）",
+        "累計退款金額 refundedAmount 不變",
+        "傳入的 order 不被修改（純函式）"
+      ],
+      "resolved_by": [
+        "resolved/features/訂單狀態機_失敗原因格式與多重錯誤優先序.md",
+        "resolved/features/訂單狀態機_單次退款超過剩餘可退金額的反應.md"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-009",
+      "type": "edge_case",
+      "actor": "客戶",
+      "pre_conditions": [
+        "訂單狀態為 SHIPPED（已出貨）",
+        "累計退款金額 + 本次退款金額 = 已付金額（可為多次退款累計達到）"
+      ],
+      "trigger_event": "申請退款 refund(order, amount)",
+      "post_assertions": [
+        "回傳 ok=true 與更新後的新訂單物件",
+        "累計退款金額 refundedAmount 等於已付金額 paidAmount",
+        "訂單狀態為 REFUNDED（已退款）",
+        "傳入的 order 不被修改（純函式）"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-010",
+      "type": "edge_case",
+      "actor": "客戶",
+      "pre_conditions": [
+        "訂單目前狀態不允許該操作",
+        "且傳入金額同時不合法或不符（例如已取消的訂單以不等於訂單金額的金額付款）"
+      ],
+      "trigger_event": "任一操作 pay／ship／cancel／refund",
+      "post_assertions": [
+        "回傳 ok=false，reason = INVALID_TRANSITION（檢查順序：先狀態 → 再金額合法性 → 再金額比對，只回報第一個命中的代碼）",
+        "傳入的 order 不被修改（純函式）"
+      ],
+      "resolved_by": "resolved/features/訂單狀態機_失敗原因格式與多重錯誤優先序.md"
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-011",
+      "type": "edge_case",
+      "actor": "客戶／商家",
+      "pre_conditions": [
+        "訂單狀態為 CANCELLED（已取消）"
+      ],
+      "trigger_event": "付款 pay／出貨 ship／申請退款 refund／取消 cancel（任一）",
+      "post_assertions": [
+        "回傳 ok=false，reason = INVALID_TRANSITION",
+        "訂單狀態維持 CANCELLED，各金額欄位不變",
+        "傳入的 order 不被修改（純函式）"
+      ],
+      "resolved_by": "resolved/features/訂單狀態機_已取消訂單的後續操作.md"
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-012",
+      "type": "edge_case",
+      "actor": "客戶／商家",
+      "pre_conditions": [
+        "訂單狀態為 REFUNDED（已退款）"
+      ],
+      "trigger_event": "申請退款 refund／出貨 ship／取消 cancel／付款 pay（任一）",
+      "post_assertions": [
+        "回傳 ok=false，reason = INVALID_TRANSITION",
+        "訂單狀態維持 REFUNDED，各金額欄位不變",
+        "傳入的 order 不被修改（純函式）"
+      ],
+      "resolved_by": "resolved/features/訂單狀態機_已退款訂單的後續操作.md"
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-013",
+      "type": "edge_case",
+      "actor": "客戶",
+      "pre_conditions": [
+        "訂單狀態為 PAID（已付款，尚未出貨）"
+      ],
+      "trigger_event": "申請退款 refund(order, amount)",
+      "post_assertions": [
+        "回傳 ok=false，reason = INVALID_TRANSITION（要退錢須走取消）",
+        "傳入的 order 不被修改（純函式）"
+      ],
+      "resolved_by": "resolved/features/訂單狀態機_已付款未出貨訂單能否直接退款.md"
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-014",
+      "type": "edge_case",
+      "actor": "客戶",
+      "pre_conditions": [
+        "訂單狀態為 SHIPPED（已出貨）",
+        "本次退款金額 ≤ 0"
+      ],
+      "trigger_event": "申請退款 refund(order, amount)",
+      "post_assertions": [
+        "回傳 ok=false，reason = INVALID_AMOUNT",
+        "累計退款金額 refundedAmount 不變",
+        "傳入的 order 不被修改（純函式）"
+      ],
+      "resolved_by": "resolved/features/訂單狀態機_退款金額為零或負數.md"
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-015",
+      "type": "edge_case",
+      "actor": "客戶",
+      "pre_conditions": [
+        "訂單狀態為 SHIPPED（已出貨）"
+      ],
+      "trigger_event": "取消 cancel(order)",
+      "post_assertions": [
+        "回傳 ok=false，reason = INVALID_TRANSITION",
+        "傳入的 order 不被修改（純函式）"
+      ],
+      "resolved_by": "resolved/features/訂單狀態機_已出貨訂單能否取消.md"
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-016",
+      "type": "edge_case",
+      "actor": "商家",
+      "pre_conditions": [
+        "訂單狀態為 CREATED（已建立，尚未付款）"
+      ],
+      "trigger_event": "出貨 ship(order)",
+      "post_assertions": [
+        "回傳 ok=false，reason = INVALID_TRANSITION",
+        "傳入的 order 不被修改（純函式）"
+      ],
+      "resolved_by": "resolved/features/訂單狀態機_已建立訂單能否出貨.md"
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-017",
+      "type": "edge_case",
+      "actor": "客戶／商家",
+      "pre_conditions": [
+        "重複觸發同一動作：訂單狀態為 PAID（已付款）時再付款，或狀態為 SHIPPED（已出貨）時再出貨"
+      ],
+      "trigger_event": "付款 pay(order, amount)／出貨 ship(order)",
+      "post_assertions": [
+        "回傳 ok=false，reason = INVALID_TRANSITION（不視為冪等成功）",
+        "訂單狀態與各金額欄位不變",
+        "傳入的 order 不被修改（純函式）"
+      ],
+      "resolved_by": "resolved/features/訂單狀態機_重複操作的處理.md"
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-018",
+      "type": "edge_case",
+      "actor": "客戶／商家",
+      "pre_conditions": [
+        "狀態×操作組合未在本矩陣明列為允許（例如：狀態為 CREATED 時申請退款、狀態為 SHIPPED 時付款）"
+      ],
+      "trigger_event": "付款 pay／出貨 ship／取消 cancel／申請退款 refund（任一）",
+      "post_assertions": [
+        "回傳 ok=false，reason = INVALID_TRANSITION（通則：凡未明列為允許的狀態×操作一律視為狀態不允許）",
+        "訂單狀態與各金額欄位不變",
+        "傳入的 order 不被修改（純函式）"
+      ],
+      "resolved_by": "resolved/features/訂單狀態機_矩陣未列的狀態與操作組合.md"
+    },
+    {
+      "rule_id": "R-ORDER_STATE_MACHINE-019",
+      "type": "edge_case",
+      "actor": "客戶",
+      "pre_conditions": [
+        "訂單狀態為 CREATED（已建立）",
+        "付款金額 ≤ 0"
+      ],
+      "trigger_event": "付款 pay(order, amount)",
+      "post_assertions": [
+        "回傳 ok=false，reason = INVALID_AMOUNT（金額合法性檢查先於金額比對）",
+        "傳入的 order 不被修改（純函式）"
+      ],
+      "resolved_by": "resolved/features/訂單狀態機_付款金額為零或負數的失敗代碼.md"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+
+a4a6383 2026-10-20 15:41:08 +0800 T3-B-r3 done
+
+ .gitignore                                         |   4 +
+ .specify/memory/constitution.md                    |  89 ++++---
+ BENCH-LOG.md                                       |  94 ++++++++
+ .../checklists/requirements.md                     |  36 +++
+ .../contracts/apply-coupons.md                     |  35 +++
+ specs/001-multi-tenant-coupons/data-model.md       |  43 ++++
+ specs/001-multi-tenant-coupons/plan.md             |  84 +++++++
+ specs/001-multi-tenant-coupons/quickstart.md       |  19 ++
+ specs/001-multi-tenant-coupons/research.md         |  41 ++++
+ specs/001-multi-tenant-coupons/spec.md             | 142 +++++++++++
+ specs/001-multi-tenant-coupons/tasks.md            | 107 +++++++++
+ src/coupon.ts                                      | 124 ++++++++++
+ src/index.ts                                       |   2 +-
+ tests/features/us1-single-coupon.feature           |  57 +++++
+ tests/features/us2-validation.feature              | 265 +++++++++++++++++++++
+ tests/features/us3-stacking.feature                |  92 +++++++
+ tests/steps/coupon.steps.ts                        | 107 +++++++++
+ 17 files changed, 1305 insertions(+), 36 deletions(-)
+
+a821c55 2026-10-20 02:42:33 +0800 spec-kit init
+
+ .claude/skills/speckit-analyze/SKILL.md            | 262 +++++++
+ .claude/skills/speckit-checklist/SKILL.md          | 386 ++++++++++
+ .claude/skills/speckit-clarify/SKILL.md            | 294 ++++++++
+ .claude/skills/speckit-constitution/SKILL.md       | 182 +++++
+ .claude/skills/speckit-converge/SKILL.md           | 285 ++++++++
+ .claude/skills/speckit-implement/SKILL.md          | 229 ++++++
+ .claude/skills/speckit-plan/SKILL.md               | 169 +++++
+ .claude/skills/speckit-specify/SKILL.md            | 348 +++++++++
+ .claude/skills/speckit-tasks/SKILL.md              | 218 ++++++
+ .claude/skills/speckit-taskstoissues/SKILL.md      | 120 +++
+ .specify/.gitignore                                |  14 +
+ .specify/init-options.json                         |  10 +
+ .specify/integration.json                          |  15 +
+ .specify/integrations/claude.manifest.json         |  17 +
+ .specify/integrations/speckit.manifest.json        |  19 +
+ .specify/memory/.constitution-template.json        |   4 +
+ .specify/memory/constitution.md                    |  50 ++
+ .../scripts/powershell/check-prerequisites.ps1     | 194 +++++
+ .specify/scripts/powershell/common.ps1             | 813 +++++++++++++++++++++
+ .specify/scripts/powershell/create-new-feature.ps1 | 357 +++++++++
+ .specify/scripts/powershell/resolve-template.ps1   |  38 +
+ .specify/scripts/powershell/setup-plan.ps1         |  90 +++
+ .specify/scripts/powershell/setup-tasks.ps1        |  93 +++
+ .specify/templates/checklist-template.md           |  45 ++
+ .specify/templates/constitution-template.md        |  50 ++
+ .specify/templates/plan-template.md                | 113 +++
+ .specify/templates/spec-template.md                | 131 ++++
+ .specify/templates/tasks-template.md               | 252 +++++++
+ .specify/workflows/speckit/workflow.yml            |  74 ++
+ .specify/workflows/workflow-registry.json          |  13 +
+ 30 files changed, 4885 insertions(+)
+
+849a03d 2026-10-20 02:39:53 +0800 base v2: node24 tsx import
+
+ README.md    | 2 +-
+ cucumber.cjs | 4 +---
+ package.json | 2 +-
+ 3 files changed, 3 insertions(+), 5 deletions(-)
+
+3a2dc64 2026-10-20 01:58:10 +0800 bench base
+
+ .gitignore        |    3 +
+ README.md         |    3 +
+ cucumber.cjs      |    9 +
+ package-lock.json | 2317 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json      |   16 +
+ src/index.ts      |    2 +
+ tsconfig.json     |   13 +
+ 7 files changed, 2363 insertions(+)

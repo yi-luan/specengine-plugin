@@ -1,0 +1,32 @@
+// 命名慣例待 manifest 核實，目前暫採 snake_case
+// 本模組 applyCoupons 為純函式、不碰資料庫（見 exclusions.md X-MULTI_TENANT_COUPON-001）；
+// 本檔描述的是領域資料模型（Coupon 型別與租戶、訂單的關聯），供型別與不變式對照。
+
+Table tenants {
+  id varchar [pk, note: "租戶識別碼（對應 tenantId）"]
+}
+
+Table coupons {
+  id int [pk, increment, note: "優惠券流水號"]
+  tenant_id varchar [not null, note: "所屬租戶（對應 tenantId）；優惠券只能用在同一租戶的訂單"]
+  code varchar [not null, note: "優惠券代碼；同一租戶內唯一"]
+  type varchar [not null, note: "折扣類型: PERCENT | FIXED"]
+  value int [not null, note: "PERCENT 為折扣百分比，必須為 1～100 的整數；FIXED 為折扣金額（整數元），必須 > 0；違反時 INVALID_COUPON"]
+  valid_from timestamp [not null, note: "有效期間起（ISO 8601，含頭），必須 <= valid_to；無法解析或晚於 valid_to 時 INVALID_COUPON"]
+  valid_to timestamp [not null, note: "有效期間迄（ISO 8601，含尾）；無法解析時 INVALID_COUPON"]
+  stackable boolean [not null, note: "是否可疊加；false 時一張訂單只能用一張，且不得與可疊加券混用"]
+  min_order_amount int [null, note: "最低消費金額（整數元），必須 >= 0 且為整數，0 等同無門檻；NULL 表示無限制；負數或非整數時 INVALID_COUPON"]
+
+  indexes {
+    (tenant_id, code) [unique, note: "同一租戶內優惠券代碼唯一"]
+  }
+}
+
+Table orders {
+  id int [pk, increment, note: "訂單流水號"]
+  tenant_id varchar [not null, note: "訂單所屬租戶（對應 tenantId）"]
+  amount int [not null, note: "訂單金額（折扣前，整數元），必須 > 0 且為整數；違反時 INVALID_INPUT"]
+}
+
+Ref: coupons.tenant_id > tenants.id
+Ref: orders.tenant_id > tenants.id

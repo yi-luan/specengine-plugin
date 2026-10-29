@@ -1,0 +1,18 @@
+// 命名慣例待 manifest 核實，目前暫採 snake_case
+// 本模組（POINTS_REDEMPTION）依需求為純函式、不碰資料庫；以下僅為需求中出現的概念實體草稿，
+// 供術語對照與日後持久化模組參照，本模組不負責其讀寫。
+
+Table member {
+  id int [pk, note: "會員識別碼"]
+  points_balance int [note: "點數餘額，整數點，必須 >= 0 且為整數（負數或非整數為非法輸入，INVALID_INPUT），1 點可折抵 1 元；折抵成功後須扣掉本次使用的點數"]
+}
+
+Table order {
+  id int [pk, note: "訂單識別碼"]
+  member_id int [note: "下單會員"]
+  order_amount int [note: "訂單金額，整數元，必須 > 0 且為整數（0、負數或非整數為非法輸入，INVALID_INPUT）"]
+  points_used int [note: "本次折抵使用的點數，必須是整數且 >= 0，不得超過 member.points_balance，且不得超過折抵上限 floor(order_amount * 0.3)"]
+  final_amount int [note: "折抵後的應付金額，整數元 = order_amount − points_used"]
+}
+
+Ref: order.member_id > member.id

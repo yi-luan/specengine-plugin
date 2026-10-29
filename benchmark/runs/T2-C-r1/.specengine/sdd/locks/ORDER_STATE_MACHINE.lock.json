@@ -1,0 +1,28 @@
+{
+  "module": "ORDER_STATE_MACHINE",
+  "lockedAt": "2026-10-19T23:40:59.697Z",
+  "lockedAtLocal": "2026-10-20 07:40",
+  "features": {
+    ".specengine/spec/features/訂單狀態機.feature": "d4e372f4c2dec8b76eaf2c82c0e1393de249bde49294136bc8d8449e5f4783cd"
+  },
+  "stepSignatures": {
+    "tests/steps/order-state-machine.steps.ts": [
+      "Given::一筆狀態為 {string} 的訂單，訂單金額為 {string}、已付金額為 {string}、累計退款金額為 {string}",
+      "Then::傳入的訂單內容與呼叫前相同",
+      "Then::回傳的訂單不是傳入的同一個物件",
+      "Then::回傳訂單的已付金額為 {string}",
+      "Then::回傳訂單的狀態為 {string}",
+      "Then::回傳訂單的累計退款金額為 {string}",
+      "Then::回傳訂單的訂單金額為 {string}",
+      "Then::操作失敗，失敗原因為 {string}",
+      "Then::操作成功",
+      "When::操作者付款 {string}",
+      "When::操作者出貨",
+      "When::操作者取消訂單",
+      "When::操作者對訂單執行 {string} 操作，金額 {string}",
+      "When::操作者建立訂單，識別字 {string}、金額 {string}",
+      "When::操作者退款 {string}"
+    ]
+  },
+  "driverInterfaces": {}
+}

@@ -1,0 +1,50 @@
+{
+  "剩餘點數為 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/會員點數折抵.feature"
+    ]
+  },
+  "失敗原因為 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/會員點數折抵.feature"
+    ]
+  },
+  "應付金額為 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/會員點數折抵.feature"
+    ]
+  },
+  "折抵結果為 {string}": {
+    "count": 5,
+    "files": [
+      ".specengine/spec/features/會員點數折抵.feature"
+    ]
+  },
+  "會員輸入折抵點數 {string}": {
+    "count": 5,
+    "files": [
+      ".specengine/spec/features/會員點數折抵.feature"
+    ]
+  },
+  "會員點數餘額為 {string}": {
+    "count": 5,
+    "files": [
+      ".specengine/spec/features/會員點數折抵.feature"
+    ]
+  },
+  "訂單金額為 {string}": {
+    "count": 5,
+    "files": [
+      ".specengine/spec/features/會員點數折抵.feature"
+    ]
+  },
+  "點數餘額維持 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/會員點數折抵.feature"
+    ]
+  }
+}

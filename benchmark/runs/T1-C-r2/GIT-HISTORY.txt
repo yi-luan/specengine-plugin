@@ -1,0 +1,44 @@
+
+d0ed2b9 2026-10-20 02:19:27 +0800 C-r2 done
+
+ .claude/spec/architecture-manifest.md              |  78 ++++++++
+ .specengine/sdd/flow-design/POINTS_REDEMPTION.md   |  12 ++
+ ...211\215\347\275\256\346\252\242\346\237\245.md" |  36 ++++
+ ...265\220\346\236\234\345\233\236\345\202\263.md" |  23 +++
+ .specengine/sdd/locks/POINTS_REDEMPTION.lock.json  |  21 +++
+ .specengine/sdd/matrix/POINTS_REDEMPTION.json      | 112 +++++++++++
+ .specengine/sdd/overview.md                        |   5 +
+ .specengine/sdd/overview/POINTS_REDEMPTION.md      |  31 +++
+ ...260\217\346\225\270\345\217\226\346\215\250.md" |  31 +++
+ ...233\236\345\240\261\351\240\206\345\272\217.md" |  31 +++
+ ...273\236\347\232\204\350\231\225\347\220\206.md" |  31 +++
+ ...225\270\347\232\204\350\231\225\347\220\206.md" |  31 +++
+ ...200\274\347\232\204\350\231\225\347\220\206.md" |  31 +++
+ ...220\206\350\210\207\346\226\207\346\241\210.md" |  31 +++
+ ...207\211\350\210\207\346\226\207\346\241\210.md" |  31 +++
+ ...263\273\347\265\261\345\217\215\346\207\211.md" |  31 +++
+ .specengine/sdd/steps-index.json                   |  50 +++++
+ .specengine/spec/erm.dbml                          |  18 ++
+ .specengine/spec/exclusions.md                     |   5 +
+ ...36\346\225\270\346\212\230\346\212\265.feature" |  92 +++++++++
+ .specengine/spec/policy-defaults.md                |   6 +
+ .specengine/spec/terms.md                          |  25 +++
+ BENCH-LOG.md                                       | 210 +++++++++++++++++++++
+ CLAUDE.md                                          |  91 +++++++++
+ cucumber.cjs                                       |   1 -
+ package.json                                       |   2 +-
+ src/points.ts                                      |  65 +++++++
+ tests/steps/points-redemption.steps.ts             |  85 +++++++++
+ tests/support/world.ts                             |  17 ++
+ 29 files changed, 1231 insertions(+), 2 deletions(-)
+
+3a2dc64 2026-10-20 01:58:10 +0800 bench base
+
+ .gitignore        |    3 +
+ README.md         |    3 +
+ cucumber.cjs      |    9 +
+ package-lock.json | 2317 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json      |   16 +
+ src/index.ts      |    2 +
+ tsconfig.json     |   13 +
+ 7 files changed, 2363 insertions(+)

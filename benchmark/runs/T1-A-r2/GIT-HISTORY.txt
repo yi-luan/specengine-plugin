@@ -1,0 +1,21 @@
+
+6b36f62 2026-10-20 02:03:15 +0800 A-r2 done
+
+ BENCH-LOG.md                           | 30 ++++++++++++++
+ cucumber.cjs                           |  4 +-
+ package.json                           |  2 +-
+ src/points.ts                          | 63 ++++++++++++++++++++++++++++
+ tests/features/points-discount.feature | 55 ++++++++++++++++++++++++
+ tests/steps/points-discount.steps.ts   | 76 ++++++++++++++++++++++++++++++++++
+ 6 files changed, 226 insertions(+), 4 deletions(-)
+
+3a2dc64 2026-10-20 01:58:10 +0800 bench base
+
+ .gitignore        |    3 +
+ README.md         |    3 +
+ cucumber.cjs      |    9 +
+ package-lock.json | 2317 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json      |   16 +
+ src/index.ts      |    2 +
+ tsconfig.json     |   13 +
+ 7 files changed, 2363 insertions(+)

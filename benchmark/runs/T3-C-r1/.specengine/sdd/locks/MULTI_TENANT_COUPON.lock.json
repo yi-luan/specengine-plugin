@@ -1,0 +1,24 @@
+{
+  "module": "MULTI_TENANT_COUPON",
+  "lockedAt": "2026-10-20T07:23:25.380Z",
+  "lockedAtLocal": "2026-10-20 15:23",
+  "features": {
+    ".specengine/spec/features/多租戶優惠券.feature": "46a7d4880ea6812d75cf3527fd77d29793e07f9842fd09edc7826f511c364df9"
+  },
+  "stepSignatures": {
+    "tests/steps/multi-tenant-coupon.steps.ts": [
+      "Given::優惠券 {string} 的最低消費金額為 {string}",
+      "Given::優惠券 {string} 的有效期間為 {string} 至 {string}",
+      "Given::有一張優惠券 {string}：租戶 {string}、類型 {string}、值 {string}、可疊加 {string}",
+      "Given::結帳時間為 {string}",
+      "Given::訂單屬租戶 {string}",
+      "Given::訂單金額為 {string}",
+      "Then::套用失敗，失敗原因為 {string}",
+      "Then::套用成功，折扣總額為 {string}，折扣後金額為 {string}",
+      "Then::實際套用的優惠券代碼依序為 {string}",
+      "When::不使用任何優惠券結帳",
+      "When::以優惠券 {string} 結帳"
+    ]
+  },
+  "driverInterfaces": {}
+}

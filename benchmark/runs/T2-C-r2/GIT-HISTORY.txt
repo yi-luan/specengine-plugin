@@ -1,0 +1,59 @@
+
+df943de 2026-10-20 07:43:01 +0800 T2-C-r2 done
+
+ .claude/spec/architecture-manifest.md              |  77 +++++
+ .specengine/sdd/flow-design/ORDER_STATE_MACHINE.md |  16 ++
+ ...262\250\350\210\207\345\217\226\346\266\210.md" |  22 ++
+ ...253\213\350\210\207\344\273\230\346\254\276.md" |  29 ++
+ ...252\244\345\204\252\345\205\210\345\272\217.md" |  25 ++
+ .../\351\200\200\346\254\276.md"                   |  29 ++
+ .../sdd/locks/ORDER_STATE_MACHINE.lock.json        |  28 ++
+ .specengine/sdd/matrix/ORDER_STATE_MACHINE.json    | 320 +++++++++++++++++++++
+ .specengine/sdd/overview.md                        |   3 +
+ .specengine/sdd/overview/ORDER_STATE_MACHINE.md    |  25 ++
+ ...254\246\347\232\204\350\231\225\347\220\206.md" |  31 ++
+ ...244\261\346\225\227\344\273\243\347\242\274.md" |  31 ++
+ ...241\215\347\232\204\345\217\215\346\207\211.md" |  31 ++
+ ...252\244\345\204\252\345\205\210\345\272\217.md" |  31 ++
+ ...233\264\346\216\245\351\200\200\346\254\276.md" |  31 ++
+ ...200\200\346\254\276\351\207\221\351\241\215.md" |  31 ++
+ ...203\275\345\220\246\345\217\226\346\266\210.md" |  31 ++
+ ...276\214\347\272\214\346\223\215\344\275\234.md" |  31 ++
+ ...207\221\351\241\215\346\254\204\344\275\215.md" |  31 ++
+ ...203\275\345\220\246\345\207\272\350\262\250.md" |  31 ++
+ ...276\214\347\272\214\346\223\215\344\275\234.md" |  31 ++
+ ...223\215\344\275\234\347\265\204\345\220\210.md" |  31 ++
+ ...233\266\346\210\226\350\262\240\346\225\270.md" |  31 ++
+ ...250\202\345\226\256\347\213\200\346\205\213.md" |  31 ++
+ ...275\234\347\232\204\350\231\225\347\220\206.md" |  31 ++
+ .specengine/sdd/steps-index.json                   |  92 ++++++
+ .specengine/spec/erm.dbml                          |  10 +
+ .specengine/spec/exclusions.md                     |   4 +
+ ...56\347\213\200\346\205\213\346\251\237.feature" | 257 +++++++++++++++++
+ .specengine/spec/policy-defaults.md                |   8 +
+ .specengine/spec/terms.md                          |  31 ++
+ BENCH-LOG.md                                       | 245 ++++++++++++++++
+ CLAUDE.md                                          |  91 ++++++
+ src/index.ts                                       |   2 +-
+ src/order.ts                                       |  80 ++++++
+ tests/steps/order-state-machine.steps.ts           | 147 ++++++++++
+ tests/support/world.ts                             |  22 ++
+ 37 files changed, 2027 insertions(+), 1 deletion(-)
+
+849a03d 2026-10-20 02:39:53 +0800 base v2: node24 tsx import
+
+ README.md    | 2 +-
+ cucumber.cjs | 4 +---
+ package.json | 2 +-
+ 3 files changed, 3 insertions(+), 5 deletions(-)
+
+3a2dc64 2026-10-20 01:58:10 +0800 bench base
+
+ .gitignore        |    3 +
+ README.md         |    3 +
+ cucumber.cjs      |    9 +
+ package-lock.json | 2317 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json      |   16 +
+ src/index.ts      |    2 +
+ tsconfig.json     |   13 +
+ 7 files changed, 2363 insertions(+)

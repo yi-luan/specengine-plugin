@@ -1,0 +1,10 @@
+// 命名慣例待 manifest 核實，目前暫採 snake_case（contract-rules 第 2.4 節 fallback）
+// 本模組為純函式記憶體物件（Order），無資料庫；此處以 DBML 描述領域模型骨架供型別對齊。
+
+Table orders {
+  id varchar [pk, note: "訂單識別碼，由呼叫端提供，建立後不變"]
+  status varchar [not null, note: "狀態: CREATED | PAID | SHIPPED | CANCELLED | REFUNDED（已建立｜已付款｜已出貨｜已取消｜已退款）"]
+  amount int [not null, note: "訂單金額，整數元，必須 > 0"]
+  paid_amount int [not null, default: 0, note: "已付金額，整數元，必須 >= 0；付款成功後等於 amount"]
+  refunded_amount int [not null, default: 0, note: "累計退款金額，整數元，必須 >= 0 且 <= paid_amount"]
+}

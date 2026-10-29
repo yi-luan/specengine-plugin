@@ -1,0 +1,91 @@
+
+c7333c5 2026-10-20 07:32:58 +0800 E4-B done
+
+ BENCH-LOG.md                                       | 67 ++++++++++++++++++++++
+ .../001-points-discount/checklists/requirements.md |  3 +
+ specs/001-points-discount/contracts/points-api.md  | 13 +++--
+ specs/001-points-discount/data-model.md            |  7 ++-
+ specs/001-points-discount/plan.md                  | 23 ++++++--
+ specs/001-points-discount/quickstart.md            | 11 ++--
+ specs/001-points-discount/research.md              | 21 ++++---
+ specs/001-points-discount/spec.md                  | 52 ++++++++++-------
+ specs/001-points-discount/tasks.md                 | 57 ++++++++++++++++--
+ src/points.ts                                      |  7 ++-
+ tests/features/points-discount.feature             | 18 +++---
+ 11 files changed, 214 insertions(+), 65 deletions(-)
+
+ed77c6e 2026-10-20 02:46:04 +0800 Revert "tamper: spec 30%->35%"
+
+ specs/001-points-discount/spec.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+6bcf78f 2026-10-20 02:21:08 +0800 tamper: spec 30%->35%
+
+ specs/001-points-discount/spec.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+382d00a 2026-10-20 02:14:59 +0800 B-r1 done
+
+ .gitignore                                         |   3 +
+ .specify/memory/constitution.md                    | 102 ++++++----
+ BENCH-LOG.md                                       | 105 ++++++++++
+ cucumber.cjs                                       |   6 +-
+ package.json                                       |   2 +-
+ .../001-points-discount/checklists/requirements.md |  39 ++++
+ specs/001-points-discount/contracts/points-api.md  |  47 +++++
+ specs/001-points-discount/data-model.md            |  45 +++++
+ specs/001-points-discount/plan.md                  | 106 ++++++++++
+ specs/001-points-discount/quickstart.md            |  41 ++++
+ specs/001-points-discount/research.md              |  55 ++++++
+ specs/001-points-discount/spec.md                  | 201 +++++++++++++++++++
+ specs/001-points-discount/tasks.md                 | 217 +++++++++++++++++++++
+ src/index.ts                                       |   3 +-
+ src/points.ts                                      |  55 ++++++
+ tests/features/points-discount.feature             | 115 +++++++++++
+ tests/steps/points-discount.steps.ts               |  53 +++++
+ 17 files changed, 1155 insertions(+), 40 deletions(-)
+
+ca9f409 2026-10-20 02:00:01 +0800 spec-kit init
+
+ .claude/skills/speckit-analyze/SKILL.md            | 262 +++++++
+ .claude/skills/speckit-checklist/SKILL.md          | 386 ++++++++++
+ .claude/skills/speckit-clarify/SKILL.md            | 294 ++++++++
+ .claude/skills/speckit-constitution/SKILL.md       | 182 +++++
+ .claude/skills/speckit-converge/SKILL.md           | 285 ++++++++
+ .claude/skills/speckit-implement/SKILL.md          | 229 ++++++
+ .claude/skills/speckit-plan/SKILL.md               | 169 +++++
+ .claude/skills/speckit-specify/SKILL.md            | 348 +++++++++
+ .claude/skills/speckit-tasks/SKILL.md              | 218 ++++++
+ .claude/skills/speckit-taskstoissues/SKILL.md      | 120 +++
+ .specify/.gitignore                                |  14 +
+ .specify/init-options.json                         |  10 +
+ .specify/integration.json                          |  15 +
+ .specify/integrations/claude.manifest.json         |  17 +
+ .specify/integrations/speckit.manifest.json        |  19 +
+ .specify/memory/.constitution-template.json        |   4 +
+ .specify/memory/constitution.md                    |  50 ++
+ .../scripts/powershell/check-prerequisites.ps1     | 194 +++++
+ .specify/scripts/powershell/common.ps1             | 813 +++++++++++++++++++++
+ .specify/scripts/powershell/create-new-feature.ps1 | 357 +++++++++
+ .specify/scripts/powershell/resolve-template.ps1   |  38 +
+ .specify/scripts/powershell/setup-plan.ps1         |  90 +++
+ .specify/scripts/powershell/setup-tasks.ps1        |  93 +++
+ .specify/templates/checklist-template.md           |  45 ++
+ .specify/templates/constitution-template.md        |  50 ++
+ .specify/templates/plan-template.md                | 113 +++
+ .specify/templates/spec-template.md                | 131 ++++
+ .specify/templates/tasks-template.md               | 252 +++++++
+ .specify/workflows/speckit/workflow.yml            |  74 ++
+ .specify/workflows/workflow-registry.json          |  13 +
+ 30 files changed, 4885 insertions(+)
+
+3a2dc64 2026-10-20 01:58:10 +0800 bench base
+
+ .gitignore        |    3 +
+ README.md         |    3 +
+ cucumber.cjs      |    9 +
+ package-lock.json | 2317 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json      |   16 +
+ src/index.ts      |    2 +
+ tsconfig.json     |   13 +
+ 7 files changed, 2363 insertions(+)

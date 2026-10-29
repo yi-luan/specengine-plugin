@@ -1,0 +1,34 @@
+// 命名慣例待 manifest 核實，目前暫採 snake_case
+// 模組 TENANT_COUPON 為純函式，本檔描述呼叫端傳入的資料形狀，不代表本模組讀寫資料庫
+
+Table tenants {
+  id varchar [pk, note: "租戶識別碼"]
+  note: "租戶；每個租戶擁有自己的優惠券"
+}
+
+Table coupons {
+  tenant_id varchar [not null, note: "所屬租戶識別碼；只能用於同一租戶的訂單，不符時失敗原因 TENANT_MISMATCH"]
+  code varchar [not null, note: "優惠券代碼；同一租戶內唯一，同一次結帳重複傳入時失敗原因 DUPLICATE_COUPON"]
+  type varchar [not null, note: "折扣類型: PERCENT | FIXED"]
+  value int [not null, note: "PERCENT 時為折扣百分比，必須為 1～100 的整數；FIXED 時為折扣金額（整數元），必須 >= 1；不合法時失敗原因 INVALID_COUPON"]
+  valid_from timestamp [not null, note: "有效期間起（ISO 8601，含）；必須 <= valid_to，否則失敗原因 INVALID_COUPON"]
+  valid_to timestamp [not null, note: "有效期間迄（ISO 8601，含）；結帳時間不在 [valid_from, valid_to] 時失敗原因 COUPON_EXPIRED"]
+  stackable boolean [not null, note: "是否可疊加；不可疊加的優惠券只能單獨使用，否則失敗原因 NOT_STACKABLE"]
+  min_order_amount int [null, note: "最低消費金額（整數元）；NULL 表示無限制；有值時必須為整數，否則失敗原因 INVALID_COUPON；折扣前訂單金額 < 此值時失敗原因 MIN_ORDER_NOT_MET"]
+
+  indexes {
+    (tenant_id, code) [unique, note: "同一租戶內優惠券代碼唯一"]
+  }
+}
+
+Table checkout_orders {
+  tenant_id varchar [not null, note: "訂單所屬租戶識別碼"]
+  order_amount int [not null, note: "折扣前訂單金額（整數元），必須 > 0，否則失敗原因 INVALID_INPUT"]
+  now timestamp [not null, note: "結帳時間（ISO 8601），以時間戳與有效期間比較"]
+  final_amount int [null, note: "折扣後金額（整數元），必須 >= 0；折扣總額超過訂單金額時失敗原因 DISCOUNT_EXCEEDS_AMOUNT"]
+  discount int [null, note: "折扣總額（整數元），必須 <= order_amount"]
+  note: "結帳套用輸入與結果（非持久化，僅描述資料形狀）"
+}
+
+Ref: coupons.tenant_id > tenants.id
+Ref: checkout_orders.tenant_id > tenants.id

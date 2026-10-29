@@ -1,0 +1,27 @@
+
+5e18922 2026-10-20 07:25:18 +0800 T2-A-r1 done
+
+ BENCH-LOG.md                 |  32 +++++++
+ src/order.ts                 | 124 +++++++++++++++++++++++++++
+ tests/features/order.feature | 200 +++++++++++++++++++++++++++++++++++++++++++
+ tests/steps/order.steps.ts   | 143 +++++++++++++++++++++++++++++++
+ tests/support/world.ts       |  39 +++++++++
+ 5 files changed, 538 insertions(+)
+
+849a03d 2026-10-20 02:39:53 +0800 base v2: node24 tsx import
+
+ README.md    | 2 +-
+ cucumber.cjs | 4 +---
+ package.json | 2 +-
+ 3 files changed, 3 insertions(+), 5 deletions(-)
+
+3a2dc64 2026-10-20 01:58:10 +0800 bench base
+
+ .gitignore        |    3 +
+ README.md         |    3 +
+ cucumber.cjs      |    9 +
+ package-lock.json | 2317 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json      |   16 +
+ src/index.ts      |    2 +
+ tsconfig.json     |   13 +
+ 7 files changed, 2363 insertions(+)

@@ -1,0 +1,229 @@
+{
+  "spec_engine_version": "2.0.0",
+  "module_name": "多租戶優惠券",
+  "rules": [
+    {
+      "rule_id": "R-TENANT_COUPON-000",
+      "type": "main_flow",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "訂單屬於租戶 T，訂單金額為大於 0 的整數元",
+        "傳入一張屬於租戶 T、資料合法的優惠券",
+        "結帳時間落在該券有效期間內",
+        "該券未設定最低消費金額，或訂單金額大於或等於最低消費金額",
+        "該券折扣金額不大於訂單金額"
+      ],
+      "trigger_event": "以租戶、訂單金額、優惠券清單與結帳時間呼叫套用優惠券",
+      "post_assertions": [
+        "回傳成功",
+        "折扣總額為該券的折扣金額",
+        "折扣後金額 = 訂單金額 - 折扣總額",
+        "實際套用的優惠券代碼為該券代碼"
+      ]
+    },
+    {
+      "rule_id": "R-TENANT_COUPON-001",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "傳入可用的百分比折扣優惠券（PERCENT），折扣值為 value"
+      ],
+      "trigger_event": "套用優惠券",
+      "post_assertions": [
+        "該券折扣金額 = 無條件捨去(折扣前訂單金額 × value / 100)",
+        "多張百分比折扣券各自以折扣前的訂單金額計算、各自無條件捨去後再加總"
+      ],
+      "resolved_by": "resolved/features/多租戶優惠券_百分比折扣取整方式.md"
+    },
+    {
+      "rule_id": "R-TENANT_COUPON-002",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "傳入可用的固定金額折扣優惠券（FIXED），折扣值為 value 元"
+      ],
+      "trigger_event": "套用優惠券",
+      "post_assertions": [
+        "該券折扣金額 = value"
+      ]
+    },
+    {
+      "rule_id": "R-TENANT_COUPON-003",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "傳入的優惠券中有任一張的租戶與訂單租戶不同"
+      ],
+      "trigger_event": "套用優惠券",
+      "post_assertions": [
+        "回傳失敗，失敗原因為 TENANT_MISMATCH",
+        "所有優惠券都不套用"
+      ],
+      "resolved_by": [
+        "resolved/features/多租戶優惠券_部分優惠券不可用時的處理.md",
+        "resolved/features/多租戶優惠券_失敗原因文案.md"
+      ]
+    },
+    {
+      "rule_id": "R-TENANT_COUPON-004",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "傳入的優惠券中有任一張的結帳時間早於有效期間起點，或晚於有效期間迄點（以時間戳比較）"
+      ],
+      "trigger_event": "套用優惠券",
+      "post_assertions": [
+        "回傳失敗，失敗原因為 COUPON_EXPIRED（尚未生效與已過期同一代碼）",
+        "所有優惠券都不套用",
+        "結帳時間等於起點或等於迄點時視為在有效期間內，可使用"
+      ],
+      "resolved_by": [
+        "resolved/features/多租戶優惠券_部分優惠券不可用時的處理.md",
+        "resolved/features/多租戶優惠券_失敗原因文案.md",
+        "resolved/features/多租戶優惠券_有效期間邊界.md"
+      ]
+    },
+    {
+      "rule_id": "R-TENANT_COUPON-005",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "傳入的優惠券中有任一張設定了最低消費金額，且折扣前的訂單金額小於該最低消費金額"
+      ],
+      "trigger_event": "套用優惠券",
+      "post_assertions": [
+        "回傳失敗，失敗原因為 MIN_ORDER_NOT_MET",
+        "所有優惠券都不套用",
+        "最低消費一律以折扣前的訂單金額判定，訂單金額等於最低消費金額時可使用",
+        "未設定最低消費金額表示無限制"
+      ],
+      "resolved_by": [
+        "resolved/features/多租戶優惠券_部分優惠券不可用時的處理.md",
+        "resolved/features/多租戶優惠券_失敗原因文案.md",
+        "resolved/features/多租戶優惠券_最低消費的比較基準.md"
+      ]
+    },
+    {
+      "rule_id": "R-TENANT_COUPON-006",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "傳入兩張以上皆可用且皆標記為可疊加的優惠券",
+        "折扣總額不大於訂單金額"
+      ],
+      "trigger_event": "套用優惠券",
+      "post_assertions": [
+        "回傳成功，全部優惠券都被套用",
+        "折扣總額為各券折扣金額之和",
+        "折扣後金額 = 訂單金額 - 折扣總額",
+        "實際套用的優惠券代碼依傳入順序列出"
+      ]
+    },
+    {
+      "rule_id": "R-TENANT_COUPON-007",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "傳入兩張以上優惠券，且其中至少一張標記為不可疊加（含兩張以上不可疊加，或不可疊加與可疊加混用）"
+      ],
+      "trigger_event": "套用優惠券",
+      "post_assertions": [
+        "回傳失敗，失敗原因為 NOT_STACKABLE",
+        "所有優惠券都不套用",
+        "不可疊加的優惠券只能單獨使用；單獨使用一張不可疊加券時依一般規則套用"
+      ],
+      "resolved_by": [
+        "resolved/features/多租戶優惠券_不可疊加券與其他券同時使用.md",
+        "resolved/features/多租戶優惠券_失敗原因文案.md"
+      ]
+    },
+    {
+      "rule_id": "R-TENANT_COUPON-008",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "所有優惠券皆可用，但各券折扣金額加總大於訂單金額"
+      ],
+      "trigger_event": "套用優惠券",
+      "post_assertions": [
+        "回傳失敗，失敗原因為 DISCOUNT_EXCEEDS_AMOUNT",
+        "所有優惠券都不套用",
+        "折扣總額剛好等於訂單金額時回傳成功，折扣後金額為 0"
+      ],
+      "resolved_by": "resolved/features/多租戶優惠券_折扣超過訂單金額時的反應.md"
+    },
+    {
+      "rule_id": "R-TENANT_COUPON-009",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "訂單金額合法，優惠券清單為空"
+      ],
+      "trigger_event": "套用優惠券",
+      "post_assertions": [
+        "回傳成功",
+        "折扣總額為 0",
+        "折扣後金額等於訂單金額",
+        "實際套用的優惠券代碼為空清單"
+      ],
+      "resolved_by": "resolved/features/多租戶優惠券_未傳入任何優惠券.md"
+    },
+    {
+      "rule_id": "R-TENANT_COUPON-010",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "優惠券清單中有兩張以上代碼相同的優惠券"
+      ],
+      "trigger_event": "套用優惠券",
+      "post_assertions": [
+        "回傳失敗，失敗原因為 DUPLICATE_COUPON",
+        "所有優惠券都不套用"
+      ],
+      "resolved_by": "resolved/features/多租戶優惠券_同一張券重複傳入.md"
+    },
+    {
+      "rule_id": "R-TENANT_COUPON-011",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "優惠券清單中有任一張資料不合法：百分比折扣的折扣值不是 1～100 的整數；固定金額折扣的折扣值不是大於或等於 1 的整數；有設定最低消費金額但不是整數；有效期間起點晚於迄點"
+      ],
+      "trigger_event": "套用優惠券",
+      "post_assertions": [
+        "回傳失敗，失敗原因為 INVALID_COUPON",
+        "所有優惠券都不套用",
+        "有效期間起點等於迄點視為合法"
+      ],
+      "resolved_by": "resolved/data/多租戶優惠券_優惠券資料不合理.md"
+    },
+    {
+      "rule_id": "R-TENANT_COUPON-012",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "訂單金額為 0、負數或非整數"
+      ],
+      "trigger_event": "套用優惠券",
+      "post_assertions": [
+        "回傳失敗，失敗原因為 INVALID_INPUT",
+        "所有優惠券都不套用"
+      ],
+      "resolved_by": "resolved/data/多租戶優惠券_訂單金額不合理.md"
+    },
+    {
+      "rule_id": "R-TENANT_COUPON-013",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "同一次結帳同時命中多個失敗條件"
+      ],
+      "trigger_event": "套用優惠券",
+      "post_assertions": [
+        "依固定檢查順序回報第一個命中的失敗原因：INVALID_INPUT → INVALID_COUPON → TENANT_MISMATCH → DUPLICATE_COUPON → COUPON_EXPIRED → MIN_ORDER_NOT_MET → NOT_STACKABLE → DISCOUNT_EXCEEDS_AMOUNT",
+        "每一類檢查涵蓋清單中的全部優惠券，該類全部通過才進行下一類"
+      ],
+      "resolved_by": "resolved/features/多租戶優惠券_多重問題時回報哪個原因.md"
+    }
+  ]
+}

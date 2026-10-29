@@ -1,0 +1,26 @@
+{
+  "以租戶 {string}、訂單金額 {string}、結帳時間 {string} 套用優惠券 {string}": {
+    "count": 28,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "優惠券 {string}：租戶 {string}、類型 {string}、折扣值 {string}、可疊加 {string}、最低消費 {string}、有效期間 {string} 至 {string}": {
+    "count": 39,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "套用失敗，失敗原因 {string}": {
+    "count": 16,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "套用成功，折扣總額 {string}、折扣後金額 {string}、實際套用的優惠券代碼 {string}": {
+    "count": 12,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  }
+}

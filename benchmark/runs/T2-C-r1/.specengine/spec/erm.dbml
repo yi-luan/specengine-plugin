@@ -1,0 +1,12 @@
+// 命名慣例待 manifest 核實，目前暫採 snake_case（architecture-manifest.md 第 3 節仍為〔待確認〕）
+// 本模組為純函式狀態機，需求未宣告任何持久化；本 DBML 僅描述 Order 實體的邏輯資料模型。
+
+Table orders {
+  id varchar [pk, note: "訂單識別字，由呼叫端提供，系統不驗證（空字串亦照常建立，見 exclusions X-ORDER_STATE_MACHINE-001）"]
+  status varchar [not null, note: "狀態: CREATED | PAID | SHIPPED | CANCELLED | REFUNDED；建立後為 CREATED"]
+  amount int [not null, note: "訂單金額（整數元），必須為正整數（> 0 且為有限整數，非整數或 NaN 一律拒絕）"]
+  paid_amount int [not null, default: 0, note: "已付金額（整數元），必須 >= 0；付款成功後等於 amount"]
+  refunded_amount int [not null, default: 0, note: "累計退款金額（整數元），必須 >= 0 且 <= paid_amount；已付款訂單取消時記為 paid_amount"]
+}
+
+// 關聯：本模組僅有單一實體，無外鍵關聯。

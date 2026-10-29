@@ -1,0 +1,62 @@
+
+ed069f2 2026-10-20 07:41:23 +0800 E4-C done
+
+ .specengine/sdd/flow-design/POINTS_REDEMPTION.md   |   6 +-
+ ...255\211\350\210\207\346\210\220\344\272\244.md" |  11 +-
+ .specengine/sdd/locks/POINTS_REDEMPTION.lock.json  |   6 +-
+ .specengine/sdd/matrix/POINTS_REDEMPTION.json      |  39 ++--
+ .specengine/sdd/overview.md                        |   6 +-
+ .specengine/sdd/overview/POINTS_REDEMPTION.md      |   5 +-
+ ...\213\350\256\212\346\233\264\347\202\27235%.md" |  31 +++
+ .specengine/spec/erm.dbml                          |   2 +-
+ ...36\346\225\270\346\212\230\346\212\265.feature" |  16 +-
+ .specengine/spec/terms.md                          |   4 +-
+ BENCH-LOG.md                                       | 228 +++++++++++++++++++++
+ src/points.ts                                      |  14 +-
+ 12 files changed, 326 insertions(+), 42 deletions(-)
+
+14d74d8 2026-10-20 02:21:14 +0800 C-r1 done
+
+ .claude/spec/architecture-manifest.md              |  77 ++++
+ .specengine/sdd/flow-design/POINTS_REDEMPTION.md   |  16 +
+ ...255\211\350\210\207\346\210\220\344\272\244.md" |  38 ++
+ ...274\270\345\205\245\351\251\227\350\255\211.md" |  34 ++
+ .specengine/sdd/locks/POINTS_REDEMPTION.lock.json  |  20 +
+ .specengine/sdd/matrix/POINTS_REDEMPTION.json      | 159 +++++++
+ .specengine/sdd/overview.md                        |   5 +
+ .specengine/sdd/overview/POINTS_REDEMPTION.md      |  44 ++
+ ...216\237\345\233\240\346\226\207\346\241\210.md" |  30 ++
+ ...217\226\346\225\264\346\226\271\345\274\217.md" |  31 ++
+ ...240\261\345\223\252\344\270\200\345\200\213.md" |  31 ++
+ ...212\237\346\210\226\345\244\261\346\225\227.md" |  30 ++
+ ...202\272\350\262\240\346\225\270\346\231\202.md" |  30 ++
+ ...235\236\346\225\264\346\225\270\346\231\202.md" |  31 ++
+ ...241\215\351\235\236\346\263\225\346\231\202.md" |  31 ++
+ ...263\273\347\265\261\345\217\215\346\207\211.md" |  31 ++
+ ...263\273\347\265\261\345\217\215\346\207\211.md" |  31 ++
+ .specengine/sdd/steps-index.json                   |  44 ++
+ .specengine/spec/erm.dbml                          |  18 +
+ .specengine/spec/exclusions.md                     |   5 +
+ ...36\346\225\270\346\212\230\346\212\265.feature" | 127 ++++++
+ .specengine/spec/policy-defaults.md                |   9 +
+ .specengine/spec/terms.md                          |  23 +
+ BENCH-LOG.md                                       | 479 +++++++++++++++++++++
+ CLAUDE.md                                          |  91 ++++
+ cucumber.cjs                                       |   1 -
+ package.json                                       |   2 +-
+ src/index.ts                                       |   2 +-
+ src/points.ts                                      |  50 +++
+ tests/steps/points-redemption.steps.ts             |  67 +++
+ tests/support/world.ts                             |  20 +
+ 31 files changed, 1604 insertions(+), 3 deletions(-)
+
+3a2dc64 2026-10-20 01:58:10 +0800 bench base
+
+ .gitignore        |    3 +
+ README.md         |    3 +
+ cucumber.cjs      |    9 +
+ package-lock.json | 2317 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json      |   16 +
+ src/index.ts      |    2 +
+ tsconfig.json     |   13 +
+ 7 files changed, 2363 insertions(+)

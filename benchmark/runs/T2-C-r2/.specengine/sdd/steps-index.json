@@ -1,0 +1,92 @@
+{
+  "一筆狀態為 {string} 的訂單，訂單金額 {string}、已付金額 {string}、累計退款金額 {string}": {
+    "count": 19,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "傳入的訂單未被修改": {
+    "count": 18,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "商家出貨": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "客戶付款 {string}": {
+    "count": 3,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "客戶以金額 {string} 建立編號 {string} 的訂單": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "客戶取消訂單": {
+    "count": 3,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "客戶申請退款 {string}": {
+    "count": 7,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "對訂單執行 {string} 操作，金額 {string}": {
+    "count": 5,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "已付金額為 {string}": {
+    "count": 7,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "操作失敗，失敗原因為 {string}": {
+    "count": 13,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "操作結果為 {string}": {
+    "count": 8,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "累計退款金額為 {string}": {
+    "count": 8,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "訂單狀態為 {string}": {
+    "count": 8,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "訂單編號為 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "訂單金額為 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  }
+}

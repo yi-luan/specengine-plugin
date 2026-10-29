@@ -1,0 +1,25 @@
+// 命名慣例待 manifest 核實，目前暫採 snake_case
+// 本模組（MULTI_TENANT_COUPON）依需求為純函式、不碰資料庫；本檔為領域實體草稿，
+// 描述優惠券與租戶的資料約束，供 Step／fixture 的強型別對齊使用。
+
+Table tenants {
+  id varchar [pk, note: "租戶識別碼（對應 Coupon.tenantId / ApplyInput.tenantId），非空"]
+}
+
+Table coupons {
+  id int [pk, increment, note: "優惠券流水號"]
+  tenant_id varchar [not null, note: "所屬租戶，優惠券只能用在同一租戶的訂單"]
+  code varchar [not null, note: "優惠券代碼（對應 Coupon.code），同一租戶內唯一"]
+  type varchar [not null, note: "折扣類型: PERCENT | FIXED"]
+  value int [not null, note: "PERCENT：折扣百分比，必須為 1～100 的整數；FIXED：折扣金額（整數元），必須 > 0 的整數。不合法時整筆拒絕 INVALID_COUPON"]
+  valid_from timestamp [not null, note: "有效期間起（ISO 8601，對應 Coupon.validFrom）"]
+  valid_to timestamp [not null, note: "有效期間迄（ISO 8601，對應 Coupon.validTo），必須 >= valid_from；時間不合法或期間顛倒時整筆拒絕 INVALID_COUPON"]
+  stackable boolean [not null, note: "是否可疊加；false 表示一張訂單只能用一張"]
+  min_order_amount int [null, note: "最低消費金額（整數元），NULL 表示無限制；以折扣前訂單金額判定，訂單金額 >= 本值才可用，未達時整筆拒絕 MIN_ORDER_NOT_MET；有設定時必須為 >= 0 的整數，否則整筆拒絕 INVALID_COUPON"]
+
+  indexes {
+    (tenant_id, code) [unique, note: "同一租戶內優惠券代碼唯一"]
+  }
+}
+
+Ref: coupons.tenant_id > tenants.id

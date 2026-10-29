@@ -1,0 +1,68 @@
+{
+  "不使用任何優惠券結帳": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "以優惠券 {string} 結帳": {
+    "count": 28,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "優惠券 {string} 的最低消費金額為 {string}": {
+    "count": 5,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "優惠券 {string} 的有效期間為 {string} 至 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "套用失敗，失敗原因為 {string}": {
+    "count": 20,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "套用成功，折扣總額為 {string}，折扣後金額為 {string}": {
+    "count": 9,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "實際套用的優惠券代碼依序為 {string}": {
+    "count": 9,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "有一張優惠券 {string}：租戶 {string}、類型 {string}、值 {string}、可疊加 {string}": {
+    "count": 40,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "結帳時間為 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "訂單屬租戶 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "訂單金額為 {string}": {
+    "count": 29,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  }
+}

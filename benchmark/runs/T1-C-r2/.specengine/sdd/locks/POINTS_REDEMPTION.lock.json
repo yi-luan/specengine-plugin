@@ -1,0 +1,21 @@
+{
+  "module": "POINTS_REDEMPTION",
+  "lockedAt": "2026-10-19T18:18:53.155Z",
+  "lockedAtLocal": "2026-10-20 02:18",
+  "features": {
+    ".specengine/spec/features/會員點數折抵.feature": "bbcd1cccd900a697d76d0b6d26afcd0d541e807dc1739119b2b642af0f69a519"
+  },
+  "stepSignatures": {
+    "tests/steps/points-redemption.steps.ts": [
+      "Given::會員點數餘額為 {string}",
+      "Given::訂單金額為 {string}",
+      "Then::剩餘點數為 {string}",
+      "Then::失敗原因為 {string}",
+      "Then::應付金額為 {string}",
+      "Then::折抵結果為 {string}",
+      "Then::點數餘額維持 {string}",
+      "When::會員輸入折抵點數 {string}"
+    ]
+  },
+  "driverInterfaces": {}
+}

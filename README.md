@@ -89,7 +89,7 @@ Three requirements of increasing difficulty were implemented under three conditi
 
 | Tamper test: one value changed in a locked specification | Result |
 | :--- | :--- |
-| SpecEngine | **7 of 7** detected by `spec-guard.js audit` in under a second |
+| SpecEngine | **8 of 8** detected by `spec-guard.js audit` in under a second |
 | GitHub Spec Kit | 1 of 2 detected by `converge`; a changed threshold was noted but still reported as converged |
 | No SDD tool | No mechanism; tests kept passing |
 
@@ -100,7 +100,7 @@ What the numbers say:
 - **SpecEngine's advantage is enforcement.** Its guarantees come from scripts, so they hold regardless of which model runs the workflow.
 - **SpecEngine costs more time.** Runs took about 1.4 to 1.6 times as long as Spec Kit and stopped for human input more often.
 
-Each cell holds one or two runs, so differences of one or two tests are not meaningful. Three T3 runs were discarded after the agent read the answer sheet, and clean runs were repeated with answers supplied by a separate session. The benchmark materials are not yet published in this repository.
+Each cell holds one or two runs, so differences of one or two tests are not meaningful. Three T3 runs were discarded after the agent read the answer sheet, and clean runs were repeated with answers supplied by a separate session. Requirements, answer sheets, hidden tests, every run's output and the scoring scripts are in [`benchmark/`](benchmark/README.md), and every number above can be regenerated from them.
 
 ### Change workflow (2.1.0)
 
@@ -179,6 +179,7 @@ specengine-plugin/
 ├── scripts/       feature-lint, spec-guard, spec-change, spec-status (Node.js, no dependencies)
 ├── docs/          contract-rules.md: the format of every artifact
 ├── templates/     manifest and CLAUDE.md section used during onboarding
+├── benchmark/     comparison against Spec Kit and a no-tool baseline, with every run and the scoring scripts
 ├── case-study/    replication package for the paper
 └── paper/         paper source (LaTeX) and PDF
 

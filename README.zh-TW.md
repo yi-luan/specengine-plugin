@@ -89,7 +89,7 @@ flowchart LR
 
 | 偷改測試：在已上鎖的規格中改掉一個值 | 結果 |
 | :--- | :--- |
-| SpecEngine | **7 次全部**被 `spec-guard.js audit` 在一秒內抓到 |
+| SpecEngine | **8 次全部**被 `spec-guard.js audit` 在一秒內抓到 |
 | GitHub Spec Kit | `converge` 2 次抓到 1 次；改掉的門檻值有被提到，但仍判定已收斂 |
 | 不用 SDD 工具 | 沒有機制，測試照樣通過 |
 
@@ -100,7 +100,7 @@ flowchart LR
 - **SpecEngine 的優勢在強制力。** 它的保證來自腳本，不論哪個模型執行流程都成立。
 - **SpecEngine 比較花時間。** 耗時約為 Spec Kit 的 1.4 到 1.6 倍，停下來等人的次數也較多。
 
-每格只有一到兩個回合，相差一兩條測試不代表優劣。T3 有三個回合因代理讀到答案表而作廢，改由另一個 session 回答後重跑乾淨回合。評測素材尚未放進本 repo。
+每格只有一到兩個回合，相差一兩條測試不代表優劣。T3 有三個回合因代理讀到答案表而作廢，改由另一個 session 回答後重跑乾淨回合。需求、答案表、隱藏測試、每個回合的產出與評分腳本都在 [`benchmark/`](benchmark/README.md)，上面每個數字都能從中重新產生。
 
 ### 需求變更流程（2.1.0）
 
@@ -179,6 +179,7 @@ specengine-plugin/
 ├── scripts/       feature-lint、spec-guard、spec-change、spec-status（Node.js，無相依套件）
 ├── docs/          contract-rules.md：所有產物的格式規範
 ├── templates/     導入時用的 manifest 與 CLAUDE.md 區塊範本
+├── benchmark/     與 Spec Kit、不用工具的對照評測：每個回合的產出與評分腳本
 ├── case-study/    論文個案的重現包
 └── paper/         論文原始檔（LaTeX）與 PDF
 

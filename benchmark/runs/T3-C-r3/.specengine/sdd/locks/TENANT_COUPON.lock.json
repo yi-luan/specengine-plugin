@@ -1,0 +1,17 @@
+{
+  "module": "TENANT_COUPON",
+  "lockedAt": "2026-10-20T07:43:39.751Z",
+  "lockedAtLocal": "2026-10-20 15:43",
+  "features": {
+    ".specengine/spec/features/多租戶優惠券.feature": "2253c0b19eb12912bcb2592c2ef9f2d2aa002b93c6edf8cb4842d9740ef46261"
+  },
+  "stepSignatures": {
+    "tests/steps/tenant-coupon.steps.ts": [
+      "Given::優惠券 {string}：租戶 {string}、類型 {string}、折扣值 {string}、可疊加 {string}、最低消費 {string}、有效期間 {string} 至 {string}",
+      "Then::套用失敗，失敗原因 {string}",
+      "Then::套用成功，折扣總額 {string}、折扣後金額 {string}、實際套用的優惠券代碼 {string}",
+      "When::以租戶 {string}、訂單金額 {string}、結帳時間 {string} 套用優惠券 {string}"
+    ]
+  },
+  "driverInterfaces": {}
+}
