@@ -1,135 +1,217 @@
+<div align="center">
+
 # SpecEngine
 
-讓 Claude 替你寫程式時，先把需求問清楚、再把規格釘死、最後才動手的一套流程。裝在 Claude Code 裡用。
+**Executable, hash-frozen specification contracts for AI coding agents.**
 
-## 它解決什麼問題
+SpecEngine is a Claude Code plugin that makes an agent ask before it assumes, and that makes the agreed specification impossible to rewrite quietly while the code is being written.
 
-叫 AI 寫程式，常見兩種翻車。
+[![Version](https://img.shields.io/badge/version-2.1.0-blue)](CHANGELOG.md)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-8A63D2)](#installation)
+[![Node.js ≥ 18](https://img.shields.io/badge/node-%E2%89%A5%2018-339933)](#requirements)
+[![Runtime dependencies: 0](https://img.shields.io/badge/runtime%20dependencies-0-brightgreen)](scripts/)
 
-**第一種：它自己腦補。** 你給四句話需求，剩下的 90% 它自己猜。猜錯的地方要到驗收才發現。
+English · [繁體中文](README.zh-TW.md)
 
-**第二種：它偷改考卷。** 測試過不了，最省事的做法是把測試改成程式會過的樣子，然後報告「全部通過」。你永遠不知道。
+</div>
 
-SpecEngine 對這兩件事各有一個答案：
+---
 
-- 需求裡沒講的事，變成選擇題丟給人決定，AI 不准猜。
-- 規格一旦定案，寫程式期間用檢查腳本釘死，AI 碰不得。想矇混會被腳本抓到。
+## The problem
 
-## 怎麼用
+Coding agents fail in two well-documented ways.
 
-### 第一次導入專案
+1. **They fill gaps with guesses.** A four-sentence requirement leaves dozens of boundaries open. The agent picks an answer for each one and you discover the wrong picks at acceptance.
+2. **They edit the test instead of the code.** When a test and the implementation disagree, the cheapest path to green is to change the test. The report still says "all tests pass".
 
-裝好 plugin 後，在你的專案裡對 Claude 說：
+Specification-driven tools such as GitHub Spec Kit address the first problem by writing a specification before coding. Their specification is still prose, though. Acceptance criteria are not executed, test derivation is left to the agent, and nothing stops the specification from changing during implementation.
 
-> 幫我把 SpecEngine 導入這個專案
+## The approach
 
-它會掃描專案，把「用什麼語言、測試怎麼跑、程式放哪裡」這些環境資訊寫進一份設定檔。查不到的留白，五個非填不可的欄位一次問你。
+SpecEngine treats the specification as a contract that a script enforces, not a document the agent is asked to respect.
 
-### 開始一個功能
-
-把需求貼給它，說：
-
-> spec run
-
-它會從頭跑到尾，中間只有需要你決定的時候才停。
-
-### 已經做完的功能要改需求
-
-直接把變更告訴它，例如：
-
-> 需求變更：折抵上限從 30% 改成 35%
-
-它會先判斷這次改多少：只改數字、改既有行為、還是新增規則。只改數字的話，問你一次「核准嗎」就改完；改行為會再請你看一次流程圖。不論哪一種，改規格一定要你點頭，改完一定重新上鎖，而且腳本會逐字檢查沒被波及的規則一個字都沒動。
-
-做到一半中斷也沒關係，新的 session 說「接著做」，它會從記錄找到中斷點。
-
-### 隨時看進度
-
-> spec status
-
-告訴你每個功能模組現在到哪一步、還有幾題沒答、下一步該做什麼。
-
-## 流程長什麼樣
-
-用「會員點數折抵」當例子。
-
-| 站 | 誰做 | 做什麼 |
-| :--- | :--- | :--- |
-| 1 掃需求 | Claude | 讀需求，整理出確定的規則、資料長什麼樣、以及需求沒講的洞。每個洞變一題選擇題。不問你。 |
-| 2 你回答 | 你 | 它分組拿選擇題問你，一次最多四題。你答完它立刻寫進規格。可以通用的決定記成公司慣例，下次不再問。 |
-| 3 看圖確認 | 你 | 它把規則畫成流程圖，請你看整體有沒有漏。有漏就回第 2 站補問。 |
-| 4 寫正式規格 | Claude | 把規則寫成「在什麼情況、做什麼、應該怎樣」的句子，邊界值列表格，逐列核對，跑檢查。 |
-| 5 建測試骨架 | Claude | 每句規格綁一個測試，全部先故意失敗。中間隔一層 Driver，以後畫面改版規格不用動。 |
-| 6 寫程式 | Claude | 開工前把規格「拍照存證」。寫程式讓測試一盞盞變綠。收工比對照片，規格沒動才算過，然後上鎖。 |
-
-另外兩個不在流程裡的動作：
-
-- **巡檢**（`spec 06`）：上線後定期跑，看規格有沒有被事後偷改、資料庫有沒有被手動改過沒回寫。只報告不修。
-- **環境核實**（`spec manifest sync`）：專案架構變了或 plugin 升級時跑，更新那份環境設定檔。
-
-## 三種決定，三個地方
-
-你在第 2 站回答的東西，依性質放在不同地方：
-
-- **會發生動作的規則**（有人做了什麼，系統發生什麼）→ 進規則清單 → 畫進流程圖 → 寫成測試。
-- **刻意不做的決定**（系統故意不動作、不提供某功能、屬於別的模組）→ 進「刻意不做清單」。流程圖確認時另外列出來讓你看，但不畫分支、不寫測試。
-- **Claude 自己抄錯的**（規格很清楚，是它寫測試例子時寫錯）→ 它自己修、留一筆紀錄，不問你。只有真的規格矛盾才停下來問。
-
-## 誰在守規矩
-
-| 要守的事 | 怎麼守 |
+| Principle | Mechanism |
 | :--- | :--- |
-| 不確定的事不猜 | 流程設計：第 1、3、6 站只准寫問題，不准寫答案 |
-| 問題由人答 | 第 2、3 站真的停下來等你 |
-| 規格格式正確、每條規則有對應測試 | 腳本 `feature-lint.js`，第 4 站收工前必跑 |
-| 寫程式期間規格不動 | 腳本 `spec-guard.js` 拍照比對，第 6 站頭尾必跑 |
-| 完工後規格不被偷改 | 上鎖紀錄進版本控制，巡檢時比對 |
-| 現在到哪一站 | 腳本 `spec-status.js` 從檔案推算，不信手寫的狀態 |
+| **Humans decide, agents ask** | Every unresolved boundary becomes a multiple-choice decision. Only a human may answer it. Answers are written back into a rule matrix whose fields map to a Hoare triple: precondition, trigger, postcondition. |
+| **Rules compile to tests** | Confirmed rules become Gherkin scenarios, linted for structure and one-to-one rule coverage, and bound to step definitions through a thin driver interface. |
+| **The target cannot move** | Before implementation, a script snapshots the specification, every step sentence and the driver interface. After implementation it verifies them byte for byte. Any change fails the run. |
+| **Done means locked** | A completed module gets a lock file in version control. A later audit reports any change to the spec, the rule matrix, shared glossary or data model that did not go through the change workflow. |
+| **State is derived, not declared** | A module's stage is computed from which artifacts exist, so a stale status field cannot mislead the agent or the team. |
 
-前兩項靠文字規則，AI 遵守的機率高但不是百分之百。後四項靠腳本，想繞也繞不過。
+All enforcement scripts use only the Node.js standard library.
 
-## 實測
+## Workflow
 
-在一個小專案上用四句話需求跑完整輪。Claude 自己挖出 9 個需求沒講的洞，畫圖時又抓到 1 個。寫到最後一條測試時它發現是自己把例子抄錯了，沒有改規格矇混，停下來報告。修正後 21 條測試全綠、上鎖。事後故意改規格一個數字，巡檢立刻報警。
-
-## 它不是什麼
-
-- **不是全自動。** 能自動的是執行與驗證，決定要什麼仍然是人的事。
-- **不是數學證明。** 測試是例子，不是窮舉。表格列了三個值不代表第四個值一定對。真需要窮舉保證的地方要另外補測試。
-
-## 安裝
-
+```mermaid
+flowchart LR
+    R([Requirement]) --> D1[1 · Discover<br/>rules and open questions]
+    D1 --> C2{{2 · Clarify<br/>human answers MCQs}}
+    C2 --> F3{{3 · Flow review<br/>human confirms diagrams}}
+    F3 -- gap found --> C2
+    F3 --> G4[4 · Formalize<br/>Gherkin + lint]
+    G4 --> T5[5 · Test stubs<br/>all red]
+    T5 --> I6[6 · Implement<br/>snapshot → green → verify]
+    I6 --> L([Locked module])
+    L -. requirement changes .-> CH{{spec change<br/>human approves scope}}
+    CH --> G4
+    L -. after release .-> A[Drift audit]
 ```
+
+Hexagons are human gates. The agent stops there and waits.
+
+| Stage | Command | Who acts | Output |
+| :--- | :--- | :--- | :--- |
+| Onboarding | `spec manifest sync` | Agent, then human for missing fields | `architecture-manifest.md`: language, test command, directories |
+| 1 Discover | `spec 01` | Agent | Rule matrix draft, data model draft, question queue |
+| 2 Clarify | `spec 02` | **Human** | Decisions written back into the matrix |
+| 3 Flow review | `spec flow-align` | **Human** | Confirmed flow diagrams; gaps go back to stage 2 |
+| 4 Formalize | `spec 03` | Agent | `.feature` files that pass `feature-lint.js` |
+| 5 Test stubs | `spec 04` | Agent | Step definitions and driver interface, all failing |
+| 6 Implement | `spec 05` | Agent | Product code, `spec-guard.js verify` pass, module lock |
+| Change | `spec change` | Agent, **human approves** | Classified change record, re-lock, untouched rules verified unchanged |
+| Audit | `spec 06` | Agent, read-only | Drift report: lock, schema and rule coverage |
+| Status | `spec status` | Script | Stage, open questions and next step for every module |
+
+`spec run` chains stages 1 to 6 and starts from wherever the module currently is.
+
+## Evidence
+
+### Controlled comparison
+
+Three requirements of increasing difficulty were implemented under three conditions with the same base project and the same stakeholder answer sheet. Most runs used Claude Fable 5.1. T3 runs that were resumed or repeated after a model switch used Claude Opus 5.5. Results were scored by hidden acceptance tests that the agent never saw. The table counts only clean runs.
+
+| Requirement | No SDD tool | GitHub Spec Kit | SpecEngine 2.0 |
+| :--- | :---: | :---: | :---: |
+| T1 Loyalty-point redemption (18 tests) | 11, 11 | 18, 18 | 18, 18 |
+| T2 Order state machine (32 tests) | 20, 20 | 32, 32 | 32, 32 |
+| T3 Multi-tenant coupons (38 tests) | 20, 22 | 36, 38 | 38 |
+
+| Tamper test: one value changed in a locked specification | Result |
+| :--- | :--- |
+| SpecEngine | **7 of 7** detected by `spec-guard.js audit` in under a second |
+| GitHub Spec Kit | 1 of 2 detected by `converge`; a changed threshold was noted but still reported as converged |
+| No SDD tool | No mechanism; tests kept passing |
+
+What the numbers say:
+
+- **Both SDD tools beat the baseline by a wide margin.** Without one, the agent guessed every error code wrong, and on T3 it also guessed behaviour wrong.
+- **Accuracy was a tie between Spec Kit and SpecEngine.** SpecEngine asked about every open boundary in T2. Spec Kit's clarify step caps each round at five questions and missed one boundary in one T3 run.
+- **SpecEngine's advantage is enforcement.** Its guarantees come from scripts, so they hold regardless of which model runs the workflow.
+- **SpecEngine costs more time.** Runs took about 1.4 to 1.6 times as long as Spec Kit and stopped for human input more often.
+
+Each cell holds one or two runs, so differences of one or two tests are not meaningful. Three T3 runs were discarded after the agent read the answer sheet, and clean runs were repeated with answers supplied by a separate session. The benchmark materials are not yet published in this repository.
+
+### Change workflow (2.1.0)
+
+Thirteen change scenarios passed their hidden acceptance tests. The scenarios covered parameter changes, behaviour changes, new rules, vague requests, a behaviour change disguised as a small tweak, and resumption in a fresh session. Under the same instructions, the 2.0 control changed the specification without asking for approval whenever the change request said "all other rules unchanged".
+
+### Case study
+
+A four-sentence requirement became 11 human decisions and 21 passing scenarios. One scenario failed because the agent had copied an example wrongly into the Gherkin. The agent reported the defect instead of editing the frozen specification. The full replication package is in [`case-study/`](case-study/README.md).
+
+## Installation
+
+Inside Claude Code:
+
+```text
 /plugin marketplace add https://github.com/yi-luan/specengine-plugin
 /plugin install specengine@specengine-marketplace
 ```
 
-升級：
+To upgrade:
 
-```
+```text
 /plugin marketplace update specengine-marketplace
 ```
 
-repo 為私有時，安裝的機器要能用 git 認證存取它。
+### Requirements
 
-導入後請把 `.specengine/sdd/.spec-guard-snapshot.json` 加進專案的 `.gitignore`，那是寫程式期間的暫存照片。其他 `.specengine/` 底下的東西都要進版本控制。
+- Claude Code
+- Node.js 18 or later on the `PATH`
+- A git repository and a BDD test runner declared in the manifest. The workflow has been run end to end with cucumber-js.
 
-## 檔案在哪
+## Quick start
+
+**1. Onboard a project.** In your repository, tell Claude:
+
+> Set up SpecEngine for this project
+
+It scans the project, writes `.claude/spec/architecture-manifest.md` and asks only for fields it could not determine.
+
+**2. Build a feature.** Paste the requirement and say:
+
+> spec run
+
+The agent works through the stages and stops only at the human gates.
+
+**3. Change a finished feature.**
+
+> Requirement change: raise the redemption cap from 30% to 35%
+
+The change is classified as a parameter change, a behaviour change or a new rule, and only the stages that class needs are run. You approve the scope before the specification changes. Afterwards a script checks that every rule outside the approved scope is byte-for-byte unchanged.
+
+**4. Check progress at any time.**
+
+> spec status
+
+Add `.specengine/sdd/.spec-guard-snapshot.json` to `.gitignore`. Everything else under `.specengine/` belongs in version control.
+
+## What is enforced, and how
+
+| Guarantee | Enforced by | Strength |
+| :--- | :--- | :--- |
+| Unresolved questions are not answered by the agent | Stage instructions | Prompt-level |
+| Human gates actually stop | Stage instructions | Prompt-level |
+| Gherkin structure and one-to-one rule coverage | `feature-lint.js` | Script |
+| Specification, step sentences and driver interface frozen during implementation | `spec-guard.js snapshot / verify` | Script |
+| Completed modules not changed outside the change workflow | `spec-guard.js lock / audit` | Script |
+| Changes approved, scoped and recorded | `spec-change.js` | Script |
+| Module stage | `spec-status.js` | Script |
+
+Prompt-level rules held in the runs above, but no script guarantees them. Script-level guarantees cannot be bypassed by the agent.
+
+## Project layout
 
 ```text
-plugin 本身（這個 repo）
-├── skills/        十一個指令的說明書
-├── scripts/       四支檢查腳本，只用 Node 內建功能
-├── docs/          規格的格式規範
-└── templates/     導入專案時用的範本
+specengine-plugin/
+├── skills/        11 workflow stages, one SKILL.md each
+├── scripts/       feature-lint, spec-guard, spec-change, spec-status (Node.js, no dependencies)
+├── docs/          contract-rules.md: the format of every artifact
+├── templates/     manifest and CLAUDE.md section used during onboarding
+├── case-study/    replication package for the paper
+└── paper/         paper source (LaTeX) and PDF
 
-你的專案（導入後）
-├── .claude/spec/architecture-manifest.md   環境設定檔
+your-project/  (after onboarding)
+├── .claude/spec/architecture-manifest.md
 └── .specengine/
-    ├── sdd/       過程中的東西：規則清單、待答的題、答完的題、流程圖、鎖、需求變更紀錄
-    └── spec/      定案的規格：測試句子、資料模型、術語、慣例、刻意不做清單
+    ├── spec/      specification contract: features, data model, glossary, conventions, exclusions
+    └── sdd/       process state: rule matrix, questions, decisions, flow diagrams, locks, change records
 ```
 
-## 版本與授權
+## Limitations
 
-版本號在 `.claude-plugin/plugin.json`。改了什麼看 `CHANGELOG.md`。MIT 授權，見 `LICENSE`。
+- **Tests are examples, not proofs.** A table with three values does not prove the fourth.
+- **Step-sentence freezing recognises call-style step definitions** such as `Given('…', fn)` in cucumber-js and Cucumber-JVM. Decorator-based frameworks such as pytest-bdd, behave and Reqnroll are not yet detected.
+- **Stage instructions are written in Traditional Chinese**, and so are the generated artifacts. Identifiers in generated code follow the manifest setting.
+- **The approach costs human attention.** For a trivial change it is more process than the change needs.
+
+## Paper
+
+The design and case study are described in:
+
+> Allen Tsai. *Constraining LLM-Assisted Behavior-Driven Development with Externally Enforced Specification Contracts: Design and Case Study of SpecEngine.* 2026. Source in [`paper/`](paper/).
+
+```bibtex
+@misc{tsai2026specengine,
+  author = {Tsai, Allen},
+  title  = {Constraining {LLM}-Assisted Behavior-Driven Development with Externally
+            Enforced Specification Contracts: Design and Case Study of {SpecEngine}},
+  year   = {2026},
+  note   = {Manuscript}
+}
+```
+
+## License
+
+[MIT](LICENSE). Release notes are in [CHANGELOG.md](CHANGELOG.md).
