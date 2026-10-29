@@ -2,9 +2,9 @@
 
 # SpecEngine
 
-**Executable, hash-frozen specification contracts for AI coding agents.**
+**Stepwise refinement from requirements to test code, enforced for AI coding agents.**
 
-SpecEngine is a Claude Code plugin that makes an agent ask before it assumes, and that makes the agreed specification impossible to rewrite quietly while the code is being written.
+SpecEngine is a Claude Code plugin that never lets an agent jump from a requirement straight to tests. It lowers the requirement one level of abstraction at a time, down to step definitions and test code. Humans fill every gap, scripts check every level, and no lower level can rewrite the one above it.
 
 [![Version](https://img.shields.io/badge/version-2.1.0-blue)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
@@ -25,18 +25,49 @@ Coding agents fail in two well-documented ways.
 1. **They fill gaps with guesses.** A four-sentence requirement leaves dozens of boundaries open. The agent picks an answer for each one and you discover the wrong picks at acceptance.
 2. **They edit the test instead of the code.** When a test and the implementation disagree, the cheapest path to green is to change the test. The report still says "all tests pass".
 
-Specification-driven tools such as GitHub Spec Kit address the first problem by writing a specification before coding. Their specification is still prose, though. Acceptance criteria are not executed, test derivation is left to the agent, and nothing stops the specification from changing during implementation.
+Specification-driven tools such as GitHub Spec Kit and Kiro address the first problem by writing a specification before coding. The agent then derives the tests from that specification largely on its own, and nothing locks the specification or the tests while the code is written.
 
-## The approach
+## The approach: stepwise refinement
 
-SpecEngine treats the specification as a contract that a script enforces, not a document the agent is asked to respect.
+SpecEngine does not translate a natural-language specification into tests in one move. It refines the requirement through six levels, from the stakeholder's words down to test code. Each level is a file you can read, each answers one question, and each is checked before the next one is written.
+
+| Level | Artifact | Question it answers | Checked by |
+| :--- | :--- | :--- | :--- |
+| 1 | Natural-language requirement | What does the stakeholder want? | Human |
+| 2 | Rule matrix | Under which precondition, on which trigger, must the system do what? | Human answers every open question; `feature-lint.js` checks the structure |
+| 3 | Flow diagrams | Do the rules together cover every branch? | Human confirms; any gap goes back to level 2 |
+| 4 | Gherkin scenarios and example tables | What are the concrete cases for each rule? | `feature-lint.js`: one-to-one rule coverage; every example row must follow from the matrix |
+| 5 | Step sentences and driver interface | Which system operation does each sentence drive? | In driver mode every `@binds` must point to a real driver method; sentences are frozen |
+| 6 | Step implementations and product code | How is it done? | Tests go from red to green while levels 2 to 5 stay byte-for-byte unchanged |
+
+Refining in levels gives two things a one-step translation cannot:
+
+- **Each error is caught at the level where it is made.** An unclear requirement becomes a question at level 2. A missing branch shows up in the diagrams at level 3. A miscopied example fails the lint at level 4. In a one-step translation all three surface later as the same symptom, a failing test, with nothing to say which level went wrong.
+- **Every test line is traceable to a decision.** A step implementation leads to its sentence, its scenario and its rule, and from there to the question it came from and the person who answered it.
+
+### Established theory, put into practice
+
+None of the ideas underneath SpecEngine is new on its own. Its contribution is turning them into one working toolchain for AI coding agents.
+
+| Idea | Source | Where it lives in SpecEngine |
+| :--- | :--- | :--- |
+| Stepwise refinement | Wirth, *Program Development by Stepwise Refinement*, 1971 | The six levels above |
+| Preconditions and postconditions | Hoare, *An Axiomatic Basis for Computer Programming*, 1969 | Each rule in the matrix is a precondition, a trigger and a postcondition |
+| Behaviour-driven development and specification by example | North, 2006; Adzic, 2011 | Gherkin scenarios with example tables as the executable level |
+| Test-driven development | Beck, 2002 | Every test starts red; code is written until it turns green |
+
+On top of that foundation SpecEngine adds two rules that classic refinement never needed, because its refiner was a human:
+
+1. **Gaps between levels are filled only by humans.** Whenever a level cannot be derived from the one above, the agent must stop and ask. Every answer is filed with the rule it produced.
+2. **A lower level cannot rewrite a higher one.** While the agent writes levels 5 and 6, a script holds levels 2 to 5 frozen. Once the module is done it is locked, and any later change must go through the change workflow.
+
+### What holds it together
 
 | Principle | Mechanism |
 | :--- | :--- |
-| **Humans decide, agents ask** | Every unresolved boundary becomes a multiple-choice decision. Only a human may answer it. Answers are written back into a rule matrix whose fields map to a Hoare triple: precondition, trigger, postcondition. |
-| **Rules compile to tests** | Confirmed rules become Gherkin scenarios, linted for structure and one-to-one rule coverage, and bound to step definitions through a thin driver interface. |
-| **The target cannot move** | Before implementation, a script snapshots the specification, every step sentence and the driver interface. After implementation it verifies them byte for byte. Any change fails the run. |
-| **Done means locked** | A completed module gets a lock file in version control. A later audit reports any change to the spec, the rule matrix, shared glossary or data model that did not go through the change workflow. |
+| **Humans decide, agents ask** | Every unresolved boundary becomes a multiple-choice decision that only a human may answer. |
+| **The target cannot move** | Before implementation, a script snapshots the specification, every step sentence and the driver interface. Afterwards it compares them byte for byte, and any change fails the run. |
+| **Done means locked** | A completed module gets a lock file in version control. A later audit reports any change made outside the change workflow to the specification, the rule matrix, the shared glossary or the data model. |
 | **State is derived, not declared** | A module's stage is computed from which artifacts exist, so a stale status field cannot mislead the agent or the team. |
 
 All enforcement scripts use only the Node.js standard library.
