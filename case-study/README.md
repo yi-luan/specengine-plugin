@@ -31,7 +31,19 @@ node ../../scripts/spec-status.js                     # POINTS_REDEMPTION: IMPLE
 
 To see the audit catch tampering, change any number in `.specengine/spec/features/點數折抵.feature` and run the audit again; it reports `LOCK_DRIFT`.
 
+## Differences from release 2.0.0
+
 The case ran on a working version just before release 2.0.0, so two checks added after the case report on these artifacts:
 
-- `feature-lint.js` rejects the rule types `validation` and `known_tradeoff` in the matrix. The executor invented them for "the system deliberately does nothing" decisions; this is gap (ii) in Section IV-E, fixed afterwards by the Exclusion entity.
+- `feature-lint.js` reports 11 violations, one per rule: release 2.0.0 accepts only the rule types `main_flow` and `edge_case`, while the matrix uses the types the executor chose at the time (`happy_path`, `constraint`, `boundary`, `error_recovery`, `validation`, `known_tradeoff`). The last two hold "the system deliberately does nothing" decisions, which is gap (ii) in Section IV-E, fixed afterwards by the Exclusion entity and the closed type set.
 - `spec-status.js` warns that the flow-design index lacks the status line introduced in 2.0.0. The derived stage is unaffected.
+
+The field `"spec_engine_version": "2.0.0"` in the matrix was written by the executor from the working version's label; the instructions it followed are those of the working version, not the final 2.0.0 release.
+
+## Exclusions
+
+The five Exclusions counted in the paper (Table VI) are the "known trade-offs" the stakeholder confirmed during flow alignment, listed in `.specengine/sdd/overview/POINTS_REDEMPTION.md`: order submission belongs to the order module; zero balance or zero order amount is covered by R-001/R-002; no automatic refund when the member leaves (R-009); no partial cancellation (R-004); no point-transaction log (POLICY-007). R-009 is also a rule in the matrix, because at the time such decisions had no other home.
+
+## Timestamps
+
+The `時間戳` fields in the decision files and the confirmation time in the flow-design index were written by the executor and are estimates; they do not match the order of events. The system clock is authoritative: `lockedAt` in the lock file is UTC (00:42 on 18 October in Taiwan time), and the file modification times of the original run place every decision, the incident record and the corrected feature file before the lock. The whole case, from the empty project to the lock, took about 35 minutes (00:09–00:44). Release 2.0.0 tells the agent to read timestamps from the system clock for this reason.
