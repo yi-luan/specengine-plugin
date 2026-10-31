@@ -1,0 +1,32 @@
+{
+  "module": "COUPON",
+  "lockedAt": "2026-10-31T15:36:32.917Z",
+  "lockedAtLocal": "2026-10-31 23:36",
+  "matrix": {
+    ".specengine/sdd/matrix/COUPON.json": "542e137d456730062fc4420d20d6b258441300055ce4fb2270ab77376322ecd7"
+  },
+  "features": {
+    ".specengine/spec/features/多租戶優惠券.feature": "c0b6b1ff14a4e47c3b183a6719211cde25a116f26afd3fbd27de794b02015396"
+  },
+  "stepSignatures": {
+    "tests/steps/coupon.steps.ts": [
+      "Given::優惠券 {string} 值為 {string}",
+      "Given::優惠券 {string} 可疊加為 {string}",
+      "Given::優惠券 {string} 所屬租戶為 {string}",
+      "Given::優惠券 {string} 最低消費為 {string}",
+      "Given::優惠券 {string} 有效期間為 {string} 至 {string}",
+      "Given::優惠券 {string} 類型為 {string}",
+      "Given::現在時間為 {string}",
+      "Given::訂單租戶為 {string}",
+      "Given::訂單金額為 {string}",
+      "Then::失敗原因代碼為 {string}",
+      "Then::套用結果為 {string}",
+      "Then::實際套用代碼為 {string}",
+      "Then::折扣後金額為 {string}",
+      "Then::折扣總額為 {string}",
+      "When::不傳入任何優惠券進行套用",
+      "When::依序傳入優惠券 {string} 進行套用"
+    ]
+  },
+  "driverInterfaces": {}
+}

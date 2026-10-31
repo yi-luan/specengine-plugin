@@ -1,0 +1,10 @@
+{
+  "lockedAt": "2026-10-31T15:36:32.917Z",
+  "lockedBy": "COUPON",
+  "files": {
+    ".specengine/spec/erm.dbml": "e9cc54e1a136cda52cfb40ec0f72c957239d15d97fe7518e25a0427927f4f850",
+    ".specengine/spec/exclusions.md": "c9c641782e157b79892926e538da08b126ec5bb3f7c62e6ecb7ac2773c376537",
+    ".specengine/spec/policy-defaults.md": "d98e42bcec6337cec08c05ee82e2e26adb82ef900c992c13fc5cd1e59a94cfdf",
+    ".specengine/spec/terms.md": "d91c7c2f2309d3a18ceeb6919badd6e9480dee9a03addc7228f98df250aa1db8"
+  }
+}

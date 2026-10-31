@@ -1,0 +1,21 @@
+
+65e6e29 2026-10-31 23:25:54 +0800 T3-A-h1 done
+
+ BENCH-LOG.md                  |  39 +++++++++++
+ src/coupon.ts                 | 105 ++++++++++++++++++++++++++++
+ tests/features/coupon.feature | 155 ++++++++++++++++++++++++++++++++++++++++++
+ tests/steps/coupon.steps.ts   | 106 +++++++++++++++++++++++++++++
+ 4 files changed, 405 insertions(+)
+
+68db830 2026-10-31 23:22:56 +0800 bench base
+
+ .gitignore             |    3 +
+ README.md              |    3 +
+ cucumber.cjs           |    7 +
+ package-lock.json      | 2317 ++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json           |   16 +
+ src/index.ts           |    2 +
+ tests/steps/.gitkeep   |    0
+ tests/support/.gitkeep |    0
+ tsconfig.json          |   13 +
+ 9 files changed, 2361 insertions(+)

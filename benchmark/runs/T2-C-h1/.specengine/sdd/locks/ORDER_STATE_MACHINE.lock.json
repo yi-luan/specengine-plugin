@@ -1,0 +1,25 @@
+{
+  "module": "ORDER_STATE_MACHINE",
+  "lockedAt": "2026-10-31T15:35:14.846Z",
+  "lockedAtLocal": "2026-10-31 23:35",
+  "matrix": {
+    ".specengine/sdd/matrix/ORDER_STATE_MACHINE.json": "00c9b9862d69a1b00cb53ded06b4bd536cdd3cba6d08ce443420176465699bfa"
+  },
+  "features": {
+    ".specengine/spec/features/訂單狀態機.feature": "337bcfd0795a582c2e06f00800eeec7f5563eec2c863ce1dadd641a278d4f43e"
+  },
+  "stepSignatures": {
+    "tests/steps/order-state-machine.steps.ts": [
+      "Given::一張訂單狀態為 {string}，訂單金額為 {string}，已付金額為 {string}，累計退款金額為 {string}",
+      "Then::已付金額為 {string}",
+      "Then::操作失敗，原因為 {string}",
+      "Then::操作成功",
+      "Then::累計退款金額為 {string}",
+      "Then::訂單狀態為 {string}",
+      "When::呼叫 {string}",
+      "When::呼叫 {string}，編號為 {string}，金額為 {string}",
+      "When::呼叫 {string}，金額為 {string}"
+    ]
+  },
+  "driverInterfaces": {}
+}

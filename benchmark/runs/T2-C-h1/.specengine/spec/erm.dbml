@@ -1,0 +1,10 @@
+// 命名慣例待 manifest 核實，目前暫採 snake_case。
+// 本專案為純函式模組、無資料庫；此檔描述領域實體 Order 的欄位與約束，作為規格模型。
+
+Table orders {
+  id varchar [pk, note: "訂單編號，識別字串"]
+  status varchar [not null, note: "狀態: CREATED（已建立） | PAID（已付款） | SHIPPED（已出貨） | CANCELLED（已取消） | REFUNDED（已退款）"]
+  amount int [not null, note: "訂單金額（整數元），必須 > 0"]
+  paid_amount int [not null, note: "已付金額（整數元），必須 >= 0 且不超過訂單金額"]
+  refunded_amount int [not null, note: "累計退款金額（整數元），必須 >= 0 且不超過已付金額"]
+}

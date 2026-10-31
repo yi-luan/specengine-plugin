@@ -1,0 +1,328 @@
+{
+  "spec_engine_version": "2.1.0",
+  "rules": [
+    {
+      "rule_id": "R-COUPON-000",
+      "type": "main_flow",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "優惠券為可疊加的百分比折扣（PERCENT）",
+        "現在時間落在優惠券有效期間內（含起迄時刻）",
+        "優惠券未設定最低消費"
+      ],
+      "trigger_event": "以訂單金額 1000 元與該券呼叫套用",
+      "post_assertions": [
+        "折扣總額為 100 元",
+        "折扣後金額為 900 元",
+        "實際套用代碼包含該券代碼"
+      ],
+      "resolved_by": ["resolved/features/優惠券_百分比折扣取整方式.md"]
+    },
+    {
+      "rule_id": "R-COUPON-001",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "優惠券為可疊加的固定金額折扣（FIXED），折扣金額 300 元",
+        "現在時間落在優惠券有效期間內（含起迄時刻）",
+        "優惠券未設定最低消費"
+      ],
+      "trigger_event": "以訂單金額 1000 元與該券呼叫套用",
+      "post_assertions": [
+        "折扣總額為 300 元",
+        "折扣後金額為 700 元",
+        "實際套用代碼包含該券代碼"
+      ]
+    },
+    {
+      "rule_id": "R-COUPON-002",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "優惠券的有效期間為 2026-01-01 至 2026-12-31",
+        "現在時間明顯早於有效起日，或明顯晚於有效迄日"
+      ],
+      "trigger_event": "以訂單金額 1000 元與該券呼叫套用",
+      "post_assertions": [
+        "套用結果為失敗，整筆拒絕",
+        "失敗原因代碼為 COUPON_EXPIRED（未生效與已過期使用同一代碼）",
+        "不回傳任何已套用的優惠券代碼"
+      ],
+      "resolved_by": [
+        "resolved/features/優惠券_期間邊界時刻.md",
+        "resolved/features/優惠券_任一張券不符合條件時.md",
+        "resolved/features/優惠券_失敗原因文案.md"
+      ]
+    },
+    {
+      "rule_id": "R-COUPON-003",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "優惠券設定最低消費 1000 元",
+        "現在時間落在優惠券有效期間內",
+        "訂單金額為 500 元，低於最低消費"
+      ],
+      "trigger_event": "以該訂單金額與該券呼叫套用",
+      "post_assertions": [
+        "套用結果為失敗，整筆拒絕",
+        "失敗原因代碼為 MIN_ORDER_NOT_MET",
+        "不回傳任何已套用的優惠券代碼"
+      ],
+      "resolved_by": [
+        "resolved/features/優惠券_任一張券不符合條件時.md",
+        "resolved/features/優惠券_失敗原因文案.md"
+      ]
+    },
+    {
+      "rule_id": "R-COUPON-004",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "同時提供兩張可疊加的百分比折扣：10% 與 5%",
+        "兩張券皆在有效期間內且未設最低消費"
+      ],
+      "trigger_event": "以訂單金額 1000 元依序傳入兩張券呼叫套用",
+      "post_assertions": [
+        "兩張券的百分比皆以折扣前金額 1000 元計算，各自無條件捨去",
+        "折扣總額為 150 元（100 + 50）",
+        "折扣後金額為 850 元",
+        "實際套用代碼依傳入順序列出"
+      ],
+      "resolved_by": ["resolved/features/優惠券_百分比折扣取整方式.md"]
+    },
+    {
+      "rule_id": "R-COUPON-005",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "同時提供一張可疊加的百分比折扣 10% 與一張可疊加的固定金額折扣 300 元",
+        "兩張券皆在有效期間內且未設最低消費"
+      ],
+      "trigger_event": "以訂單金額 1000 元呼叫套用",
+      "post_assertions": [
+        "百分比部分以折扣前金額 1000 元計算為 100 元",
+        "折扣總額為 400 元",
+        "折扣後金額為 600 元"
+      ]
+    },
+    {
+      "rule_id": "R-COUPON-006",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "優惠券為不可疊加的百分比折扣 20%",
+        "現在時間落在優惠券有效期間內（含起迄時刻）",
+        "優惠券未設定最低消費"
+      ],
+      "trigger_event": "以訂單金額 1000 元與該券單獨呼叫套用",
+      "post_assertions": [
+        "折扣總額為 200 元",
+        "折扣後金額為 800 元",
+        "實際套用代碼包含該券代碼"
+      ],
+      "resolved_by": [
+        "resolved/features/優惠券_可疊加與不可疊加併用.md",
+        "resolved/features/優惠券_多張不可疊加同時出現.md"
+      ]
+    },
+    {
+      "rule_id": "R-COUPON-007",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "優惠券 tenantId 為 T-A",
+        "呼叫時的 ApplyInput.tenantId 為 T-B（不同租戶）"
+      ],
+      "trigger_event": "以訂單金額 1000 元與該券呼叫套用",
+      "post_assertions": [
+        "套用結果為失敗，整筆拒絕",
+        "失敗原因代碼為 TENANT_MISMATCH",
+        "不回傳任何已套用的優惠券代碼"
+      ],
+      "resolved_by": ["resolved/features/優惠券_租戶不一致時.md"]
+    },
+    {
+      "rule_id": "R-COUPON-008",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "呼叫時未傳入任何優惠券（coupons 為空清單）",
+        "訂單金額為正整數（非 0、非負、為整數）"
+      ],
+      "trigger_event": "以訂單金額 1000 元呼叫套用",
+      "post_assertions": [
+        "套用結果為成功",
+        "折扣後金額為 1000 元",
+        "折扣總額為 0 元",
+        "實際套用代碼為空清單"
+      ],
+      "resolved_by": ["resolved/features/優惠券_空券清單或無券可套用.md"]
+    },
+    {
+      "rule_id": "R-COUPON-009",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "優惠券為可疊加的固定金額折扣，折扣金額 800 元",
+        "現在時間落在優惠券有效期間內，未設最低消費"
+      ],
+      "trigger_event": "以訂單金額 500 元與該券呼叫套用",
+      "post_assertions": [
+        "套用結果為失敗，整筆拒絕",
+        "失敗原因代碼為 DISCOUNT_EXCEEDS_AMOUNT"
+      ],
+      "resolved_by": ["resolved/features/優惠券_單張固定折扣超過訂單金額.md"]
+    },
+    {
+      "rule_id": "R-COUPON-010",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "同時提供兩張可疊加的百分比折扣：60% 與 50%",
+        "兩張券皆在有效期間內且未設最低消費"
+      ],
+      "trigger_event": "以訂單金額 1000 元依序傳入兩張券呼叫套用",
+      "post_assertions": [
+        "套用結果為失敗，整筆拒絕",
+        "失敗原因代碼為 DISCOUNT_EXCEEDS_AMOUNT（合計 110% 超過訂單金額）"
+      ],
+      "resolved_by": ["resolved/features/優惠券_合計折扣超過訂單金額.md"]
+    },
+    {
+      "rule_id": "R-COUPON-011",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "同時提供一張不可疊加的券與一張可疊加的券",
+        "兩張券皆在有效期間內且未設最低消費"
+      ],
+      "trigger_event": "以訂單金額 1000 元呼叫套用",
+      "post_assertions": [
+        "套用結果為失敗，整筆拒絕",
+        "失敗原因代碼為 NOT_STACKABLE"
+      ],
+      "resolved_by": ["resolved/features/優惠券_可疊加與不可疊加併用.md"]
+    },
+    {
+      "rule_id": "R-COUPON-012",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "同時提供兩張不可疊加的券",
+        "兩張券皆在有效期間內且未設最低消費"
+      ],
+      "trigger_event": "以訂單金額 1000 元呼叫套用",
+      "post_assertions": [
+        "套用結果為失敗，整筆拒絕",
+        "失敗原因代碼為 NOT_STACKABLE"
+      ],
+      "resolved_by": ["resolved/features/優惠券_多張不可疊加同時出現.md"]
+    },
+    {
+      "rule_id": "R-COUPON-013",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "訂單金額為 0、負數或非整數（例如 99.5）其中之一"
+      ],
+      "trigger_event": "以該訂單金額呼叫套用（不論是否傳入券，且先於其他檢查）",
+      "post_assertions": [
+        "套用結果為失敗，整筆拒絕",
+        "失敗原因代碼為 INVALID_INPUT"
+      ],
+      "resolved_by": ["resolved/features/優惠券_訂單金額非法輸入.md"]
+    },
+    {
+      "rule_id": "R-COUPON-014",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "優惠券本身的值不合法：PERCENT 不在 1 至 100 之間、或 FIXED 小於等於 0、或值為非整數"
+      ],
+      "trigger_event": "以訂單金額 1000 元與該券呼叫套用",
+      "post_assertions": [
+        "套用結果為失敗，整筆拒絕",
+        "失敗原因代碼為 INVALID_COUPON"
+      ],
+      "resolved_by": ["resolved/data/優惠券_百分比折扣數值範圍.md"]
+    },
+    {
+      "rule_id": "R-COUPON-015",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "優惠券的有效迄日早於有效起日，或有效期間的時間格式不合法"
+      ],
+      "trigger_event": "以訂單金額 1000 元與該券呼叫套用",
+      "post_assertions": [
+        "套用結果為失敗，整筆拒絕",
+        "失敗原因代碼為 INVALID_COUPON"
+      ],
+      "resolved_by": ["resolved/data/優惠券_有效期間設定錯誤.md"]
+    },
+    {
+      "rule_id": "R-COUPON-016",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "同一次呼叫的 coupons 清單中出現相同代碼的兩張券"
+      ],
+      "trigger_event": "以訂單金額 1000 元呼叫套用",
+      "post_assertions": [
+        "套用結果為失敗，整筆拒絕",
+        "失敗原因代碼為 DUPLICATE_COUPON"
+      ],
+      "resolved_by": ["resolved/features/優惠券_重複代碼輸入.md"]
+    },
+    {
+      "rule_id": "R-COUPON-017",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "同一次呼叫同時違反多項檢查（例如訂單金額為 0 且券已過期）"
+      ],
+      "trigger_event": "以該輸入呼叫套用",
+      "post_assertions": [
+        "失敗原因代碼依固定檢查順序回報第一個命中：INVALID_INPUT → INVALID_COUPON → TENANT_MISMATCH → DUPLICATE_COUPON → COUPON_EXPIRED → MIN_ORDER_NOT_MET → NOT_STACKABLE → DISCOUNT_EXCEEDS_AMOUNT"
+      ],
+      "resolved_by": ["resolved/features/優惠券_失敗原因文案.md"]
+    },
+    {
+      "rule_id": "R-COUPON-018",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "優惠券為可疊加的百分比折扣 10%，設定最低消費 1000 元",
+        "現在時間落在優惠券有效期間內（含起迄時刻）",
+        "訂單金額為 1000 元，恰等於最低消費"
+      ],
+      "trigger_event": "以訂單金額 1000 元與該券呼叫套用",
+      "post_assertions": [
+        "套用結果為成功",
+        "折扣總額為 100 元",
+        "折扣後金額為 900 元",
+        "實際套用代碼包含該券代碼"
+      ],
+      "resolved_by": ["resolved/features/優惠券_最低消費等於邊界.md"]
+    },
+    {
+      "rule_id": "R-COUPON-019",
+      "type": "edge_case",
+      "actor": "結帳呼叫端",
+      "pre_conditions": [
+        "優惠券為可疊加的百分比折扣 1%，未設最低消費",
+        "現在時間落在優惠券有效期間內（含起迄時刻）",
+        "訂單金額為 50 元，1% 計算結果無條件捨去為 0 元"
+      ],
+      "trigger_event": "以訂單金額 50 元與該券呼叫套用",
+      "post_assertions": [
+        "套用結果為成功",
+        "折扣總額為 0 元",
+        "折扣後金額為 50 元",
+        "實際套用代碼包含該券代碼（折扣為 0 仍視為已套用）"
+      ],
+      "resolved_by": ["resolved/features/優惠券_零元百分比折扣是否列入applied.md"]
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "不傳入任何優惠券進行套用": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "依序傳入優惠券 {string} 進行套用": {
+    "count": 20,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "優惠券 {string} 值為 {string}": {
+    "count": 25,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "優惠券 {string} 可疊加為 {string}": {
+    "count": 25,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "優惠券 {string} 所屬租戶為 {string}": {
+    "count": 25,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "優惠券 {string} 最低消費為 {string}": {
+    "count": 25,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "優惠券 {string} 有效期間為 {string} 至 {string}": {
+    "count": 25,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "優惠券 {string} 類型為 {string}": {
+    "count": 25,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "失敗原因代碼為 {string}": {
+    "count": 13,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "套用結果為 {string}": {
+    "count": 21,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "實際套用代碼為 {string}": {
+    "count": 18,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "折扣後金額為 {string}": {
+    "count": 8,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "折扣總額為 {string}": {
+    "count": 8,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "現在時間為 {string}": {
+    "count": 21,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "訂單租戶為 {string}": {
+    "count": 21,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  },
+  "訂單金額為 {string}": {
+    "count": 21,
+    "files": [
+      ".specengine/spec/features/多租戶優惠券.feature"
+    ]
+  }
+}

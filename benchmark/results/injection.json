@@ -1,0 +1,1082 @@
+{
+  "T1-A-r1": {
+    "baseline": {
+      "ownTests": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": false
+      },
+      "L2-edit-rule": {
+        "applicable": false
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Scenario 區塊（points-discount.feature）",
+        "ownTests": "pass"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「訂單金額為 {float} 元」加字（points.steps.ts）",
+        "ownTests": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 6 個 Then 函式體",
+        "ownTests": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 8,
+        "audit": 0,
+        "any": 8
+      }
+    }
+  },
+  "T1-A-r2": {
+    "baseline": {
+      "ownTests": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": false
+      },
+      "L2-edit-rule": {
+        "applicable": false
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Scenario 區塊（points-discount.feature）",
+        "ownTests": "pass"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「訂單金額為 {float} 元」加字（points-discount.steps.ts）",
+        "ownTests": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 7 個 Then 函式體",
+        "ownTests": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 6,
+        "audit": 0,
+        "any": 6
+      }
+    }
+  },
+  "T1-B-r1": {
+    "baseline": {
+      "ownTests": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": false
+      },
+      "L2-edit-rule": {
+        "applicable": false
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Scenario 區塊（points-discount.feature）",
+        "ownTests": "pass"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「an order of {float} dollars」加字（points-discount.steps.ts）",
+        "ownTests": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 3 個 Then 函式體",
+        "ownTests": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 8,
+        "audit": 0,
+        "any": 8
+      }
+    }
+  },
+  "T1-B-r2": {
+    "baseline": {
+      "ownTests": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": false
+      },
+      "L2-edit-rule": {
+        "applicable": false
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Scenario 區塊（points-discount.feature）",
+        "ownTests": "pass"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「訂單金額為 {int} 元」加字（points-discount.steps.ts）",
+        "ownTests": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 3 個 Then 函式體",
+        "ownTests": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 6,
+        "audit": 0,
+        "any": 6
+      }
+    }
+  },
+  "T1-C-r1": {
+    "baseline": {
+      "lint": "pass",
+      "ownTests": "pass",
+      "audit": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": true,
+        "what": "刪除 R-POINTS_REDEMPTION-008",
+        "lint": "FLAG",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L2-edit-rule": {
+        "applicable": true,
+        "what": "改 R-POINTS_REDEMPTION-000 的後置斷言",
+        "lint": "pass",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Rule 區塊（會員點數折抵.feature）",
+        "lint": "FLAG",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「會員點數餘額為 {string}」加字（points-redemption.steps.ts）",
+        "lint": "pass",
+        "ownTests": "FLAG",
+        "audit": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 4 個 Then 函式體",
+        "lint": "pass",
+        "ownTests": "pass",
+        "audit": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 8,
+        "audit": 15,
+        "any": 8
+      }
+    }
+  },
+  "T1-C-r2": {
+    "baseline": {
+      "lint": "pass",
+      "ownTests": "pass",
+      "audit": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": true,
+        "what": "刪除 R-POINTS_REDEMPTION-004",
+        "lint": "FLAG",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L2-edit-rule": {
+        "applicable": true,
+        "what": "改 R-POINTS_REDEMPTION-000 的後置斷言",
+        "lint": "pass",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Rule 區塊（會員點數折抵.feature）",
+        "lint": "FLAG",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「會員點數餘額為 {string}」加字（points-redemption.steps.ts）",
+        "lint": "pass",
+        "ownTests": "FLAG",
+        "audit": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 5 個 Then 函式體",
+        "lint": "pass",
+        "ownTests": "pass",
+        "audit": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 6,
+        "audit": 15,
+        "any": 6
+      }
+    }
+  },
+  "T2-A-h1": {
+    "baseline": {
+      "ownTests": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": false
+      },
+      "L2-edit-rule": {
+        "applicable": false
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Scenario 區塊（order.feature）",
+        "ownTests": "pass"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「已付款」加字（order.steps.ts）",
+        "ownTests": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 4 個 Then 函式體",
+        "ownTests": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 10,
+        "lint": 0,
+        "ownTests": 8,
+        "audit": 0,
+        "any": 8
+      }
+    }
+  },
+  "T2-A-r1": {
+    "baseline": {
+      "ownTests": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": false
+      },
+      "L2-edit-rule": {
+        "applicable": false
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Scenario 區塊（order.feature）",
+        "ownTests": "pass"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「系統中沒有任何訂單」加字（order.steps.ts）",
+        "ownTests": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 11 個 Then 函式體",
+        "ownTests": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 12,
+        "audit": 0,
+        "any": 12
+      }
+    }
+  },
+  "T2-A-r2": {
+    "baseline": {
+      "ownTests": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": false
+      },
+      "L2-edit-rule": {
+        "applicable": false
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Scenario 區塊（order.feature）",
+        "ownTests": "pass"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「已有一筆狀態為 {string} 金額 {int} 的訂單」加字（order.steps.ts）",
+        "ownTests": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 9 個 Then 函式體",
+        "ownTests": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 12,
+        "audit": 0,
+        "any": 12
+      }
+    }
+  },
+  "T2-B-h1": {
+    "baseline": {
+      "ownTests": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": false
+      },
+      "L2-edit-rule": {
+        "applicable": false
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Scenario 區塊（order-state-machine.feature）",
+        "ownTests": "pass"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「已建立金額為 {int} 元的訂單」加字（order-state-machine.steps.ts）",
+        "ownTests": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 8 個 Then 函式體",
+        "ownTests": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 14,
+        "lint": 0,
+        "ownTests": 12,
+        "audit": 0,
+        "any": 12
+      }
+    }
+  },
+  "T2-B-r1": {
+    "baseline": {
+      "ownTests": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": false
+      },
+      "L2-edit-rule": {
+        "applicable": false
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Rule 區塊（order-state-machine.feature）",
+        "ownTests": "pass"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「一筆狀態為 {word}、金額 {int}、已付 {int}」加字（order.steps.ts）",
+        "ownTests": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 6 個 Then 函式體",
+        "ownTests": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 4,
+        "audit": 0,
+        "any": 4
+      }
+    }
+  },
+  "T2-B-r2": {
+    "baseline": {
+      "ownTests": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": false
+      },
+      "L2-edit-rule": {
+        "applicable": false
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Scenario 區塊（order-state-machine.feature）",
+        "ownTests": "pass"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「an order {string} with amount 」加字（order.steps.ts）",
+        "ownTests": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 8 個 Then 函式體",
+        "ownTests": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 12,
+        "audit": 0,
+        "any": 12
+      }
+    }
+  },
+  "T2-C-r1": {
+    "baseline": {
+      "lint": "pass",
+      "ownTests": "pass",
+      "audit": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": true,
+        "what": "刪除 R-ORDER_STATE_MACHINE-017",
+        "lint": "FLAG",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L2-edit-rule": {
+        "applicable": true,
+        "what": "改 R-ORDER_STATE_MACHINE-000 的後置斷言",
+        "lint": "pass",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Rule 區塊（訂單狀態機.feature）",
+        "lint": "FLAG",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「一筆狀態為 {string} 的訂單，訂單金額為 {stri」加字（order-state-machine.steps.ts）",
+        "lint": "pass",
+        "ownTests": "FLAG",
+        "audit": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 8 個 Then 函式體",
+        "lint": "pass",
+        "ownTests": "pass",
+        "audit": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 6,
+        "audit": 15,
+        "any": 6
+      }
+    }
+  },
+  "T2-C-r2": {
+    "baseline": {
+      "lint": "pass",
+      "ownTests": "pass",
+      "audit": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": true,
+        "what": "刪除 R-ORDER_STATE_MACHINE-019",
+        "lint": "FLAG",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L2-edit-rule": {
+        "applicable": true,
+        "what": "改 R-ORDER_STATE_MACHINE-000 的後置斷言",
+        "lint": "pass",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Rule 區塊（訂單狀態機.feature）",
+        "lint": "FLAG",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「一筆狀態為 {string} 的訂單，訂單金額 {strin」加字（order-state-machine.steps.ts）",
+        "lint": "pass",
+        "ownTests": "FLAG",
+        "audit": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 8 個 Then 函式體",
+        "lint": "pass",
+        "ownTests": "pass",
+        "audit": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 10,
+        "audit": 15,
+        "any": 10
+      }
+    }
+  },
+  "T3-A-h1": {
+    "baseline": {
+      "ownTests": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": false
+      },
+      "L2-edit-rule": {
+        "applicable": false
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Scenario 區塊（coupon.feature）",
+        "ownTests": "pass"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「訂單所屬租戶為 {string}，訂單金額為 {float}」加字（coupon.steps.ts）",
+        "ownTests": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 4 個 Then 函式體",
+        "ownTests": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 15,
+        "audit": 0,
+        "any": 15
+      }
+    }
+  },
+  "T3-A-r1": {
+    "baseline": {
+      "ownTests": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": false
+      },
+      "L2-edit-rule": {
+        "applicable": false
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Scenario 區塊（coupon.feature）",
+        "ownTests": "pass"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「現在時間是 {string}」加字（coupon.steps.ts）",
+        "ownTests": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 4 個 Then 函式體",
+        "ownTests": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 13,
+        "lint": 0,
+        "ownTests": 13,
+        "audit": 0,
+        "any": 13
+      }
+    }
+  },
+  "T3-A-r2": {
+    "baseline": {
+      "ownTests": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": false
+      },
+      "L2-edit-rule": {
+        "applicable": false
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Scenario 區塊（coupon.feature）",
+        "ownTests": "pass"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「目前時間為 {string}」加字（coupon.steps.ts）",
+        "ownTests": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 4 個 Then 函式體",
+        "ownTests": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 14,
+        "lint": 0,
+        "ownTests": 14,
+        "audit": 0,
+        "any": 14
+      }
+    }
+  },
+  "T3-B-r1": {
+    "baseline": {
+      "ownTests": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": false
+      },
+      "L2-edit-rule": {
+        "applicable": false
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Rule 區塊（coupon.feature）",
+        "ownTests": "pass"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「租戶 {string} 的訂單金額為 {float} 元」加字（coupon.steps.ts）",
+        "ownTests": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 4 個 Then 函式體",
+        "ownTests": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 14,
+        "audit": 0,
+        "any": 14
+      }
+    }
+  },
+  "T3-B-r2": {
+    "baseline": {
+      "ownTests": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": false
+      },
+      "L2-edit-rule": {
+        "applicable": false
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Scenario 區塊（coupon.feature）",
+        "ownTests": "pass"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「the order is for tenant {strin」加字（coupon.steps.ts）",
+        "ownTests": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 2 個 Then 函式體",
+        "ownTests": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 10,
+        "audit": 0,
+        "any": 10
+      }
+    }
+  },
+  "T3-B-r3": {
+    "baseline": {
+      "ownTests": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": false
+      },
+      "L2-edit-rule": {
+        "applicable": false
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Scenario 區塊（us1-single-coupon.feature）",
+        "ownTests": "pass"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「租戶 {string} 的訂單金額為 {int} 元」加字（coupon.steps.ts）",
+        "ownTests": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 3 個 Then 函式體",
+        "ownTests": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 9,
+        "audit": 0,
+        "any": 9
+      }
+    }
+  },
+  "T3-C-r1": {
+    "baseline": {
+      "lint": "pass",
+      "ownTests": "pass",
+      "audit": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": true,
+        "what": "刪除 R-MULTI_TENANT_COUPON-018",
+        "lint": "FLAG",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L2-edit-rule": {
+        "applicable": true,
+        "what": "改 R-MULTI_TENANT_COUPON-000 的後置斷言",
+        "lint": "pass",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Rule 區塊（多租戶優惠券.feature）",
+        "lint": "FLAG",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「訂單屬租戶 {string}」加字（multi-tenant-coupon.steps.ts）",
+        "lint": "pass",
+        "ownTests": "FLAG",
+        "audit": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 3 個 Then 函式體",
+        "lint": "pass",
+        "ownTests": "pass",
+        "audit": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 10,
+        "audit": 15,
+        "any": 10
+      }
+    }
+  },
+  "T3-C-r2": {
+    "baseline": {
+      "lint": "pass",
+      "ownTests": "pass",
+      "audit": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": true,
+        "what": "刪除 R-MULTI_TENANT_COUPON-013",
+        "lint": "FLAG",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L2-edit-rule": {
+        "applicable": true,
+        "what": "改 R-MULTI_TENANT_COUPON-000 的後置斷言",
+        "lint": "pass",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Rule 區塊（多租戶優惠券.feature）",
+        "lint": "FLAG",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「訂單租戶為 {string} 且訂單金額為 {string}」加字（multi-tenant-coupon.steps.ts）",
+        "lint": "pass",
+        "ownTests": "FLAG",
+        "audit": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 5 個 Then 函式體",
+        "lint": "pass",
+        "ownTests": "pass",
+        "audit": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 10,
+        "audit": 15,
+        "any": 10
+      }
+    }
+  },
+  "T3-C-r3": {
+    "baseline": {
+      "lint": "pass",
+      "ownTests": "pass",
+      "audit": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": true,
+        "what": "刪除 R-TENANT_COUPON-013",
+        "lint": "FLAG",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L2-edit-rule": {
+        "applicable": true,
+        "what": "改 R-TENANT_COUPON-000 的後置斷言",
+        "lint": "pass",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Rule 區塊（多租戶優惠券.feature）",
+        "lint": "FLAG",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「優惠券 {string}：租戶 {string}、類型 {s」加字（tenant-coupon.steps.ts）",
+        "lint": "pass",
+        "ownTests": "FLAG",
+        "audit": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 2 個 Then 函式體",
+        "lint": "pass",
+        "ownTests": "pass",
+        "audit": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 12,
+        "audit": 15,
+        "any": 12
+      }
+    }
+  },
+  "T3-B-h1": {
+    "baseline": {
+      "ownTests": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": false
+      },
+      "L2-edit-rule": {
+        "applicable": false
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Scenario 區塊（coupon.feature）",
+        "ownTests": "pass"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「現在時間為 {string}」加字（coupon.steps.ts）",
+        "ownTests": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 5 個 Then 函式體",
+        "ownTests": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 15,
+        "audit": 0,
+        "any": 15
+      }
+    }
+  },
+  "T2-C-h1": {
+    "baseline": {
+      "lint": "pass",
+      "ownTests": "pass",
+      "audit": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": true,
+        "what": "刪除 R-ORDER_STATE_MACHINE-012",
+        "lint": "FLAG",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L2-edit-rule": {
+        "applicable": true,
+        "what": "改 R-ORDER_STATE_MACHINE-000 的後置斷言",
+        "lint": "pass",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Rule 區塊（訂單狀態機.feature）",
+        "lint": "FLAG",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「一張訂單狀態為 {string}，訂單金額為 {string」加字（order-state-machine.steps.ts）",
+        "lint": "pass",
+        "ownTests": "FLAG",
+        "audit": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 5 個 Then 函式體",
+        "lint": "pass",
+        "ownTests": "pass",
+        "audit": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 11,
+        "audit": 15,
+        "any": 11
+      }
+    }
+  },
+  "T3-C-h1": {
+    "baseline": {
+      "lint": "pass",
+      "ownTests": "pass",
+      "audit": "pass"
+    },
+    "faults": {
+      "L2-drop-rule": {
+        "applicable": true,
+        "what": "刪除 R-COUPON-019",
+        "lint": "FLAG",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L2-edit-rule": {
+        "applicable": true,
+        "what": "改 R-COUPON-000 的後置斷言",
+        "lint": "pass",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L4-drop-scenario": {
+        "applicable": true,
+        "what": "刪除最後一個 Rule 區塊（多租戶優惠券.feature）",
+        "lint": "FLAG",
+        "ownTests": "pass",
+        "audit": "FLAG"
+      },
+      "L5-rename-step": {
+        "applicable": true,
+        "what": "句型「優惠券 {string} 類型為 {string}」加字（coupon.steps.ts）",
+        "lint": "pass",
+        "ownTests": "FLAG",
+        "audit": "FLAG"
+      },
+      "L5-hollow-steps": {
+        "applicable": true,
+        "what": "清空 5 個 Then 函式體",
+        "lint": "pass",
+        "ownTests": "pass",
+        "audit": "pass"
+      },
+      "L4-edit-example": {
+        "applicable": true,
+        "cells": 15,
+        "lint": 0,
+        "ownTests": 10,
+        "audit": 15,
+        "any": 10
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+
+cf6da4f 2026-10-31 23:35:39 +0800 T2-C-h1 done
+
+ .claude/spec/architecture-manifest.md              |  77 +++++++++
+ .specengine/sdd/flow-design/ORDER_STATE_MACHINE.md |  15 ++
+ .../\344\273\230\346\254\276.md"                   |  22 +++
+ .../\345\207\272\350\262\250.md"                   |  17 ++
+ .../\345\217\226\346\266\210.md"                   |  19 ++
+ ...273\272\347\253\213\350\250\202\345\226\256.md" |  17 ++
+ .../\351\200\200\346\254\276.md"                   |  26 +++
+ .../sdd/locks/ORDER_STATE_MACHINE.lock.json        |  25 +++
+ .specengine/sdd/locks/_shared.json                 |  10 ++
+ .specengine/sdd/matrix/ORDER_STATE_MACHINE.json    | 191 +++++++++++++++++++++
+ .specengine/sdd/overview.md                        |   3 +
+ .specengine/sdd/overview/ORDER_STATE_MACHINE.md    |  38 ++++
+ ...200\200\346\254\276\351\207\221\351\241\215.md" |  30 ++++
+ ...233\236\345\202\263\345\275\242\345\274\217.md" |  31 ++++
+ ...232\204\345\220\210\346\263\225\345\200\274.md" |  31 ++++
+ ...272\246\347\232\204\345\217\215\346\207\211.md" |  31 ++++
+ ...225\270\347\232\204\350\231\225\347\220\206.md" |  30 ++++
+ ...275\234\347\232\204\350\231\225\347\220\206.md" |  31 ++++
+ .specengine/sdd/steps-index.json                   |  56 ++++++
+ .specengine/spec/erm.dbml                          |  10 ++
+ .specengine/spec/exclusions.md                     |   4 +
+ ...56\347\213\200\346\205\213\346\251\237.feature" | 161 +++++++++++++++++
+ .specengine/spec/policy-defaults.md                |   6 +
+ .specengine/spec/terms.md                          |  22 +++
+ BENCH-LOG.md                                       |  60 +++++++
+ CLAUDE.md                                          |  94 ++++++++++
+ src/order.ts                                       |  60 +++++++
+ tests/steps/order-state-machine.steps.ts           | 120 +++++++++++++
+ tests/support/world.ts                             |  10 ++
+ 29 files changed, 1247 insertions(+)
+
+0494955 2026-10-31 23:22:53 +0800 bench base
+
+ .gitignore             |    3 +
+ README.md              |    3 +
+ cucumber.cjs           |    7 +
+ package-lock.json      | 2317 ++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json           |   16 +
+ src/index.ts           |    2 +
+ tests/steps/.gitkeep   |    0
+ tests/support/.gitkeep |    0
+ tsconfig.json          |   13 +
+ 9 files changed, 2361 insertions(+)

@@ -1,0 +1,56 @@
+{
+  "一張訂單狀態為 {string}，訂單金額為 {string}，已付金額為 {string}，累計退款金額為 {string}": {
+    "count": 15,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "呼叫 {string}": {
+    "count": 6,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "呼叫 {string}，編號為 {string}，金額為 {string}": {
+    "count": 3,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "呼叫 {string}，金額為 {string}": {
+    "count": 11,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "已付金額為 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "操作失敗，原因為 {string}": {
+    "count": 10,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "操作成功": {
+    "count": 10,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "累計退款金額為 {string}": {
+    "count": 7,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  },
+  "訂單狀態為 {string}": {
+    "count": 18,
+    "files": [
+      ".specengine/spec/features/訂單狀態機.feature"
+    ]
+  }
+}

@@ -131,6 +131,21 @@ What the numbers say:
 - **SpecEngine's advantage is enforcement.** Its guarantees come from scripts, so they hold regardless of which model runs the workflow.
 - **SpecEngine costs more time.** Runs took about 1.4 to 1.6 times as long as Spec Kit and stopped for human input more often.
 
+### With a weak model
+
+T2 and T3 were rerun with Claude Haiku 5.5, the smallest current Claude model.
+
+| Requirement | No SDD tool | GitHub Spec Kit | SpecEngine 2.1 |
+| :--- | :---: | :---: | :---: |
+| T2 Order state machine (32 tests) | 20 | 20 | **32** |
+| T3 Multi-tenant coupons (38 tests) | 23 | 31 | **38** |
+
+With a strong model the two SDD tools tied. With a weak model, Spec Kit's clarify step judged T2 to have no important ambiguities and asked one question, so it scored the same as using no tool. SpecEngine's discovery stage queues every open boundary as a question by procedure, so the weak model still asked about 9 of 11 and 13 of 14 boundaries and kept full marks. Each cell is a single run.
+
+### Where each layer catches mistakes
+
+Faults were planted one at a time into every run: a dropped rule, a dropped scenario, an edited example, a renamed step, hollow assertions. Only SpecEngine caught a dropped rule or scenario at creation time, through `feature-lint.js`. After locking it caught every specification edit. Two gaps remain in every tool, SpecEngine included: an example value that is wrong but consistent with the code, and step definitions emptied of assertions. Mutation testing showed that all three conditions write equally thorough tests; what differs is whether the behaviour being tested is the one the stakeholder asked for.
+
 Each cell holds one or two runs, so differences of one or two tests are not meaningful. Three T3 runs were discarded after the agent read the answer sheet, and clean runs were repeated with answers supplied by a separate session. Requirements, answer sheets, hidden tests, every run's output and the scoring scripts are in [`benchmark/`](benchmark/README.md), and every number above can be regenerated from them.
 
 ### Change workflow (2.1.0)

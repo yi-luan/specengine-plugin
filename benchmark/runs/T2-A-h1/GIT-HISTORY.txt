@@ -1,0 +1,21 @@
+
+fb90e44 2026-10-31 23:25:35 +0800 T2-A-h1 done
+
+ BENCH-LOG.md                 |  38 ++++++++++++
+ src/order.ts                 |  81 ++++++++++++++++++++++++
+ tests/features/order.feature | 120 ++++++++++++++++++++++++++++++++++++
+ tests/steps/order.steps.ts   | 144 +++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 383 insertions(+)
+
+b8141de 2026-10-31 23:22:50 +0800 bench base
+
+ .gitignore             |    3 +
+ README.md              |    3 +
+ cucumber.cjs           |    7 +
+ package-lock.json      | 2317 ++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json           |   16 +
+ src/index.ts           |    2 +
+ tests/steps/.gitkeep   |    0
+ tests/support/.gitkeep |    0
+ tsconfig.json          |   13 +
+ 9 files changed, 2361 insertions(+)

@@ -1,0 +1,64 @@
+
+8c8986e 2026-10-31 23:31:37 +0800 T2-B-h1 done
+
+ .specify/memory/constitution.md                    |  67 +++++----
+ BENCH-LOG.md                                       |  60 +++++++++
+ .../checklists/requirements.md                     |  35 +++++
+ .../001-order-state-machine/contracts/order-api.md |  37 +++++
+ specs/001-order-state-machine/data-model.md        |  35 +++++
+ specs/001-order-state-machine/plan.md              |  75 +++++++++++
+ specs/001-order-state-machine/quickstart.md        |  20 +++
+ specs/001-order-state-machine/research.md          |  27 ++++
+ specs/001-order-state-machine/spec.md              | 119 ++++++++++++++++
+ specs/001-order-state-machine/tasks.md             | 111 +++++++++++++++
+ src/order.ts                                       |  76 +++++++++++
+ tests/features/order-state-machine.feature         | 120 +++++++++++++++++
+ tests/steps/order-state-machine.steps.ts           | 149 +++++++++++++++++++++
+ 13 files changed, 896 insertions(+), 35 deletions(-)
+
+0b48f2c 2026-10-31 23:23:23 +0800 spec-kit init
+
+ .claude/skills/speckit-analyze/SKILL.md            | 262 +++++++
+ .claude/skills/speckit-checklist/SKILL.md          | 386 ++++++++++
+ .claude/skills/speckit-clarify/SKILL.md            | 294 ++++++++
+ .claude/skills/speckit-constitution/SKILL.md       | 182 +++++
+ .claude/skills/speckit-converge/SKILL.md           | 285 ++++++++
+ .claude/skills/speckit-implement/SKILL.md          | 229 ++++++
+ .claude/skills/speckit-plan/SKILL.md               | 169 +++++
+ .claude/skills/speckit-specify/SKILL.md            | 348 +++++++++
+ .claude/skills/speckit-tasks/SKILL.md              | 218 ++++++
+ .claude/skills/speckit-taskstoissues/SKILL.md      | 120 +++
+ .specify/.gitignore                                |  14 +
+ .specify/init-options.json                         |  10 +
+ .specify/integration.json                          |  15 +
+ .specify/integrations/claude.manifest.json         |  17 +
+ .specify/integrations/speckit.manifest.json        |  19 +
+ .specify/memory/.constitution-template.json        |   4 +
+ .specify/memory/constitution.md                    |  50 ++
+ .../scripts/powershell/check-prerequisites.ps1     | 194 +++++
+ .specify/scripts/powershell/common.ps1             | 813 +++++++++++++++++++++
+ .specify/scripts/powershell/create-new-feature.ps1 | 357 +++++++++
+ .specify/scripts/powershell/resolve-template.ps1   |  38 +
+ .specify/scripts/powershell/setup-plan.ps1         |  90 +++
+ .specify/scripts/powershell/setup-tasks.ps1        |  93 +++
+ .specify/templates/checklist-template.md           |  45 ++
+ .specify/templates/constitution-template.md        |  50 ++
+ .specify/templates/plan-template.md                | 113 +++
+ .specify/templates/spec-template.md                | 131 ++++
+ .specify/templates/tasks-template.md               | 252 +++++++
+ .specify/workflows/speckit/workflow.yml            |  74 ++
+ .specify/workflows/workflow-registry.json          |  13 +
+ 30 files changed, 4885 insertions(+)
+
+b8141de 2026-10-31 23:22:50 +0800 bench base
+
+ .gitignore             |    3 +
+ README.md              |    3 +
+ cucumber.cjs           |    7 +
+ package-lock.json      | 2317 ++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json           |   16 +
+ src/index.ts           |    2 +
+ tests/steps/.gitkeep   |    0
+ tests/support/.gitkeep |    0
+ tsconfig.json          |   13 +
+ 9 files changed, 2361 insertions(+)
