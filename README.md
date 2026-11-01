@@ -154,6 +154,18 @@ T4 is three services, order, inventory and payment, that share no data and talk 
 
 Out of 36 tests. Data consistency was not where the conditions differed: 11 of 12 runs, including the teams with no tool, passed every duplicate, reordering and conservation test. The baseline teams lost points on decisions each developer made alone, such as failure codes. The one consistency failure, a weak-model Spec Kit run that left an order pending forever when two events arrived in the opposite order, came from a boundary nobody had asked about. SpecEngine kept full marks in all four settings without any change to the plugin. Neither tool checks the contract between services; the teams stayed consistent because every developer asked the same stakeholder.
 
+### Concurrency and non-functional requirements
+
+T5 is a flash sale on several servers that share only a Redis-like store. Customers double-click, requests are resent, and servers can crash or stall and then resume. The hidden tests control which server's store call completes next, crash or pause servers mid-request, and check over hundreds of schedules that nothing is oversold. The answer sheet also holds six non-functional answers, to see whether clarification asks about load, latency, blocking after a crash, an unreachable store or caching.
+
+| Condition | Strong model | Haiku |
+| :--- | :---: | :---: |
+| No SDD tool | 26 | 22 |
+| GitHub Spec Kit | 27 | 27 |
+| SpecEngine 2.1 | **28** | 25 |
+
+Out of 29 tests. No tool asked a non-functional question during clarification; every question before implementation was about business rules. The one such boundary nobody asked about, what to do when the shared store is unreachable, failed in all six runs. Every run, the baselines included, avoided distributed locks and used atomic counters and claims, so the crash and stall tests did not separate the conditions. The concurrency bugs that did appear sat behind a matching rule and a green test whose in-memory store never interleaved two requests. Here SpecEngine with Haiku scored below Spec Kit with Haiku for the first time.
+
 ### Where each layer catches mistakes
 
 Faults were planted one at a time into every run: a dropped rule, a dropped scenario, an edited example, a renamed step, hollow assertions. Only SpecEngine caught a dropped rule or scenario at creation time, through `feature-lint.js`. After locking it caught every specification edit. Two gaps remain in every tool, SpecEngine included: an example value that is wrong but consistent with the code, and step definitions emptied of assertions. Mutation testing showed that all three conditions write equally thorough tests; what differs is whether the behaviour being tested is the one the stakeholder asked for.

@@ -1,0 +1,26 @@
+// 命名慣例待 manifest 核實，目前暫採 snake_case
+
+Table flash_sale {
+  sale_id varchar [pk, note: "搶購編號，唯一識別一檔限量搶購"]
+  quantity int [not null, note: "限量件數，必須為正整數"]
+  per_customer_limit int [not null, note: "每位顧客限購件數，必須為正整數"]
+  starts_at timestamp [not null, note: "搶購開始時間，ISO 8601"]
+  ends_at timestamp [not null, note: "搶購結束時間，ISO 8601"]
+}
+
+Table hold {
+  hold_id varchar [pk, note: "保留編號"]
+  sale_id varchar [not null, note: "所屬搶購編號"]
+  customer_id varchar [not null, note: "顧客編號"]
+  qty int [not null, note: "保留件數，必須為正整數"]
+  expires_at timestamp [not null, note: "保留到期時間，搶到時間加 10 分鐘"]
+  status varchar [not null, note: "狀態: HELD | PAID | EXPIRED"]
+}
+
+Table grab_request {
+  request_id varchar [pk, note: "搶購請求編號，用於重送去重"]
+  hold_id varchar [not null, note: "該請求對應的保留編號"]
+}
+
+Ref: hold.sale_id > flash_sale.sale_id
+Ref: grab_request.hold_id > hold.hold_id

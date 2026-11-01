@@ -1,0 +1,23 @@
+
+5976d51 2026-11-02 02:32:12 +0800 T5-A-r1 done
+
+ BENCH-LOG.md                      |  46 ++++++
+ src/flash.ts                      | 247 +++++++++++++++++++++++++++++++
+ tests/features/flash-sale.feature | 295 ++++++++++++++++++++++++++++++++++++++
+ tests/steps/flash.steps.ts        | 254 ++++++++++++++++++++++++++++++++
+ tests/support/memory-store.ts     | 154 ++++++++++++++++++++
+ tests/support/world.ts            |  43 ++++++
+ 6 files changed, 1039 insertions(+)
+
+68db830 2026-10-31 23:22:56 +0800 bench base
+
+ .gitignore             |    3 +
+ README.md              |    3 +
+ cucumber.cjs           |    7 +
+ package-lock.json      | 2317 ++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json           |   16 +
+ src/index.ts           |    2 +
+ tests/steps/.gitkeep   |    0
+ tests/support/.gitkeep |    0
+ tsconfig.json          |   13 +
+ 9 files changed, 2361 insertions(+)

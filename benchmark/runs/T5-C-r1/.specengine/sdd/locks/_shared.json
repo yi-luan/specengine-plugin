@@ -1,0 +1,10 @@
+{
+  "lockedAt": "2026-11-01T18:50:15.299Z",
+  "lockedBy": "FLASH_SALE",
+  "files": {
+    ".specengine/spec/erm.dbml": "1529a1c272af4be3208d50249bace90fdda194aa0c327b3c84ed591211740a33",
+    ".specengine/spec/exclusions.md": "39f40fe5e9650f44dac370352bccc26b89cef30737dc14d28609b9c7b6cc05ba",
+    ".specengine/spec/policy-defaults.md": "16e970dbde6c7c6070909e7e32b3d52b8e16a9df04309ab6318c9b83fc851194",
+    ".specengine/spec/terms.md": "6c36206614a8da48e70ebaa8ad5473797cfdbf525229316c05c7215f0dc55071"
+  }
+}

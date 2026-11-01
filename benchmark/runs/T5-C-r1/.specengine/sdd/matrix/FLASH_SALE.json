@@ -1,0 +1,413 @@
+{
+  "spec_engine_version": "2.1.0",
+  "module_name": "限量搶購",
+  "rules": [
+    {
+      "rule_id": "R-FLASH_SALE-000",
+      "type": "main_flow",
+      "actor": "顧客",
+      "pre_conditions": [
+        "搶購檔次已開檔",
+        "開始時間 <= 現在時間 < 結束時間（開始時刻含、結束時刻不含）",
+        "搶購件數 qty 為正整數，搶購編號、顧客、請求編號皆非空",
+        "剩餘可搶件數 >= qty（剛好等於也可搶到）",
+        "該顧客於此檔次的累計佔用件數 + qty <= 限購件數（剛好等於也可搶到）",
+        "本次請求編號未曾成功搶購過"
+      ],
+      "trigger_event": "顧客對檔次送出搶購請求，指定搶購件數 qty",
+      "post_assertions": [
+        "建立一筆保留，狀態為「保留中」（HELD），件數為 qty",
+        "保留的到期時間 = 現在時間 + 10 分鐘",
+        "回傳成功，內容含保留編號與到期時間",
+        "剩餘可搶件數減少 qty",
+        "該顧客於此檔次的累計佔用件數增加 qty"
+      ],
+      "resolved_by": [
+        "resolved/features/限量搶購_剩餘不足時的反應.md",
+        "resolved/features/限量搶購_超過限購時的反應.md",
+        "resolved/features/限量搶購_時間邊界的歸屬.md"
+      ]
+    },
+    {
+      "rule_id": "R-FLASH_SALE-001",
+      "type": "main_flow",
+      "actor": "商家",
+      "pre_conditions": [
+        "搶購編號非空且尚未被使用",
+        "限量件數與限購件數皆為正整數（限購件數可大於限量件數，不拒絕）",
+        "開始時間與結束時間皆為合法 ISO 8601 且開始時間早於結束時間"
+      ],
+      "trigger_event": "商家開一檔限量搶購，設定搶購編號、限量件數、每位顧客限購件數、開始時間與結束時間",
+      "post_assertions": [
+        "建立搶購檔次，回傳成功",
+        "剩餘可搶件數 = 限量件數"
+      ],
+      "resolved_by": [
+        "resolved/features/限量搶購_開檔參數不合法的反應.md",
+        "resolved/features/限量搶購_重複開同一搶購編號.md"
+      ]
+    },
+    {
+      "rule_id": "R-FLASH_SALE-002",
+      "type": "main_flow",
+      "actor": "金流",
+      "pre_conditions": [
+        "保留存在且狀態為「保留中」",
+        "付款當下的現在時間 < 保留到期時間"
+      ],
+      "trigger_event": "金流送達該保留的付款成功通知",
+      "post_assertions": [
+        "保留狀態改為「已成交」（PAID）",
+        "回傳成功",
+        "剩餘可搶件數不變（件數已於搶購時扣除）",
+        "該顧客的累計佔用件數不變（已成交仍計入限購）"
+      ],
+      "resolved_by": [
+        "resolved/features/限量搶購_時間邊界的歸屬.md",
+        "resolved/features/限量搶購_限購件數的累計方式.md"
+      ]
+    },
+    {
+      "rule_id": "R-FLASH_SALE-003",
+      "type": "main_flow",
+      "actor": "排程",
+      "pre_conditions": [
+        "存在狀態為「保留中」且已到期的保留（到期時間 <= 現在時間，剛好到期時刻即算到期）"
+      ],
+      "trigger_event": "排程執行釋放",
+      "post_assertions": [
+        "該保留狀態改為「已釋放」（EXPIRED）",
+        "該保留的件數還回剩餘可搶件數",
+        "該顧客於此檔次的累計佔用件數扣回該保留的件數"
+      ],
+      "resolved_by": [
+        "resolved/features/限量搶購_時間邊界的歸屬.md",
+        "resolved/features/限量搶購_限購件數的累計方式.md"
+      ]
+    },
+    {
+      "rule_id": "R-FLASH_SALE-004",
+      "type": "edge_case",
+      "actor": "排程",
+      "pre_conditions": [
+        "存在狀態為「保留中」且尚未到期的保留（現在時間 < 到期時間）"
+      ],
+      "trigger_event": "排程執行釋放",
+      "post_assertions": [
+        "該保留狀態維持「保留中」",
+        "剩餘可搶件數不變"
+      ]
+    },
+    {
+      "rule_id": "R-FLASH_SALE-005",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "搶購檔次已開檔，現在時間落在搶購期間內，輸入合法",
+        "剩餘可搶件數 < 搶購件數 qty（含剩餘為 0）"
+      ],
+      "trigger_event": "顧客送出搶購請求",
+      "post_assertions": [
+        "回傳失敗，原因為 SOLD_OUT",
+        "不建立保留，不部分保留，剩餘可搶件數與累計佔用件數皆不變"
+      ],
+      "resolved_by": "resolved/features/限量搶購_剩餘不足時的反應.md"
+    },
+    {
+      "rule_id": "R-FLASH_SALE-006",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "搶購檔次已開檔，現在時間落在搶購期間內，輸入合法，剩餘可搶件數 >= qty",
+        "該顧客於此檔次的累計佔用件數 + qty > 限購件數"
+      ],
+      "trigger_event": "顧客送出搶購請求",
+      "post_assertions": [
+        "回傳失敗，原因為 LIMIT_EXCEEDED",
+        "不建立保留，不截到上限，剩餘可搶件數與累計佔用件數皆不變"
+      ],
+      "resolved_by": "resolved/features/限量搶購_超過限購時的反應.md"
+    },
+    {
+      "rule_id": "R-FLASH_SALE-007",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "搶購檔次已開檔，輸入合法",
+        "現在時間 < 開始時間"
+      ],
+      "trigger_event": "顧客送出搶購請求",
+      "post_assertions": [
+        "回傳失敗，原因為 NOT_STARTED",
+        "不建立保留，剩餘可搶件數不變"
+      ],
+      "resolved_by": "resolved/features/限量搶購_時間邊界的歸屬.md"
+    },
+    {
+      "rule_id": "R-FLASH_SALE-008",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "搶購檔次已開檔，輸入合法",
+        "現在時間 >= 結束時間（剛好結束時刻即不可搶）"
+      ],
+      "trigger_event": "顧客送出搶購請求",
+      "post_assertions": [
+        "回傳失敗，原因為 ENDED",
+        "不建立保留，剩餘可搶件數不變"
+      ],
+      "resolved_by": "resolved/features/限量搶購_時間邊界的歸屬.md"
+    },
+    {
+      "rule_id": "R-FLASH_SALE-009",
+      "type": "edge_case",
+      "actor": "金流",
+      "pre_conditions": [
+        "保留存在且狀態為「已釋放」"
+      ],
+      "trigger_event": "金流送達該保留的付款成功通知",
+      "post_assertions": [
+        "回傳失敗，原因為 HOLD_EXPIRED",
+        "保留狀態維持「已釋放」，剩餘可搶件數不變"
+      ],
+      "resolved_by": "resolved/features/限量搶購_重複付款通知的回應.md"
+    },
+    {
+      "rule_id": "R-FLASH_SALE-010",
+      "type": "edge_case",
+      "actor": "金流",
+      "pre_conditions": [
+        "保留編號不存在"
+      ],
+      "trigger_event": "金流送達付款成功通知",
+      "post_assertions": [
+        "回傳失敗，原因為 HOLD_NOT_FOUND"
+      ],
+      "resolved_by": "resolved/features/限量搶購_重複付款通知的回應.md"
+    },
+    {
+      "rule_id": "R-FLASH_SALE-011",
+      "type": "edge_case",
+      "actor": "排程",
+      "pre_conditions": [
+        "存在狀態為「保留中」且已到期的保留",
+        "多台伺服器各自執行排程（同時或先後）"
+      ],
+      "trigger_event": "多台伺服器執行釋放",
+      "post_assertions": [
+        "同一保留只釋放一次，狀態為「已釋放」",
+        "該保留的件數只還回剩餘可搶件數一次，累計佔用件數只扣回一次"
+      ]
+    },
+    {
+      "rule_id": "R-FLASH_SALE-012",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "搶購檔次已開檔，現在時間落在搶購期間內",
+        "多位顧客透過多台伺服器同時對同一檔次搶購，請求件數總和超過剩餘可搶件數"
+      ],
+      "trigger_event": "多台伺服器同時處理搶購請求",
+      "post_assertions": [
+        "成功建立之保留件數總和 <= 限量件數（絕不超賣）",
+        "剩餘可搶件數 = 限量件數 − 成功保留件數總和，不為負",
+        "未成功的請求回傳失敗，原因為 SOLD_OUT"
+      ],
+      "resolved_by": "resolved/features/限量搶購_伺服器當機造成的件數遺失.md"
+    },
+    {
+      "rule_id": "R-FLASH_SALE-013",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "搶購檔次已開檔，現在時間落在搶購期間內，剩餘可搶件數充足",
+        "同一顧客連點，多個不同請求編號的搶購請求透過多台伺服器同時處理，件數總和超過限購件數"
+      ],
+      "trigger_event": "多台伺服器同時處理同一顧客的搶購請求",
+      "post_assertions": [
+        "該顧客成功建立之保留件數總和 <= 限購件數",
+        "未成功的請求回傳失敗，原因為 LIMIT_EXCEEDED"
+      ]
+    },
+    {
+      "rule_id": "R-FLASH_SALE-014",
+      "type": "edge_case",
+      "actor": "金流",
+      "pre_conditions": [
+        "某伺服器處理付款通知到一半卡住",
+        "卡住期間該保留到期並已被排程釋放，件數已還給其他人"
+      ],
+      "trigger_event": "卡住的伺服器恢復並繼續完成付款處理",
+      "post_assertions": [
+        "該保留不成交，回傳失敗，原因為 HOLD_EXPIRED，狀態維持「已釋放」",
+        "剩餘可搶件數不被重複佔用（已還回的件數不會被收回）"
+      ]
+    },
+    {
+      "rule_id": "R-FLASH_SALE-015",
+      "type": "main_flow",
+      "actor": "商品頁",
+      "pre_conditions": [
+        "搶購檔次已開檔"
+      ],
+      "trigger_event": "商品頁查詢剩餘可搶件數",
+      "post_assertions": [
+        "回傳 限量件數 − 「保留中」件數總和 − 「已成交」件數總和",
+        "已到期但排程尚未釋放的保留仍計入佔用，直到排程釋放後才還回"
+      ]
+    },
+    {
+      "rule_id": "R-FLASH_SALE-016",
+      "type": "edge_case",
+      "actor": "系統",
+      "pre_conditions": [],
+      "trigger_event": "以保留編號查詢保留",
+      "post_assertions": [
+        "保留存在時回傳保留內容（保留編號、搶購編號、顧客、件數、到期時間、狀態），不論已成交或已釋放多久都查得到",
+        "保留不存在時回傳 null"
+      ],
+      "resolved_by": "resolved/data/限量搶購_保留紀錄保存期限.md"
+    },
+    {
+      "rule_id": "R-FLASH_SALE-017",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "搶購檔次已開檔，現在時間落在搶購期間內，剩餘可搶件數充足",
+        "該顧客先前的保留已到期並被排程釋放，釋放後累計佔用件數 + qty <= 限購件數"
+      ],
+      "trigger_event": "顧客再次送出搶購請求（新的請求編號）",
+      "post_assertions": [
+        "回傳成功，建立新保留（已釋放的件數不計入限購）"
+      ],
+      "resolved_by": "resolved/features/限量搶購_限購件數的累計方式.md"
+    },
+    {
+      "rule_id": "R-FLASH_SALE-018",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "同一請求編號的搶購請求先前已成功建立保留"
+      ],
+      "trigger_event": "同一請求編號的搶購請求再次送達（網路逾時重送）",
+      "post_assertions": [
+        "回傳成功，內容為同一張保留的保留編號與到期時間",
+        "不建立新保留，剩餘可搶件數與累計佔用件數皆不變"
+      ],
+      "resolved_by": "resolved/features/限量搶購_同一請求重送的處理.md"
+    },
+    {
+      "rule_id": "R-FLASH_SALE-019",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "同一請求編號的搶購請求先前失敗（未建立保留）"
+      ],
+      "trigger_event": "同一請求編號的搶購請求再次送達",
+      "post_assertions": [
+        "視為新請求重新判斷：條件成立則建立保留並回傳成功，否則依當下原因回傳失敗"
+      ],
+      "resolved_by": "resolved/features/限量搶購_同一請求重送的處理.md"
+    },
+    {
+      "rule_id": "R-FLASH_SALE-020",
+      "type": "edge_case",
+      "actor": "金流",
+      "pre_conditions": [
+        "保留存在且狀態為「保留中」",
+        "付款當下的現在時間 >= 保留到期時間（剛好到期時刻亦算到期）",
+        "排程尚未釋放該保留"
+      ],
+      "trigger_event": "金流送達該保留的付款成功通知",
+      "post_assertions": [
+        "回傳失敗，原因為 HOLD_EXPIRED",
+        "保留不成交，之後由排程照常釋放（釋放前狀態仍為「保留中」，剩餘可搶件數尚未還回）"
+      ],
+      "resolved_by": "resolved/features/限量搶購_到期後排程釋放前收到付款.md"
+    },
+    {
+      "rule_id": "R-FLASH_SALE-021",
+      "type": "edge_case",
+      "actor": "金流",
+      "pre_conditions": [
+        "保留存在且狀態為「已成交」"
+      ],
+      "trigger_event": "金流再次送達同一保留的付款成功通知（重複送達）",
+      "post_assertions": [
+        "回傳成功",
+        "保留狀態維持「已成交」，剩餘可搶件數與累計佔用件數皆不變"
+      ],
+      "resolved_by": "resolved/features/限量搶購_重複付款通知的回應.md"
+    },
+    {
+      "rule_id": "R-FLASH_SALE-022",
+      "type": "edge_case",
+      "actor": "商家",
+      "pre_conditions": [
+        "搶購編號已存在"
+      ],
+      "trigger_event": "商家以同一搶購編號再開一檔",
+      "post_assertions": [
+        "回傳失敗，原因為 DUPLICATE_SALE",
+        "原檔次的設定、剩餘可搶件數與所有保留皆不變"
+      ],
+      "resolved_by": "resolved/features/限量搶購_重複開同一搶購編號.md"
+    },
+    {
+      "rule_id": "R-FLASH_SALE-023",
+      "type": "edge_case",
+      "actor": "商家",
+      "pre_conditions": [
+        "開檔參數不合法：限量件數不是正整數、或限購件數不是正整數、或搶購編號為空字串、或開始時間不早於結束時間、或開始／結束時間無法解析為合法 ISO 8601"
+      ],
+      "trigger_event": "商家開一檔限量搶購",
+      "post_assertions": [
+        "回傳失敗，原因為 INVALID_INPUT",
+        "不建立檔次，不改任何資料"
+      ],
+      "resolved_by": "resolved/features/限量搶購_開檔參數不合法的反應.md"
+    },
+    {
+      "rule_id": "R-FLASH_SALE-024",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "搶購參數不合法：搶購件數 qty 不是正整數、或搶購編號／顧客／請求編號為空字串"
+      ],
+      "trigger_event": "顧客送出搶購請求",
+      "post_assertions": [
+        "回傳失敗，原因為 INVALID_INPUT",
+        "不建立保留，不改任何資料"
+      ],
+      "resolved_by": "resolved/features/限量搶購_搶購輸入不合法的反應.md"
+    },
+    {
+      "rule_id": "R-FLASH_SALE-025",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "搶購參數合法",
+        "搶購編號對應的檔次不存在"
+      ],
+      "trigger_event": "顧客送出搶購請求",
+      "post_assertions": [
+        "回傳失敗，原因為 SALE_NOT_FOUND",
+        "不建立保留，不改任何資料"
+      ],
+      "resolved_by": "resolved/features/限量搶購_搶購輸入不合法的反應.md"
+    },
+    {
+      "rule_id": "R-FLASH_SALE-026",
+      "type": "edge_case",
+      "actor": "商品頁",
+      "pre_conditions": [
+        "搶購編號對應的檔次不存在"
+      ],
+      "trigger_event": "商品頁查詢剩餘可搶件數",
+      "post_assertions": [
+        "回傳 0，不拋出例外"
+      ],
+      "resolved_by": "resolved/features/限量搶購_搶購輸入不合法的反應.md"
+    }
+  ]
+}

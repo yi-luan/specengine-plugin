@@ -1,0 +1,56 @@
+
+30e68a6 2026-11-02 02:51:45 +0800 T5-C-r1 done
+
+ .claude/spec/architecture-manifest.md              |  77 ++++
+ .specengine/sdd/flow-design/FLASH_SALE.md          |  23 ++
+ ...273\230\346\254\276\351\200\232\347\237\245.md" |  30 ++
+ ...216\222\347\250\213\351\207\213\346\224\276.md" |  25 ++
+ ...220\266\350\263\274\350\253\213\346\261\202.md" |  38 ++
+ .../FLASH_SALE/\346\237\245\350\251\242.md"        |  25 ++
+ ...244\232\346\251\237\344\275\265\347\231\274.md" |  26 ++
+ .../FLASH_SALE/\351\226\213\346\252\224.md"        |  25 ++
+ .specengine/sdd/locks/FLASH_SALE.lock.json         |  40 ++
+ .specengine/sdd/locks/_shared.json                 |  10 +
+ .specengine/sdd/matrix/FLASH_SALE.json             | 413 +++++++++++++++++++++
+ .specengine/sdd/overview.md                        |   3 +
+ .specengine/sdd/overview/FLASH_SALE.md             |  40 ++
+ ...277\235\345\255\230\346\234\237\351\231\220.md" |  30 ++
+ ...226\207\346\241\210\346\240\274\345\274\217.md" |  30 ++
+ ...273\266\346\225\270\351\201\272\345\244\261.md" |  30 ++
+ ...224\266\345\210\260\344\273\230\346\254\276.md" |  30 ++
+ ...231\202\347\232\204\345\217\215\346\207\211.md" |  30 ++
+ ...200\201\347\232\204\350\231\225\347\220\206.md" |  31 ++
+ ...263\225\347\232\204\345\217\215\346\207\211.md" |  30 ++
+ ...225\214\347\232\204\346\255\270\345\261\254.md" |  30 ++
+ ...231\202\347\232\204\345\217\215\346\207\211.md" |  30 ++
+ ...237\245\347\232\204\345\233\236\346\207\211.md" |  30 ++
+ ...220\266\350\263\274\347\267\250\350\231\237.md" |  30 ++
+ ...263\225\347\232\204\345\217\215\346\207\211.md" |  31 ++
+ ...264\257\350\250\210\346\226\271\345\274\217.md" |  30 ++
+ .specengine/sdd/steps-index.json                   | 146 ++++++++
+ .specengine/spec/erm.dbml                          |  45 +++
+ .specengine/spec/exclusions.md                     |   7 +
+ ...20\351\207\217\346\220\266\350\263\274.feature" | 323 ++++++++++++++++
+ .specengine/spec/policy-defaults.md                |  13 +
+ .specengine/spec/terms.md                          |  45 +++
+ BENCH-LOG.md                                       | 390 +++++++++++++++++++
+ CLAUDE.md                                          |  94 +++++
+ src/flash-types.ts                                 |  27 ++
+ src/flash.ts                                       | 242 ++++++++++++
+ tests/steps/flash-sale.steps.ts                    | 238 ++++++++++++
+ tests/support/memory-store.ts                      | 119 ++++++
+ tests/support/world.ts                             |  54 +++
+ 39 files changed, 2910 insertions(+)
+
+f3ade0a 2026-10-31 23:22:59 +0800 bench base
+
+ .gitignore             |    3 +
+ README.md              |    3 +
+ cucumber.cjs           |    7 +
+ package-lock.json      | 2317 ++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json           |   16 +
+ src/index.ts           |    2 +
+ tests/steps/.gitkeep   |    0
+ tests/support/.gitkeep |    0
+ tsconfig.json          |   13 +
+ 9 files changed, 2361 insertions(+)

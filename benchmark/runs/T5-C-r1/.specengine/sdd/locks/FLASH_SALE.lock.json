@@ -1,0 +1,40 @@
+{
+  "module": "FLASH_SALE",
+  "lockedAt": "2026-11-01T18:50:15.299Z",
+  "lockedAtLocal": "2026-11-02 02:50",
+  "matrix": {
+    ".specengine/sdd/matrix/FLASH_SALE.json": "552e9518cb71bc1999b66c71f061b90978cbbefee0dc632d8d001ea28990311d"
+  },
+  "features": {
+    ".specengine/spec/features/限量搶購.feature": "feea761fb9f157fb9ea29609d57d83c69c6f3879ab8aeb2497741c1ac925870c"
+  },
+  "stepSignatures": {
+    "tests/steps/flash-sale.steps.ts": [
+      "Given::商家已開檔 {string}，限量 {string} 件、限購 {string} 件、開始 {string}、結束 {string}",
+      "Given::現在時間為 {string}",
+      "Given::顧客 {string} 已以請求編號 {string} 搶購檔次 {string} {string} 件，搶到的保留記為 {string}",
+      "Then::保留 {string} 的狀態為 {string}",
+      "Then::失敗的原因皆為 {string}",
+      "Then::成功搶到的件數總和為 {string}",
+      "Then::搶到的保留到期時間為 {string}",
+      "Then::搶到的保留與 {string} 為同一張保留",
+      "Then::搶到的保留記為 {string}",
+      "Then::查詢保留 {string} 回傳 null",
+      "Then::查詢保留 {string} 回傳搶購編號 {string}、顧客 {string}、件數 {string}、到期時間 {string}、狀態 {string}",
+      "Then::檔次 {string} 的剩餘可搶件數為 {string}",
+      "Then::系統回傳結果 {string}",
+      "Then::顧客 {string} 於檔次 {string} 的累計佔用件數為 {string}",
+      "When::{string} 位顧客各以不同請求編號透過 {string} 台伺服器同時搶購檔次 {string} 各 {string} 件",
+      "When::卡住的伺服器恢復並完成處理",
+      "When::商家開檔 {string}，限量 {string} 件、限購 {string} 件、開始 {string}、結束 {string}",
+      "When::排程在 {string} 台伺服器上同時執行",
+      "When::排程執行",
+      "When::時間來到 {string}",
+      "When::某台伺服器開始處理保留 {string} 的付款成功通知並在寫入前卡住",
+      "When::金流送達保留 {string} 的付款成功通知",
+      "When::顧客 {string} 以 {string} 個不同請求編號透過 {string} 台伺服器同時搶購檔次 {string} 各 {string} 件",
+      "When::顧客 {string} 以請求編號 {string} 搶購檔次 {string} {string} 件"
+    ]
+  },
+  "driverInterfaces": {}
+}

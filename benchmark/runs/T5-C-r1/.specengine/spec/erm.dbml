@@ -1,0 +1,45 @@
+// 限量搶購 資料模型（spec-01 草稿，spec-02 依決策更新）
+// 命名慣例待 manifest 核實，目前暫採 snake_case
+// 註：實際持久化為共用 key-value 儲存（Store，類似 Redis），本檔描述的是邏輯實體與屬性；
+//     每個 Table 對應一組 key，spec-05 實作時以 key 前綴對應 Table 名稱。所有紀錄永久保存、不設存活期限。
+
+Table flash_sales {
+  sale_id varchar [pk, note: "搶購編號，商家開檔時指定，唯一，不得為空字串；重複開檔拒絕（DUPLICATE_SALE）"]
+  quantity int [note: "限量件數，必須為正整數（>= 1），否則 INVALID_INPUT"]
+  per_customer_limit int [note: "每位顧客限購件數，必須為正整數（>= 1），否則 INVALID_INPUT；允許大於 quantity，不檢查"]
+  starts_at timestamp [note: "搶購開始時間（含），合法 ISO 8601，否則 INVALID_INPUT"]
+  ends_at timestamp [note: "搶購結束時間（不含），合法 ISO 8601，必須晚於 starts_at，否則 INVALID_INPUT"]
+  remaining int [note: "剩餘可搶件數，整數，必須 >= 0；開檔時 = quantity，搶購扣減 qty、排程釋放加回 qty"]
+}
+
+Table holds {
+  hold_id varchar [pk, note: "保留編號，系統產生，全域唯一"]
+  sale_id varchar [note: "所屬搶購編號"]
+  customer_id varchar [note: "顧客識別，不得為空字串"]
+  qty int [note: "保留件數，正整數，必須 <= 限購件數"]
+  expires_at timestamp [note: "保留到期時間 = 建立時的現在時間 + 10 分鐘，ISO 8601；現在時間 >= expires_at 即為已到期"]
+  status varchar [note: "狀態: HELD | PAID | EXPIRED（保留中／已成交／已釋放）；HELD → PAID（到期前付款）或 HELD → EXPIRED（排程釋放），單向不可逆"]
+}
+
+Table grab_requests {
+  sale_id varchar [note: "所屬搶購編號"]
+  request_id varchar [note: "請求編號，呼叫端提供且不得為空字串，用於辨識網路逾時重送的同一請求；只記錄成功的請求，失敗不記錄（重送時重新判斷）"]
+  hold_id varchar [note: "該請求成功建立的保留編號，重送時回放此保留"]
+  indexes {
+    (sale_id, request_id) [pk]
+  }
+}
+
+Table customer_quotas {
+  sale_id varchar [note: "所屬搶購編號"]
+  customer_id varchar [note: "顧客識別"]
+  used_qty int [note: "該顧客於此檔次累計佔用件數 = 保留中 + 已成交件數，整數，必須 >= 0 且 <= 限購件數；搶購成功加 qty，排程釋放扣回 qty，付款成交不變"]
+  indexes {
+    (sale_id, customer_id) [pk]
+  }
+}
+
+Ref: holds.sale_id > flash_sales.sale_id
+Ref: grab_requests.sale_id > flash_sales.sale_id
+Ref: grab_requests.hold_id > holds.hold_id
+Ref: customer_quotas.sale_id > flash_sales.sale_id

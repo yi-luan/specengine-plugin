@@ -1,0 +1,37 @@
+{
+  "module": "FLASH_SALE",
+  "lockedAt": "2026-11-01T18:33:48.361Z",
+  "lockedAtLocal": "2026-11-02 02:33",
+  "matrix": {
+    ".specengine/sdd/matrix/FLASH_SALE.json": "118c4f54cc41edb6dd0b7f452e6579e2d89804b6d79278047bae7d819857ae1b"
+  },
+  "features": {
+    ".specengine/spec/features/限量搶購.feature": "447612601d5e6c9b95e32051a4061ecc222dd3d84ec7adcaf90e0c4c4ddb1bd3"
+  },
+  "stepSignatures": {
+    "tests/steps/flash-sale.steps.ts": [
+      "Given::已開檔搶購 {string} 限量 {string} 每人限購 {string} 期間 {string} 到 {string}",
+      "Given::現在時間為 {string}",
+      "Given::顧客 {string} 已成功搶到 {string} 件，保留記為 {string}",
+      "Then::付款結果為 {string}",
+      "Then::保留 {string} 到期時間為 {string}",
+      "Then::保留 {string} 狀態為 {string}",
+      "Then::保留記為 {string}",
+      "Then::剩餘件數加上未到期保留件數等於限量 {string}",
+      "Then::剩餘可搶件數為 {string}",
+      "Then::搶購結果為 {string}",
+      "Then::查詢保留 {string} 回傳空值",
+      "Then::查詢剩餘件數為 {string}",
+      "Then::重送結果為同一張保留 {string}",
+      "Then::開檔結果為 {string}",
+      "When::商家開檔搶購 {string} 限量 {string} 每人限購 {string} 期間 {string} 到 {string}",
+      "When::排程於 {string} 在另一台伺服器同時執行釋放",
+      "When::排程於 {string} 執行釋放",
+      "When::查詢剩餘件數",
+      "When::金流於 {string} 送達 {string} 付款成功通知",
+      "When::顧客 {string} 以請求編號 {string} 搶購 {string} {string} 件",
+      "When::顧客 {string} 以請求編號 {string} 搶購 {string} {string} 件，處理中途伺服器當機後恢復"
+    ]
+  },
+  "driverInterfaces": {}
+}

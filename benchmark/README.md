@@ -38,6 +38,7 @@ All three conditions started from the same project in [`base/`](base/): TypeScri
 | T3 | [Multi-tenant coupons](tasks/t3/requirement.md) | 14 | 3 | 38 |
 | E4 | [Change request on T1](tasks/e4/change.md): cap 30% → 35% | – | – | 12 |
 | T4 | [Event-driven order, inventory and payment services](tasks/t4/requirement.md), solo and as a [three-person team](tasks/t4/team-requirement.md) | 14 | 3 | 36 |
+| T5 | [Flash sale on several servers sharing a Redis-like store](tasks/t5/requirement.md) | 9 + 6 non-functional | 3 | 29 |
 
 Each requirement fixes the public interface, so one hidden test file can score every condition. The requirements are written in Traditional Chinese, as in the original study.
 
@@ -224,6 +225,64 @@ What it shows:
 
 The lock held for every SpecEngine project in T4: `spec-guard audit` passes on the two solo runs and on all six team developers' projects, and `tamper.mjs` reports LOCK_DRIFT for both solo runs.
 
+### Concurrency, distributed locks and non-functional requirements (T5)
+
+T5 asks two questions. Does the clarification stage raise non-functional requirements (load, latency, failure of a shared dependency, caching) on its own, or only when the stakeholder brings them up? And do the conditions differ on concurrency, where distributed locks are the usual tool?
+
+**The task.** A flash sale: a merchant opens a sale with a quantity and a per-customer limit, customers grab items and get a 10-minute hold, a payment notification turns the hold into a sale, and a scheduler releases expired holds. The requirement states that several servers run at once and share only a Redis-like `Store` (atomic `get`, `set` with `nx` and `px`, `del`, `incrBy`, and set operations), that customers double-click and requests are resent, that payment notifications repeat, that the scheduler runs on every server, and that a server can crash midway or stall and then resume. It says the system must never oversell. It says nothing about locks.
+
+The answer sheet has 9 business boundaries (H1–H9) and 6 non-functional ones (N1–N6). The non-functional answers are: peak load and server count (N1), a latency target (N2), no "try again later" while items remain (N3), at most 5 seconds of blocking when a server crashes (N4), return `TRY_AGAIN` when the store is unreachable (N5), and no stale or cached remaining count (N6). N1 and N2 are only recorded; the other four have hidden tests.
+
+**The hidden tests.** Each server is a separate module instance of `src/flash.ts`, so servers cannot share memory. The test supplies the `Store` and decides which server's pending store call completes next. It can also freeze a server at its k-th call (a crash) or pause it and resume it later (a stall). There are 21 single-server tests, 5 concurrency tests over 60 to 200 schedules each (simultaneous grabs, oversell, per-customer limit, several schedulers at once, a payment racing the scheduler at the expiry instant), 2 fault tests (another server must sell within 5 seconds of a crash; a server that resumes after a 30-second stall must not oversell), and one property test over 300 mixed schedules that checks conservation, the limit and final states.
+
+Before the runs, the tests were checked against five deliberately wrong implementations:
+
+| Wrong implementation | Score | Failed on |
+| :--- | ---: | :--- |
+| Read, check, write without atomic operations | 22/29 | every concurrency test |
+| Per-sale lock with a 10-second TTL | 24/29 | blocked longer than 5 seconds after a crash; oversold after a stall |
+| Per-sale lock with a 3-second TTL | 25/29 | oversold after a stall (the lock expired, no fencing token) |
+| Each server caches the remaining count | 26/29 | the remaining count is stale |
+| Store errors are not caught | 28/29 | store unavailable |
+
+Every condition ran with Claude Fable 5.1 (`-r1`) and Claude Haiku 5.5 (`-h1`), solo, with SpecEngine 2.1.0 and the same Spec Kit commit. One separate session answered all questions from the sheet.
+
+| Condition | Fable | Haiku |
+| :--- | ---: | ---: |
+| No SDD tool | 26/29 | 22/29 |
+| Spec Kit | 27/29 | 27/29 |
+| SpecEngine | **28/29** | 25/29 |
+
+| Condition | Fable | Haiku |
+| :--- | :--- | :--- |
+| No SDD tool | 73 min · 113k | 72 min · 136k |
+| Spec Kit | 102 min · 330k | 82 min · 361k |
+| SpecEngine | 93 min · 283k | 76 min · 296k |
+
+All six ran at the same time and the baseline runs alone took over 70 minutes, against 2 to 4 minutes in T4, so the times mostly measure API contention and are not comparable with other tasks. Token counts are comparable.
+
+Which non-functional boundaries were asked, and what the hidden tests found:
+
+| Boundary | Asked by | Hidden test |
+| :--- | :--- | :--- |
+| N1 peak load | nobody | – |
+| N2 latency | nobody | – |
+| N3 no failure while items remain | Spec Kit Haiku, in the converge stage after implementing | 6/6 pass |
+| N4 at most 5 s blocked after a crash | nobody | 6/6 pass |
+| N5 store unreachable | nobody | **0/6 pass** |
+| N6 remaining count not cached | nobody | 6/6 pass |
+
+What it shows:
+
+- **No tool raises non-functional requirements during clarification.** Across both tools and both models, every question asked before implementation was about business rules. The closest were consistency trade-offs under failure: SpecEngine Fable asked whether items lost to a crash between two store writes should be recovered or written off, and its flow review flagged a server that stalls past the sale's end. Spec Kit Haiku asked about load-related false rejections only after its implementation was done. Load, latency and blocking time were never asked.
+- **The one boundary nobody asked about and nobody inferred failed everywhere.** No run catches store errors and returns `TRY_AGAIN`; all six throw. That is the clearest gap: what to do when a shared dependency is down is a question any business scenario has, and neither tool's discovery asks it.
+- **No run used a distributed lock.** All six, including the baselines, decided with atomic counters (`incrBy`, then undo on overshoot) and `set nx` claims. That is why every run passed the crash and stall tests, and why those two tests did not separate the conditions. The lock pitfalls they target show up only in the wrong implementations above.
+- **The concurrency failures were in code that had a matching rule and a green test.** SpecEngine Haiku's specification has "several schedulers release the same hold only once", with a scenario that runs two schedulers through `Promise.all`. Its in-memory store answers immediately, so the calls never interleave and the scenario passes. Under the hidden scheduler the same hold is released several times (T5-25). Spec Kit Haiku's own tests also missed a race until, after the N3 answer, it wrote a random-interleaving harness; that run then passed every concurrency test. Spec Kit Fable wrote 118 scenarios, including a crash at every store call, and still left one hold that a resent request kept in HELD after it expired and the scheduler ran (property test, seed 73). Gherkin examples describe one sequence of events; they cannot say "in every interleaving".
+- **SpecEngine Haiku was below Spec Kit Haiku for the first time.** Besides the double release, it returned `INVALID_INPUT` instead of `SALE_NOT_FOUND` for an unknown sale. Its flow diagrams had no branch for an unknown sale; under the answering rules the stakeholder does not point out what is missing, and the agent did not ask.
+- **The scores are close.** Every run lost the store-outage test. The rest of the spread is one to five tests, mostly failure codes, and each cell is one run.
+
+The lock held for both SpecEngine projects: `spec-guard audit` passes and `tamper.mjs` reports LOCK_DRIFT for T5-C-r1 and T5-C-h1.
+
 ### What this means for the framework
 
 The three experiments point at two concrete improvements, both still to be built:
@@ -239,6 +298,7 @@ The three experiments point at two concrete improvements, both still to be built
 - **Test fix.** Two T3 tests (T3-35, T3-36) originally used coupons whose start date was after their end date. An agent reasonably rejected those as invalid coupons. The test data was corrected and every T3 run was rescored. The table above uses the corrected tests.
 - **Haiku runs.** Each weak-model cell is a single run. The Haiku runs used SpecEngine 2.1.0, while the earlier runs used 2.0.0. Between the two, the stage instructions for spec-01 to spec-05 are unchanged and `spec-run` differs by one routing line; the 2.1.0 scripts add matrix hashing and line-ending normalisation to the lock. The fault-injection counts treat an edited example cell as "noticed" when any own test turns red, so cells that are inputs and do not change any outcome count as not noticed.
 - **T4.** Every T4 cell is a single run. The team setting simulates parallel development without a shared specification: developers could not talk to each other, only to the stakeholder. Because one session answered every developer from one sheet, the teams never received conflicting answers; real teams can. One Fable SpecEngine developer (T4-C-tm-r1, order) was interrupted by a rate limit after its tests were green and finished about ten hours later; its time is counted up to the green run. Fable T4-B-r1 and T4-C-r1 were the slowest solo runs in part because they waited for answers while eight other agents were also waiting.
+- **T5.** Every T5 cell is a single run. Two hidden tests were corrected after the first runs came in, and every run was rescored with the corrected file. The mixed-schedule test first required a hold that had expired but was not yet released to show HELD; the requirement does not say which status it shows, and one baseline showed EXPIRED. Three tests and the mixed-schedule test first opened sales whose per-customer limit was larger than the quantity; whether that is valid is not on the answer sheet, the stakeholder answered "your call", and SpecEngine Haiku chose to reject it. Servers are isolated by loading `src/flash.ts` once per server; helper modules it imports are shared, so module-level state in a helper would go unnoticed.
 - **Sample size.** Each cell has one or two clean runs. A difference of one or two tests is not evidence of a difference between tools.
 - **Recovery.** The run directories were restored from each run's git objects after the working copies were removed by an automatic temp-folder cleanup. Each run's `GIT-HISTORY.txt` lists its commits. Third-party files (Spec Kit's bundled skills and scripts) and `package-lock.json` are omitted. Local absolute paths in the logs were replaced with `<bench>`, `<plugin>` and `<home>`.
 
@@ -261,6 +321,6 @@ benchmark/
 └── mutate.mjs     mutation testing of each run's own tests
 ```
 
-Runs ending in `-h1` used Claude Haiku 5.5. Runs with `-tm-` in the name are T4 team runs.
+Runs ending in `-h1` used Claude Haiku 5.5. Runs with `-tm-` in the name are T4 team runs. In T5, the tests of each run, the requirement and the hidden scheduler use the same `Store` interface, so a run's own `tests/support/` shows how it simulated concurrency.
 
 Each run's `BENCH-LOG.md` holds its timestamps, every question and answer, the assumptions it made on its own, and the tool errors it hit.

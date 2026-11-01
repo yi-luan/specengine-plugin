@@ -1,0 +1,146 @@
+{
+  "{string} 位顧客各以不同請求編號透過 {string} 台伺服器同時搶購檔次 {string} 各 {string} 件": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "保留 {string} 的狀態為 {string}": {
+    "count": 11,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "卡住的伺服器恢復並完成處理": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "商家已開檔 {string}，限量 {string} 件、限購 {string} 件、開始 {string}、結束 {string}": {
+    "count": 7,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "商家開檔 {string}，限量 {string} 件、限購 {string} 件、開始 {string}、結束 {string}": {
+    "count": 3,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "失敗的原因皆為 {string}": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "成功搶到的件數總和為 {string}": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "排程在 {string} 台伺服器上同時執行": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "排程執行": {
+    "count": 7,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "搶到的保留到期時間為 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "搶到的保留與 {string} 為同一張保留": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "搶到的保留記為 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "時間來到 {string}": {
+    "count": 17,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "某台伺服器開始處理保留 {string} 的付款成功通知並在寫入前卡住": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "查詢保留 {string} 回傳 null": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "查詢保留 {string} 回傳搶購編號 {string}、顧客 {string}、件數 {string}、到期時間 {string}、狀態 {string}": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "檔次 {string} 的剩餘可搶件數為 {string}": {
+    "count": 28,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "現在時間為 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "系統回傳結果 {string}": {
+    "count": 22,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "金流送達保留 {string} 的付款成功通知": {
+    "count": 9,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "顧客 {string} 以 {string} 個不同請求編號透過 {string} 台伺服器同時搶購檔次 {string} 各 {string} 件": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "顧客 {string} 以請求編號 {string} 搶購檔次 {string} {string} 件": {
+    "count": 12,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "顧客 {string} 已以請求編號 {string} 搶購檔次 {string} {string} 件，搶到的保留記為 {string}": {
+    "count": 16,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "顧客 {string} 於檔次 {string} 的累計佔用件數為 {string}": {
+    "count": 11,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  }
+}

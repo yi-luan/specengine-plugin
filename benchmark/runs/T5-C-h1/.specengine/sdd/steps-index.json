@@ -1,0 +1,128 @@
+{
+  "付款結果為 {string}": {
+    "count": 7,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "保留 {string} 到期時間為 {string}": {
+    "count": 3,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "保留 {string} 狀態為 {string}": {
+    "count": 11,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "保留記為 {string}": {
+    "count": 6,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "剩餘件數加上未到期保留件數等於限量 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "剩餘可搶件數為 {string}": {
+    "count": 17,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "商家開檔搶購 {string} 限量 {string} 每人限購 {string} 期間 {string} 到 {string}": {
+    "count": 3,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "已開檔搶購 {string} 限量 {string} 每人限購 {string} 期間 {string} 到 {string}": {
+    "count": 27,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "排程於 {string} 在另一台伺服器同時執行釋放": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "排程於 {string} 執行釋放": {
+    "count": 5,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "搶購結果為 {string}": {
+    "count": 19,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "查詢保留 {string} 回傳空值": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "查詢剩餘件數": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "查詢剩餘件數為 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "現在時間為 {string}": {
+    "count": 28,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "重送結果為同一張保留 {string}": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "金流於 {string} 送達 {string} 付款成功通知": {
+    "count": 10,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "開檔結果為 {string}": {
+    "count": 3,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "顧客 {string} 以請求編號 {string} 搶購 {string} {string} 件": {
+    "count": 21,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "顧客 {string} 以請求編號 {string} 搶購 {string} {string} 件，處理中途伺服器當機後恢復": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  },
+  "顧客 {string} 已成功搶到 {string} 件，保留記為 {string}": {
+    "count": 14,
+    "files": [
+      ".specengine/spec/features/限量搶購.feature"
+    ]
+  }
+}
