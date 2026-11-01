@@ -1,0 +1,39 @@
+{
+  "module": "ORDER_SERVICE",
+  "lockedAt": "2026-10-31T19:13:25.695Z",
+  "lockedAtLocal": "2026-11-01 03:13",
+  "matrix": {
+    ".specengine/sdd/matrix/ORDER_SERVICE.json": "94b728d7bdf5229023f15ae2f62803d04a871096907936042ab7c9b8452098ff"
+  },
+  "features": {
+    ".specengine/spec/features/訂單服務.feature": "4f4da3c92641c7838ce7e9d0f54f0f63f407c6db62b485ef53d726258e8f37fa"
+  },
+  "stepSignatures": {
+    "tests/steps/order-service.steps.ts": [
+      "Given::時間已推進到 {string}",
+      "Given::訂單 {string} 已收到事件 {string}",
+      "Given::訂單 {string} 已被顧客取消於 {string}",
+      "Given::訂單服務已啟動",
+      "Given::訂單服務已收到事件 {string} 類型 {string} 訂單 {string}",
+      "Given::顧客 {string} 已下單 {string}，商品 {string} 數量 {string} 金額 {string}，下單時間 {string}",
+      "Then::命令結果為失敗，原因 {string}",
+      "Then::命令結果為成功",
+      "Then::所有發出的事件 id 皆為非空字串且互不重複",
+      "Then::發出的 OrderPlaced 事件內容為顧客 {string} 商品 {string} 數量 {string} 金額 {string} 時間 {string}",
+      "Then::發出的事件中不含訂單 {string} 的事件",
+      "Then::發出的事件中含訂單 {string} 的 {string} 事件",
+      "Then::發出的事件數為 {string}",
+      "Then::第 {string} 個發出的事件類型為 {string}，訂單為 {string}",
+      "Then::訂單 {string} 不存在",
+      "Then::訂單 {string} 無取消原因",
+      "Then::訂單 {string} 狀態為 {string}",
+      "Then::訂單 {string} 狀態為 {string}，取消原因為 {string}",
+      "When::時間推進到 {string}",
+      "When::查詢訂單 {string}",
+      "When::訂單服務收到事件 {string} 類型 {string} 訂單 {string}",
+      "When::顧客 {string} 下單 {string}，商品 {string} 數量 {string} 金額 {string}，下單時間 {string}",
+      "When::顧客取消訂單 {string} 於 {string}"
+    ]
+  },
+  "driverInterfaces": {}
+}

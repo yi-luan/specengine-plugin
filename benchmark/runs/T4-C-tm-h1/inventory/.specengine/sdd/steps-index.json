@@ -1,0 +1,68 @@
+{
+  "同一事件再次送達": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/庫存服務.feature"
+    ]
+  },
+  "商品 {string} 的可供保留庫存為 {string}": {
+    "count": 24,
+    "files": [
+      ".specengine/spec/features/庫存服務.feature"
+    ]
+  },
+  "收到下單 訂單 {string} 商品 {string} 數量 {string}": {
+    "count": 9,
+    "files": [
+      ".specengine/spec/features/庫存服務.feature"
+    ]
+  },
+  "收到付款失敗 訂單 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/庫存服務.feature"
+    ]
+  },
+  "收到取消 訂單 {string}": {
+    "count": 3,
+    "files": [
+      ".specengine/spec/features/庫存服務.feature"
+    ]
+  },
+  "系統不發出 {string} 訂單 {string}": {
+    "count": 3,
+    "files": [
+      ".specengine/spec/features/庫存服務.feature"
+    ]
+  },
+  "系統不發出任何事件": {
+    "count": 7,
+    "files": [
+      ".specengine/spec/features/庫存服務.feature"
+    ]
+  },
+  "系統發出 {string} 訂單 {string}": {
+    "count": 6,
+    "files": [
+      ".specengine/spec/features/庫存服務.feature"
+    ]
+  },
+  "訂單 {string} 已保留 {string} 個商品 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/庫存服務.feature"
+    ]
+  },
+  "訂單 {string} 已被記為付款失敗": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/庫存服務.feature"
+    ]
+  },
+  "訂單 {string} 已被記為已取消": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/庫存服務.feature"
+    ]
+  }
+}

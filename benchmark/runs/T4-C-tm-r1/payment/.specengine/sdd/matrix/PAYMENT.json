@@ -1,0 +1,258 @@
+{
+  "spec_engine_version": "2.1.0",
+  "module_name": "付款服務",
+  "rules": [
+    {
+      "rule_id": "R-PAYMENT-000",
+      "type": "main_flow",
+      "actor": "庫存服務（透過事件匯流排）",
+      "pre_conditions": [
+        "付款服務已收到該訂單的 OrderPlaced，記住了顧客與訂單金額",
+        "該訂單狀態為等待扣款（未扣款、未失敗、未取消）",
+        "訂單金額 >= 0（0 視為足夠）",
+        "顧客餘額 >= 訂單金額（相等視為足夠）"
+      ],
+      "trigger_event": "收到該訂單的 StockReserved（首次，事件 id 未處理過）",
+      "post_assertions": [
+        "顧客餘額減少訂單金額",
+        "該訂單狀態變為已扣款",
+        "回傳恰好一個事件：PaymentSucceeded，orderId 為該訂單、amount 為訂單金額",
+        "回傳事件的 id 為全系統唯一的新值"
+      ],
+      "resolved_by": ["resolved/features/PAYMENT_F-005_訂單金額為零或負數.md"]
+    },
+    {
+      "rule_id": "R-PAYMENT-001",
+      "type": "edge_case",
+      "actor": "庫存服務（透過事件匯流排）",
+      "pre_conditions": [
+        "付款服務已收到該訂單的 OrderPlaced，記住了顧客與訂單金額",
+        "該訂單狀態為等待扣款（未扣款、未失敗、未取消）",
+        "訂單金額 >= 0",
+        "顧客餘額 < 訂單金額（顧客不在初始餘額表者餘額視為 0）"
+      ],
+      "trigger_event": "收到該訂單的 StockReserved（首次，事件 id 未處理過）",
+      "post_assertions": [
+        "顧客餘額不變，一毛都不扣",
+        "該訂單狀態變為付款失敗",
+        "回傳恰好一個事件：PaymentFailed，orderId 為該訂單",
+        "回傳事件的 id 為全系統唯一的新值"
+      ],
+      "resolved_by": ["resolved/data/PAYMENT_D-001_初始餘額表沒有的顧客.md"]
+    },
+    {
+      "rule_id": "R-PAYMENT-002",
+      "type": "edge_case",
+      "actor": "訂單服務（透過事件匯流排）",
+      "pre_conditions": [
+        "付款服務對該訂單沒有任何記錄（未保留庫存、未取消）"
+      ],
+      "trigger_event": "收到該訂單的 OrderPlaced（首次，事件 id 未處理過）",
+      "post_assertions": [
+        "付款服務記住該訂單的顧客與訂單金額，該訂單狀態為等待扣款",
+        "顧客餘額不變",
+        "回傳空陣列"
+      ]
+    },
+    {
+      "rule_id": "R-PAYMENT-003",
+      "type": "edge_case",
+      "actor": "訂單服務（透過事件匯流排）",
+      "pre_conditions": [
+        "該訂單狀態為已扣款（已發出 PaymentSucceeded，尚未退款）"
+      ],
+      "trigger_event": "收到該訂單的 OrderCancelled（首次，事件 id 未處理過）",
+      "post_assertions": [
+        "顧客餘額加回原先扣除的訂單金額（全額退，同一張訂單最多退一次）",
+        "該訂單狀態變為已退款",
+        "回傳恰好一個事件：PaymentRefunded，orderId 為該訂單、amount 為原先扣除的金額",
+        "回傳事件的 id 為全系統唯一的新值"
+      ],
+      "resolved_by": ["resolved/features/PAYMENT_F-002_重複送達已處理完的事件.md"]
+    },
+    {
+      "rule_id": "R-PAYMENT-004",
+      "type": "edge_case",
+      "actor": "訂單服務（透過事件匯流排）",
+      "pre_conditions": [
+        "該訂單從未扣款成功（付款服務尚無該訂單記錄、等待扣款、只保留了庫存、或付款曾失敗）"
+      ],
+      "trigger_event": "收到該訂單的 OrderCancelled（首次，事件 id 未處理過）",
+      "post_assertions": [
+        "顧客餘額不變",
+        "付款服務記住該訂單已取消",
+        "不發出 PaymentRefunded，回傳空陣列"
+      ],
+      "resolved_by": ["resolved/features/PAYMENT_F-003_訂單已取消後才收到庫存已保留.md"]
+    },
+    {
+      "rule_id": "R-PAYMENT-005",
+      "type": "edge_case",
+      "actor": "任一服務（透過事件匯流排）",
+      "pre_conditions": [],
+      "trigger_event": "收到付款服務不關心的事件類型（StockRejected、StockReleased、PaymentSucceeded、PaymentFailed、PaymentRefunded）",
+      "post_assertions": [
+        "所有顧客餘額不變",
+        "回傳空陣列"
+      ]
+    },
+    {
+      "rule_id": "R-PAYMENT-006",
+      "type": "edge_case",
+      "actor": "整合人員／查詢者",
+      "pre_conditions": [
+        "付款服務以初始餘額表建立（例如 alice 100、bob 50）"
+      ],
+      "trigger_event": "查詢顧客餘額 getBalance",
+      "post_assertions": [
+        "回傳該顧客目前餘額（初始餘額加減歷次扣款與退款後的整數值）",
+        "不在初始餘額表的顧客回傳 0",
+        "不同顧客的餘額互不影響"
+      ],
+      "resolved_by": ["resolved/data/PAYMENT_D-001_初始餘額表沒有的顧客.md"]
+    },
+    {
+      "rule_id": "R-PAYMENT-007",
+      "type": "edge_case",
+      "actor": "庫存服務（透過事件匯流排）",
+      "pre_conditions": [
+        "付款服務尚未收到該訂單的 OrderPlaced（沒有顧客與金額可扣款）",
+        "該訂單未取消"
+      ],
+      "trigger_event": "收到該訂單的 StockReserved（事件亂序，先於 OrderPlaced 到達）",
+      "post_assertions": [
+        "付款服務記住該訂單庫存已保留、等待下單資料",
+        "所有顧客餘額不變",
+        "不發出任何事件，回傳空陣列"
+      ],
+      "resolved_by": ["resolved/features/PAYMENT_F-001_庫存已保留先於下單事件到達.md"]
+    },
+    {
+      "rule_id": "R-PAYMENT-008",
+      "type": "edge_case",
+      "actor": "訂單服務（透過事件匯流排）",
+      "pre_conditions": [
+        "付款服務已記住該訂單庫存已保留、等待下單資料（R-PAYMENT-007）",
+        "該訂單未取消"
+      ],
+      "trigger_event": "收到該訂單的 OrderPlaced（補到的下單資料）",
+      "post_assertions": [
+        "付款服務記住顧客與訂單金額，並立即依 R-PAYMENT-000／001／010 的條件做扣款判斷",
+        "餘額足夠：顧客餘額減少訂單金額、訂單變為已扣款，本次回傳恰好一個 PaymentSucceeded（amount 為訂單金額）",
+        "餘額不足或金額為負：餘額不變、訂單變為付款失敗，本次回傳恰好一個 PaymentFailed",
+        "回傳事件的 id 為全系統唯一的新值"
+      ],
+      "resolved_by": ["resolved/features/PAYMENT_F-001_庫存已保留先於下單事件到達.md"]
+    },
+    {
+      "rule_id": "R-PAYMENT-009",
+      "type": "edge_case",
+      "actor": "庫存服務或訂單服務（透過事件匯流排）",
+      "pre_conditions": [
+        "付款服務已記住該訂單已取消（取消時未扣款，R-PAYMENT-004）"
+      ],
+      "trigger_event": "之後才收到該訂單的 StockReserved 或 OrderPlaced（亂序或晚到）",
+      "post_assertions": [
+        "不扣款，所有顧客餘額不變",
+        "該訂單維持已取消",
+        "不發出任何事件，回傳空陣列"
+      ],
+      "resolved_by": ["resolved/features/PAYMENT_F-003_訂單已取消後才收到庫存已保留.md"]
+    },
+    {
+      "rule_id": "R-PAYMENT-010",
+      "type": "edge_case",
+      "actor": "庫存服務（透過事件匯流排）",
+      "pre_conditions": [
+        "付款服務已收到該訂單的 OrderPlaced",
+        "該訂單狀態為等待扣款",
+        "訂單金額 < 0（上游資料錯誤）"
+      ],
+      "trigger_event": "收到該訂單的 StockReserved（首次，事件 id 未處理過）",
+      "post_assertions": [
+        "視為無效金額，顧客餘額不變",
+        "該訂單狀態變為付款失敗",
+        "回傳恰好一個事件：PaymentFailed，orderId 為該訂單"
+      ],
+      "resolved_by": ["resolved/features/PAYMENT_F-005_訂單金額為零或負數.md"]
+    },
+    {
+      "rule_id": "R-PAYMENT-011",
+      "type": "edge_case",
+      "actor": "任一服務（透過事件匯流排）",
+      "pre_conditions": [
+        "同一個事件（相同 id）已經被付款服務處理過一次"
+      ],
+      "trigger_event": "再次收到相同 id 的事件（任何類型，第二次起）",
+      "post_assertions": [
+        "不改任何狀態，所有顧客餘額不變",
+        "不發任何事件，回傳空陣列"
+      ],
+      "resolved_by": [
+        "resolved/features/PAYMENT_F-002_重複送達已處理完的事件.md",
+        "resolved/features/PAYMENT_F-004_付款失敗後再次收到庫存已保留.md"
+      ]
+    },
+    {
+      "rule_id": "R-PAYMENT-012",
+      "type": "edge_case",
+      "actor": "庫存服務（透過事件匯流排）",
+      "pre_conditions": [
+        "該訂單狀態為已扣款或已退款"
+      ],
+      "trigger_event": "再次收到該訂單的 StockReserved（事件 id 不同）",
+      "post_assertions": [
+        "不重複扣款，顧客餘額不變",
+        "訂單狀態不變",
+        "不發任何事件，回傳空陣列"
+      ],
+      "resolved_by": ["resolved/features/PAYMENT_F-002_重複送達已處理完的事件.md"]
+    },
+    {
+      "rule_id": "R-PAYMENT-013",
+      "type": "edge_case",
+      "actor": "訂單服務（透過事件匯流排）",
+      "pre_conditions": [
+        "該訂單狀態為已退款或已取消"
+      ],
+      "trigger_event": "再次收到該訂單的 OrderCancelled（事件 id 不同）",
+      "post_assertions": [
+        "不重複退款（同一張訂單最多退一次），顧客餘額不變",
+        "訂單狀態不變",
+        "不發任何事件，回傳空陣列"
+      ],
+      "resolved_by": ["resolved/features/PAYMENT_F-002_重複送達已處理完的事件.md"]
+    },
+    {
+      "rule_id": "R-PAYMENT-014",
+      "type": "edge_case",
+      "actor": "庫存服務（透過事件匯流排）",
+      "pre_conditions": [
+        "該訂單狀態為付款失敗（已發出 PaymentFailed）",
+        "顧客餘額此時可能已足夠"
+      ],
+      "trigger_event": "再次收到該訂單的 StockReserved（事件 id 不同）",
+      "post_assertions": [
+        "不重試扣款，顧客餘額不變",
+        "訂單維持付款失敗",
+        "不發任何事件，回傳空陣列"
+      ],
+      "resolved_by": ["resolved/features/PAYMENT_F-004_付款失敗後再次收到庫存已保留.md"]
+    },
+    {
+      "rule_id": "R-PAYMENT-015",
+      "type": "edge_case",
+      "actor": "訂單服務（透過事件匯流排）",
+      "pre_conditions": [
+        "付款服務已記錄該訂單的顧客與金額（任一狀態）"
+      ],
+      "trigger_event": "再次收到該訂單的 OrderPlaced（事件 id 不同）",
+      "post_assertions": [
+        "保留第一次記錄的顧客與金額，不覆寫",
+        "顧客餘額不變，訂單狀態不變",
+        "不發任何事件，回傳空陣列"
+      ],
+      "resolved_by": ["resolved/features/PAYMENT_F-002_重複送達已處理完的事件.md"]
+    }
+  ]
+}

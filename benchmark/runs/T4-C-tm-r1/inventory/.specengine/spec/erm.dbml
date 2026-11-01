@@ -1,0 +1,21 @@
+// 領域資料模型（庫存服務，記憶體內狀態）
+// 命名慣例：manifest 宣告本專案無資料庫，依 contract-rules 第 2.4 節暫採 snake_case。
+// 本模型描述 createInventoryService(stock) 建立的服務實例內部狀態，不對應任何實體資料庫。
+
+Table inventory_stock {
+  sku varchar [pk, note: "商品 SKU，初始庫存表 stock 的鍵；不在表中的 SKU 視為 available = 0（決策見 resolved/data/INVENTORY_RESERVATION_初始庫存表沒有的SKU.md）"]
+  available int [note: "目前可供保留的數量，整數，必須 >= 0；保留時減少 qty、放回時加回 qty"]
+}
+
+Table stock_reservation {
+  order_id varchar [pk, note: "訂單編號，一張訂單至多一筆紀錄；同訂單編號的 OrderPlaced 只處理一次（決策見 resolved/data/INVENTORY_RESERVATION_重複送達的判定依據.md）"]
+  sku varchar [null, note: "保留或被拒絕的商品 SKU；狀態為 ENDED（放回事件先到）時為空"]
+  qty int [null, note: "實際保留數量，整數 >= 1，等於 OrderPlaced 的 qty；REJECTED 時為當初要求的數量；ENDED 時為空"]
+  status varchar [note: "狀態: RESERVED | RELEASED | REJECTED | ENDED（RESERVED 保留中；RELEASED 已放回，最多放回一次；REJECTED 庫存不足、未知 SKU 或 qty <= 0 被拒絕；ENDED 放回事件先於 OrderPlaced 到達、之後的 OrderPlaced 不保留）"]
+}
+
+Table processed_event {
+  event_id varchar [pk, note: "已處理過的事件 id；同一事件 id 第二次起忽略、不改狀態、不發事件（決策見 resolved/features/INVENTORY_RESERVATION_重複收到同一訂單OrderPlaced的回應.md）"]
+}
+
+Ref: stock_reservation.sku > inventory_stock.sku

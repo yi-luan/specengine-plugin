@@ -1,0 +1,34 @@
+{
+  "module": "ORDER_SERVICE",
+  "lockedAt": "2026-10-31T18:54:30.778Z",
+  "lockedAtLocal": "2026-11-01 02:54",
+  "matrix": {
+    ".specengine/sdd/matrix/ORDER_SERVICE.json": "9c3e78002411804cd278f2b654ba6c6894c409b2fa9ba5dd722440bc28b2d73e"
+  },
+  "features": {
+    ".specengine/spec/features/訂單服務.feature": "ca7920b9742cb15f1568d034cb7c40b6b5fc1c95c6f835847b818af6d128be9b"
+  },
+  "stepSignatures": {
+    "tests/steps/order-service.steps.ts": [
+      "Given::事件 {string}（PaymentSucceeded）已套用於訂單 {string}",
+      "Given::訂單 {string} 已存在且狀態為 {string}",
+      "Given::訂單 {string} 狀態為 {string}",
+      "Given::訂單 {string} 狀態為 {string}，下單時間為 {string}",
+      "Given::訂單編號 {string} 尚未存在",
+      "Then::下單結果為失敗，原因為 {string}",
+      "Then::下單結果為成功",
+      "Then::不發出任何事件",
+      "Then::取消原因為 {string}",
+      "Then::取消結果為失敗，原因為 {string}",
+      "Then::取消結果為成功",
+      "Then::發出事件 {string}",
+      "Then::訂單 {string} 不存在",
+      "When::同一事件 {string} 再次送達",
+      "When::收到 {string} 事件，訂單編號為 {string}",
+      "When::時間推進到 {string}",
+      "When::顧客 {string} 下單 {string}，商品 {string}，數量 {string}，金額 {string}，時間 {string}",
+      "When::顧客 {string} 取消訂單 {string}，時間 {string}"
+    ]
+  },
+  "driverInterfaces": {}
+}

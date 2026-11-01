@@ -1,0 +1,74 @@
+{
+  "付款服務已收到訂單 {string} 的 {string} 事件，id 為 {string}": {
+    "count": 22,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "付款服務已收到訂單 {string} 的下單事件，id 為 {string}，顧客 {string}，金額 {string}": {
+    "count": 20,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "付款服務收到訂單 {string} 的 {string} 事件，id 為 {string}": {
+    "count": 21,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "付款服務收到訂單 {string} 的下單事件，id 為 {string}，顧客 {string}，金額 {string}": {
+    "count": 6,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "回傳事件的 id 為未曾出現過的新值": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "回傳恰好 {string} 個事件，類型為 {string}，訂單 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "回傳恰好 {string} 個事件，類型為 {string}，訂單 {string}，金額 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "回傳空陣列": {
+    "count": 19,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "查詢結果為 {string}": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "查詢顧客 {string} 的餘額": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "顧客 {string} 的初始餘額為 {string}": {
+    "count": 29,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "顧客 {string} 的餘額為 {string}": {
+    "count": 27,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  }
+}

@@ -1,0 +1,175 @@
+{
+  "spec_engine_version": "2.1.0",
+  "rules": [
+    {
+      "rule_id": "R-INVENTORY-000",
+      "type": "main_flow",
+      "actor": "系統（庫存服務收到訂單服務發出的事件）",
+      "pre_conditions": [
+        "訂單數量為正整數",
+        "商品 SKU 的可供保留庫存大於或等於訂單數量（剛好相等算足夠）",
+        "該訂單未被記為已取消或付款失敗"
+      ],
+      "trigger_event": "OrderPlaced",
+      "post_assertions": [
+        "為該訂單保留訂單數量的該 SKU 庫存",
+        "該 SKU 的可供保留庫存減少訂單數量",
+        "發出 StockReserved，附訂單編號"
+      ],
+      "resolved_by": [
+        "resolved/features/庫存_剛好足夠的邊界.md"
+      ]
+    },
+    {
+      "rule_id": "R-INVENTORY-001",
+      "type": "edge_case",
+      "actor": "系統（庫存服務收到訂單服務發出的事件）",
+      "pre_conditions": [
+        "商品 SKU 的可供保留庫存小於訂單數量（商品 SKU 不在庫存表時視為庫存 0）"
+      ],
+      "trigger_event": "OrderPlaced",
+      "post_assertions": [
+        "整筆拒絕，不部分保留任何庫存",
+        "該 SKU 的可供保留庫存維持不變",
+        "發出 StockRejected，附訂單編號"
+      ],
+      "resolved_by": [
+        "resolved/features/庫存_SKU不在庫存表的處理.md"
+      ]
+    },
+    {
+      "rule_id": "R-INVENTORY-002",
+      "type": "edge_case",
+      "actor": "系統（庫存服務收到付款服務發出的事件）",
+      "pre_conditions": [
+        "該訂單有保留中的庫存"
+      ],
+      "trigger_event": "PaymentFailed",
+      "post_assertions": [
+        "只放回該訂單實際保留的數量",
+        "該訂單的保留紀錄標示為已釋放",
+        "發出 StockReleased，附訂單編號"
+      ],
+      "resolved_by": [
+        "resolved/features/庫存_已放回或無保留時收到放回請求.md"
+      ]
+    },
+    {
+      "rule_id": "R-INVENTORY-003",
+      "type": "edge_case",
+      "actor": "系統（庫存服務收到訂單服務發出的事件）",
+      "pre_conditions": [
+        "該訂單有保留中的庫存"
+      ],
+      "trigger_event": "OrderCancelled",
+      "post_assertions": [
+        "只放回該訂單實際保留的數量",
+        "該訂單的保留紀錄標示為已釋放",
+        "發出 StockReleased，附訂單編號"
+      ],
+      "resolved_by": [
+        "resolved/features/庫存_取消後是否發出StockReleased.md",
+        "resolved/features/庫存_已放回或無保留時收到放回請求.md"
+      ]
+    },
+    {
+      "rule_id": "R-INVENTORY-004",
+      "type": "edge_case",
+      "actor": "系統（庫存服務收到訂單服務發出的事件）",
+      "pre_conditions": [
+        "訂單數量不是正整數（0 或負數）"
+      ],
+      "trigger_event": "OrderPlaced",
+      "post_assertions": [
+        "不保留任何庫存",
+        "發出 StockRejected，附訂單編號"
+      ],
+      "resolved_by": [
+        "resolved/features/庫存_數量為零或負數的處理.md"
+      ]
+    },
+    {
+      "rule_id": "R-INVENTORY-005",
+      "type": "edge_case",
+      "actor": "系統（庫存服務收到任一事件）",
+      "pre_conditions": [
+        "同一事件 id 已被庫存服務處理過"
+      ],
+      "trigger_event": "任何事件（重複送達）",
+      "post_assertions": [
+        "忽略該事件，不改任何狀態",
+        "不發出任何事件"
+      ],
+      "resolved_by": [
+        "resolved/features/庫存_重複OrderPlaced的處理.md"
+      ]
+    },
+    {
+      "rule_id": "R-INVENTORY-006",
+      "type": "edge_case",
+      "actor": "系統（庫存服務收到訂單服務發出的事件）",
+      "pre_conditions": [
+        "該訂單沒有保留紀錄",
+        "庫存服務尚未見過該訂單的 OrderPlaced"
+      ],
+      "trigger_event": "OrderCancelled（先於 OrderPlaced 抵達）",
+      "post_assertions": [
+        "記住該訂單已取消",
+        "不改庫存，不發出任何事件"
+      ],
+      "resolved_by": [
+        "resolved/features/庫存_亂序抵達的放回請求.md"
+      ]
+    },
+    {
+      "rule_id": "R-INVENTORY-007",
+      "type": "edge_case",
+      "actor": "系統（庫存服務收到訂單服務發出的事件）",
+      "pre_conditions": [
+        "該訂單已被記為已取消或付款失敗"
+      ],
+      "trigger_event": "OrderPlaced",
+      "post_assertions": [
+        "不保留任何庫存",
+        "不發出任何事件"
+      ],
+      "resolved_by": [
+        "resolved/features/庫存_亂序抵達的放回請求.md",
+        "resolved/features/庫存_付款失敗先於下單抵達.md"
+      ]
+    },
+    {
+      "rule_id": "R-INVENTORY-008",
+      "type": "edge_case",
+      "actor": "系統（庫存服務收到付款服務或訂單服務發出的事件）",
+      "pre_conditions": [
+        "該訂單沒有保留中的庫存（從未保留成功，或已放回過）"
+      ],
+      "trigger_event": "PaymentFailed 或 OrderCancelled",
+      "post_assertions": [
+        "不加庫存",
+        "不發出 StockReleased"
+      ],
+      "resolved_by": [
+        "resolved/features/庫存_已放回或無保留時收到放回請求.md"
+      ]
+    },
+    {
+      "rule_id": "R-INVENTORY-009",
+      "type": "edge_case",
+      "actor": "系統（庫存服務收到付款服務發出的事件）",
+      "pre_conditions": [
+        "庫存服務尚未見過該訂單的 OrderPlaced",
+        "該訂單沒有保留紀錄"
+      ],
+      "trigger_event": "PaymentFailed（先於 OrderPlaced 抵達）",
+      "post_assertions": [
+        "記住該訂單已付款失敗",
+        "不改庫存，不發出任何事件"
+      ],
+      "resolved_by": [
+        "resolved/features/庫存_付款失敗先於下單抵達.md"
+      ]
+    }
+  ]
+}

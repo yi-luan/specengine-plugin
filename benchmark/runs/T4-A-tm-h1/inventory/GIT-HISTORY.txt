@@ -1,0 +1,31 @@
+
+64b75fe 2026-11-01 02:45:43 +0800 T4-A-tm-h1 inventory done
+
+ BENCH-LOG.md                     |  39 +++++++++++++++
+ src/inventory.ts                 |  81 ++++++++++++++++++++++++++++--
+ tests/features/inventory.feature | 105 +++++++++++++++++++++++++++++++++++++++
+ tests/steps/inventory.steps.ts   |  92 ++++++++++++++++++++++++++++++++++
+ 4 files changed, 314 insertions(+), 3 deletions(-)
+
+064559c 2026-11-01 02:42:46 +0800 team base (inventory)
+
+ src/events.ts    | 24 ++++++++++++++++++++++++
+ src/index.ts     |  2 +-
+ src/inventory.ts |  6 ++++++
+ src/order.ts     |  6 ++++++
+ src/payment.ts   |  6 ++++++
+ src/shop.ts      |  5 +++++
+ 6 files changed, 48 insertions(+), 1 deletion(-)
+
+68db830 2026-10-31 23:22:56 +0800 bench base
+
+ .gitignore             |    3 +
+ README.md              |    3 +
+ cucumber.cjs           |    7 +
+ package-lock.json      | 2317 ++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json           |   16 +
+ src/index.ts           |    2 +
+ tests/steps/.gitkeep   |    0
+ tests/support/.gitkeep |    0
+ tsconfig.json          |   13 +
+ 9 files changed, 2361 insertions(+)

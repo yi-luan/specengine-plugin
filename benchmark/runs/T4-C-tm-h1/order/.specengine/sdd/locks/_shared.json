@@ -1,0 +1,10 @@
+{
+  "lockedAt": "2026-10-31T18:54:30.778Z",
+  "lockedBy": "ORDER_SERVICE",
+  "files": {
+    ".specengine/spec/erm.dbml": "c115dee0abc1cfc361ec01d60310cb1fae061aaf444f201c446be336c9399a52",
+    ".specengine/spec/exclusions.md": "e293669e54f63e60877d0f3ccd97a7cf10f0f08bc7043a8b33970412ff59fa6c",
+    ".specengine/spec/policy-defaults.md": "9fcadb6bcdd0b05de366f35d814d637c3847661319bec753e9409a4312706b0a",
+    ".specengine/spec/terms.md": "ca94db83b32c8a108867e9f86ca7cfa8e1533f32fd3f10409255cd4509d5c372"
+  }
+}

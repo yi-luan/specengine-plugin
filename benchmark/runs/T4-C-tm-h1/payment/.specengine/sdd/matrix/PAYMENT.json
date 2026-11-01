@@ -1,0 +1,130 @@
+{
+  "spec_engine_version": "2.1.0",
+  "rules": [
+    {
+      "rule_id": "R-PAYMENT-000",
+      "type": "main_flow",
+      "actor": "付款服務",
+      "pre_conditions": [
+        "付款服務已先收到該訂單的 OrderPlaced，並記下顧客與訂單金額",
+        "顧客餘額 >= 訂單金額"
+      ],
+      "trigger_event": "收到 StockReserved",
+      "post_assertions": [
+        "顧客餘額減少訂單金額",
+        "發出 PaymentSucceeded（含 orderId、amount）",
+        "記錄該訂單為已扣款，金額為訂單金額"
+      ],
+      "resolved_by": [
+        "resolved/features/付款_餘額剛好等於訂單金額.md"
+      ]
+    },
+    {
+      "rule_id": "R-PAYMENT-001",
+      "type": "edge_case",
+      "actor": "付款服務",
+      "pre_conditions": [
+        "付款服務已先收到該訂單的 OrderPlaced，並記下顧客與訂單金額",
+        "顧客餘額 < 訂單金額（未知顧客的餘額視為 0）"
+      ],
+      "trigger_event": "收到 StockReserved",
+      "post_assertions": [
+        "顧客餘額不變，一毛都不扣",
+        "不發出 PaymentSucceeded",
+        "發出 PaymentFailed（含 orderId）"
+      ],
+      "resolved_by": [
+        "resolved/features/付款_顧客不在餘額名單中.md",
+        "resolved/features/付款_餘額剛好等於訂單金額.md"
+      ]
+    },
+    {
+      "rule_id": "R-PAYMENT-002",
+      "type": "edge_case",
+      "actor": "付款服務",
+      "pre_conditions": [
+        "該訂單目前為已扣款狀態（尚未退款）"
+      ],
+      "trigger_event": "收到 OrderCancelled",
+      "post_assertions": [
+        "顧客餘額增加已扣金額（全額退還，只退一次）",
+        "該訂單記錄為已退款",
+        "發出 PaymentRefunded（含 orderId、amount）"
+      ],
+      "resolved_by": [
+        "resolved/features/付款_重複取消事件.md"
+      ]
+    },
+    {
+      "rule_id": "R-PAYMENT-003",
+      "type": "edge_case",
+      "actor": "付款服務",
+      "pre_conditions": [
+        "該訂單的 OrderPlaced 尚未抵達付款服務",
+        "該訂單尚未被記錄為已取消"
+      ],
+      "trigger_event": "收到 StockReserved",
+      "post_assertions": [
+        "不扣款，不發出任何事件",
+        "暫存此 StockReserved 作為待處理紀錄，不設時間上限",
+        "暫存紀錄於該訂單的 OrderPlaced 抵達時依 R-PAYMENT-000 或 R-PAYMENT-001 處理並移除；或於該訂單的 OrderCancelled 抵達時依 R-PAYMENT-005 丟棄"
+      ],
+      "resolved_by": [
+        "resolved/features/付款_庫存保留事件先於訂單事件抵達.md",
+        "resolved/features/付款_流程對齊_暫存無上限.md"
+      ]
+    },
+    {
+      "rule_id": "R-PAYMENT-004",
+      "type": "edge_case",
+      "actor": "付款服務",
+      "pre_conditions": [
+        "該事件的 id 先前已被付款服務處理過"
+      ],
+      "trigger_event": "收到 StockReserved 或 OrderCancelled",
+      "post_assertions": [
+        "不改變任何狀態（餘額、扣款與退款紀錄皆不變）",
+        "不發出任何事件"
+      ],
+      "resolved_by": [
+        "resolved/features/付款_重複庫存保留事件.md",
+        "resolved/features/付款_重複取消事件.md"
+      ]
+    },
+    {
+      "rule_id": "R-PAYMENT-005",
+      "type": "edge_case",
+      "actor": "付款服務",
+      "pre_conditions": [
+        "該訂單從未被扣款，或已退款（沒有可退的已扣款項）"
+      ],
+      "trigger_event": "收到 OrderCancelled",
+      "post_assertions": [
+        "顧客餘額不變，不退款",
+        "不發出 PaymentRefunded",
+        "記錄該訂單為已取消",
+        "若有該訂單的暫存 StockReserved，一併丟棄"
+      ],
+      "resolved_by": [
+        "resolved/features/付款_未扣款訂單被取消.md",
+        "resolved/features/付款_流程對齊_已退款後再取消.md",
+        "resolved/features/付款_流程對齊_暫存無上限.md"
+      ]
+    },
+    {
+      "rule_id": "R-PAYMENT-006",
+      "type": "edge_case",
+      "actor": "付款服務",
+      "pre_conditions": [
+        "該訂單已被記錄為已取消（R-PAYMENT-005 已發生）"
+      ],
+      "trigger_event": "收到 StockReserved",
+      "post_assertions": [
+        "不扣款，不發出任何事件"
+      ],
+      "resolved_by": [
+        "resolved/features/付款_流程對齊_取消先於庫存保留.md"
+      ]
+    }
+  ]
+}

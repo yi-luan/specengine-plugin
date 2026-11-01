@@ -1,0 +1,60 @@
+
+cfe7720 2026-11-01 02:55:01 +0800 T4-C-tm-h1 order done
+
+ .claude/spec/architecture-manifest.md              |  77 +++++++
+ .specengine/sdd/flow-design/ORDER_SERVICE.md       |  20 ++
+ .../\344\270\213\345\226\256-artifact.md"          |  21 ++
+ ...46\205\213\344\277\235\350\255\267-artifact.md" |  19 ++
+ ...45\255\230\347\265\220\346\236\234-artifact.md" |  20 ++
+ ...45\213\225\345\217\226\346\266\210-artifact.md" |  20 ++
+ ...45\256\242\345\217\226\346\266\210-artifact.md" |  22 ++
+ .specengine/sdd/locks/ORDER_SERVICE.lock.json      |  34 +++
+ .specengine/sdd/locks/_shared.json                 |  10 +
+ .specengine/sdd/matrix/ORDER_SERVICE.json          | 251 +++++++++++++++++++++
+ .specengine/sdd/overview.md                        |   3 +
+ .specengine/sdd/overview/ORDER_SERVICE.md          |  27 +++
+ ...224\242\347\224\237\346\226\271\345\274\217.md" |  14 ++
+ ...205\245\345\220\210\346\263\225\346\200\247.md" |  14 ++
+ ...250\202\345\226\256\347\267\250\350\231\237.md" |  14 ++
+ ...226\256\347\232\204\345\217\226\346\266\210.md" |  14 ++
+ ...213\200\346\205\213\350\246\206\345\257\253.md" |  14 ++
+ ...273\230\346\254\276\346\210\220\345\212\237.md" |  14 ++
+ ...232\204\350\207\250\347\225\214\351\273\236.md" |  14 ++
+ ...250\202\345\226\256\347\213\200\346\205\213.md" |  14 ++
+ ...273\266\347\232\204\350\231\225\347\220\206.md" |  14 ++
+ ...266\210\347\232\204\347\213\200\346\205\213.md" |  14 ++
+ .specengine/sdd/steps-index.json                   | 110 +++++++++
+ .specengine/spec/erm.dbml                          |  16 ++
+ .specengine/spec/exclusions.md                     |   6 +
+ ...02\345\226\256\346\234\215\345\213\231.feature" | 178 +++++++++++++++
+ .specengine/spec/policy-defaults.md                |  10 +
+ .specengine/spec/terms.md                          |  22 ++
+ BENCH-LOG.md                                       |  82 +++++++
+ CLAUDE.md                                          |  95 ++++++++
+ src/order.ts                                       | 121 +++++++++-
+ tests/steps/order-service.steps.ts                 | 152 +++++++++++++
+ tests/support/order-world.ts                       |  85 +++++++
+ 33 files changed, 1539 insertions(+), 2 deletions(-)
+
+76c5349 2026-11-01 02:42:52 +0800 team base (order)
+
+ src/events.ts    | 24 ++++++++++++++++++++++++
+ src/index.ts     |  2 +-
+ src/inventory.ts |  6 ++++++
+ src/order.ts     |  6 ++++++
+ src/payment.ts   |  6 ++++++
+ src/shop.ts      |  5 +++++
+ 6 files changed, 48 insertions(+), 1 deletion(-)
+
+f3ade0a 2026-10-31 23:22:59 +0800 bench base
+
+ .gitignore             |    3 +
+ README.md              |    3 +
+ cucumber.cjs           |    7 +
+ package-lock.json      | 2317 ++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json           |   16 +
+ src/index.ts           |    2 +
+ tests/steps/.gitkeep   |    0
+ tests/support/.gitkeep |    0
+ tsconfig.json          |   13 +
+ 9 files changed, 2361 insertions(+)

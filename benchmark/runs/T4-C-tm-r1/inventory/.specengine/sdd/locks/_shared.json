@@ -1,0 +1,10 @@
+{
+  "lockedAt": "2026-10-31T19:11:53.759Z",
+  "lockedBy": "INVENTORY_RESERVATION",
+  "files": {
+    ".specengine/spec/erm.dbml": "0a1f6b1a7d151993a3378fb521b01de331e1e35d36c965bbfeafa641ad98cb31",
+    ".specengine/spec/exclusions.md": "253f4260818e51e571d7c01aa676765f8d8d59d1331a3dfcc7c025a90b98200a",
+    ".specengine/spec/policy-defaults.md": "413d6fa333b0b82bf3695514f72c6b18d56daecd4721fd542952c696c6b6fe45",
+    ".specengine/spec/terms.md": "a3b5d7364ccf8ded4bfdbba89dcc4d37c0dd630b6b30576dd6674131445386ec"
+  }
+}

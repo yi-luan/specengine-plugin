@@ -1,0 +1,28 @@
+{
+  "module": "PAYMENT",
+  "lockedAt": "2026-10-31T19:11:03.334Z",
+  "lockedAtLocal": "2026-11-01 03:11",
+  "matrix": {
+    ".specengine/sdd/matrix/PAYMENT.json": "4e065fa911e7f75285fe8308f05ed626f61158b5de797612e817a5f294c1a8e5"
+  },
+  "features": {
+    ".specengine/spec/features/付款服務.feature": "b5a6a36abcbcba4add11776e1b5772c0bc1f762b6e311d2f0d9ea2355a03c6e7"
+  },
+  "stepSignatures": {
+    "tests/steps/payment.steps.ts": [
+      "Given::付款服務已收到訂單 {string} 的 {string} 事件，id 為 {string}",
+      "Given::付款服務已收到訂單 {string} 的下單事件，id 為 {string}，顧客 {string}，金額 {string}",
+      "Given::顧客 {string} 的初始餘額為 {string}",
+      "Then::回傳事件的 id 為未曾出現過的新值",
+      "Then::回傳恰好 {string} 個事件，類型為 {string}，訂單 {string}",
+      "Then::回傳恰好 {string} 個事件，類型為 {string}，訂單 {string}，金額 {string}",
+      "Then::回傳空陣列",
+      "Then::查詢結果為 {string}",
+      "Then::顧客 {string} 的餘額為 {string}",
+      "When::付款服務收到訂單 {string} 的 {string} 事件，id 為 {string}",
+      "When::付款服務收到訂單 {string} 的下單事件，id 為 {string}，顧客 {string}，金額 {string}",
+      "When::查詢顧客 {string} 的餘額"
+    ]
+  },
+  "driverInterfaces": {}
+}

@@ -1,0 +1,462 @@
+{
+  "spec_engine_version": "2.1.0",
+  "module_name": "事件驅動下單流程",
+  "rules": [
+    {
+      "rule_id": "R-ORDER_SAGA-000",
+      "type": "main_flow",
+      "actor": "顧客",
+      "pre_conditions": [
+        "SKU 的可用庫存 >= 下單數量",
+        "顧客餘額 >= 訂單金額",
+        "事件依 OrderPlaced → StockReserved → PaymentSucceeded 的順序各送達一次"
+      ],
+      "trigger_event": "顧客下單（訂單編號、顧客、SKU、數量、金額、時間）",
+      "post_assertions": [
+        "訂單服務建立訂單，狀態為「處理中」(PENDING)，並發出 OrderPlaced",
+        "庫存服務收到 OrderPlaced 後發出 StockReserved，SKU 可用庫存減少下單數量",
+        "付款服務收到 StockReserved 後扣款，顧客餘額減少訂單金額，並發出 PaymentSucceeded（amount = 訂單金額）",
+        "訂單服務收到 PaymentSucceeded 後訂單狀態為「已確認」(CONFIRMED)"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-001",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "訂單編號尚未存在於訂單服務",
+        "orderId、customerId、sku 皆非空字串，qty 與 amount 皆為正整數"
+      ],
+      "trigger_event": "顧客呼叫 placeOrder（訂單編號、顧客、SKU、數量、金額、時間）",
+      "post_assertions": [
+        "回傳 ok: true，events 恰含一個 OrderPlaced，其 orderId、customerId、sku、qty、amount、at 與輸入一致",
+        "getOrder(訂單編號) 回傳狀態 PENDING，無 cancelReason"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-002",
+      "type": "edge_case",
+      "actor": "庫存服務",
+      "pre_conditions": [
+        "SKU 的可用庫存 >= 事件中的 qty",
+        "庫存服務未曾收到該訂單的 OrderCancelled 或 PaymentFailed（訂單未被記為已結束）"
+      ],
+      "trigger_event": "庫存服務收到 OrderPlaced",
+      "post_assertions": [
+        "回傳恰含一個 StockReserved（orderId 同事件）",
+        "該 SKU 的 getAvailable 減少 qty"
+      ],
+      "resolved_by": "resolved/features/ORDER_SAGA_亂序_終結事件先於上游事件到達.md"
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-003",
+      "type": "edge_case",
+      "actor": "庫存服務",
+      "pre_conditions": [
+        "SKU 的可用庫存 < 事件中的 qty（未登錄的 SKU 視為可用庫存 0）",
+        "庫存服務未曾收到該訂單的 OrderCancelled 或 PaymentFailed（訂單未被記為已結束）"
+      ],
+      "trigger_event": "庫存服務收到 OrderPlaced",
+      "post_assertions": [
+        "回傳恰含一個 StockRejected（orderId 同事件）",
+        "該 SKU 的 getAvailable 不變"
+      ],
+      "resolved_by": [
+        "resolved/data/ORDER_SAGA_未登錄的SKU或顧客.md",
+        "resolved/features/ORDER_SAGA_亂序_終結事件先於上游事件到達.md"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-004",
+      "type": "edge_case",
+      "actor": "付款服務",
+      "pre_conditions": [
+        "付款服務已知該訂單的顧客與金額（來自 OrderPlaced）",
+        "顧客餘額 >= 訂單金額",
+        "付款服務未曾收到該訂單的 OrderCancelled（訂單未被記為已結束）"
+      ],
+      "trigger_event": "付款服務收到 StockReserved",
+      "post_assertions": [
+        "顧客 getBalance 減少訂單金額",
+        "回傳恰含一個 PaymentSucceeded（orderId 同事件，amount = 訂單金額）"
+      ],
+      "resolved_by": "resolved/features/ORDER_SAGA_亂序_終結事件先於上游事件到達.md"
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-005",
+      "type": "edge_case",
+      "actor": "付款服務",
+      "pre_conditions": [
+        "付款服務已知該訂單的顧客與金額（來自 OrderPlaced）",
+        "顧客餘額 < 訂單金額（未登錄的顧客視為餘額 0）",
+        "付款服務未曾收到該訂單的 OrderCancelled（訂單未被記為已結束）"
+      ],
+      "trigger_event": "付款服務收到 StockReserved",
+      "post_assertions": [
+        "顧客 getBalance 不變",
+        "回傳恰含一個 PaymentFailed（orderId 同事件）"
+      ],
+      "resolved_by": [
+        "resolved/data/ORDER_SAGA_未登錄的SKU或顧客.md",
+        "resolved/features/ORDER_SAGA_亂序_終結事件先於上游事件到達.md"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-006",
+      "type": "edge_case",
+      "actor": "訂單服務",
+      "pre_conditions": [
+        "訂單狀態為 PENDING"
+      ],
+      "trigger_event": "訂單服務收到 PaymentSucceeded",
+      "post_assertions": [
+        "訂單狀態變為 CONFIRMED",
+        "回傳空陣列"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-007",
+      "type": "edge_case",
+      "actor": "訂單服務",
+      "pre_conditions": [
+        "訂單狀態為 PENDING"
+      ],
+      "trigger_event": "訂單服務收到 StockRejected",
+      "post_assertions": [
+        "訂單狀態變為 REJECTED（庫存不足）",
+        "回傳空陣列"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-008",
+      "type": "edge_case",
+      "actor": "訂單服務",
+      "pre_conditions": [
+        "訂單狀態為 PENDING"
+      ],
+      "trigger_event": "訂單服務收到 PaymentFailed",
+      "post_assertions": [
+        "訂單狀態變為 FAILED（付款失敗）",
+        "回傳空陣列"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-009",
+      "type": "edge_case",
+      "actor": "庫存服務",
+      "pre_conditions": [
+        "該訂單有尚未放回的保留庫存"
+      ],
+      "trigger_event": "庫存服務收到 PaymentFailed",
+      "post_assertions": [
+        "該 SKU 的 getAvailable 增加原保留數量（放回）",
+        "回傳恰含一個 StockReleased（orderId 同事件）",
+        "該訂單被記為已結束（之後再收到它的 OrderPlaced 不再保留）"
+      ],
+      "resolved_by": "resolved/features/ORDER_SAGA_亂序_終結事件先於上游事件到達.md"
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-010",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "訂單狀態為 PENDING 或 CONFIRMED"
+      ],
+      "trigger_event": "顧客呼叫 cancelOrder（訂單編號、時間）",
+      "post_assertions": [
+        "回傳 ok: true，events 恰含一個 OrderCancelled（orderId 同訂單）",
+        "getOrder 回傳狀態 CANCELLED，cancelReason 為 CUSTOMER（已確認的訂單取消時亦為 CUSTOMER）"
+      ],
+      "resolved_by": "resolved/features/ORDER_SAGA_取消訂單_允許的狀態.md"
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-011",
+      "type": "edge_case",
+      "actor": "庫存服務",
+      "pre_conditions": [
+        "該訂單有尚未放回的保留庫存"
+      ],
+      "trigger_event": "庫存服務收到 OrderCancelled",
+      "post_assertions": [
+        "該 SKU 的 getAvailable 增加原保留數量（放回）",
+        "回傳恰含一個 StockReleased（orderId 同事件）",
+        "該訂單被記為已結束（之後再收到它的 OrderPlaced 不再保留）"
+      ],
+      "resolved_by": [
+        "resolved/features/ORDER_SAGA_取消訂單_庫存放回是否發出StockReleased.md",
+        "resolved/features/ORDER_SAGA_亂序_終結事件先於上游事件到達.md"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-012",
+      "type": "edge_case",
+      "actor": "付款服務",
+      "pre_conditions": [
+        "該訂單已成功扣款且尚未退款"
+      ],
+      "trigger_event": "付款服務收到 OrderCancelled",
+      "post_assertions": [
+        "顧客 getBalance 增加原扣款金額（退還）",
+        "回傳恰含一個 PaymentRefunded（orderId 同事件，amount = 原扣款金額）",
+        "該訂單被記為已結束（之後再收到它的 StockReserved 不再扣款）"
+      ],
+      "resolved_by": "resolved/features/ORDER_SAGA_亂序_終結事件先於上游事件到達.md"
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-013",
+      "type": "edge_case",
+      "actor": "系統（時間推進）",
+      "pre_conditions": [
+        "訂單狀態為 PENDING（REJECTED、FAILED 等其他狀態不適用逾時取消）",
+        "now − 下單時間 at >= 15 分鐘（剛好 15 分鐘整即算逾時）"
+      ],
+      "trigger_event": "訂單服務 tick(now)",
+      "post_assertions": [
+        "每張逾時訂單各發出一個 OrderCancelled，一併回傳",
+        "各逾時訂單 getOrder 回傳狀態 CANCELLED，cancelReason 為 TIMEOUT",
+        "未逾時的 PENDING 訂單不受影響，狀態仍為 PENDING"
+      ],
+      "resolved_by": [
+        "resolved/features/ORDER_SAGA_逾時_剛好15分鐘的邊界.md",
+        "resolved/features/ORDER_SAGA_逾時_適用的訂單狀態.md"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-014",
+      "type": "edge_case",
+      "actor": "任一服務",
+      "pre_conditions": [
+        "事件類型不是該服務要處理的類型（訂單服務：OrderPlaced、StockReserved、StockReleased、PaymentRefunded、OrderCancelled；庫存服務：StockReserved、StockRejected、StockReleased、PaymentSucceeded、PaymentRefunded；付款服務：StockRejected、StockReleased、PaymentSucceeded、PaymentFailed、PaymentRefunded）"
+      ],
+      "trigger_event": "服務的 handle 收到該事件",
+      "post_assertions": [
+        "回傳空陣列",
+        "服務狀態不變"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-015",
+      "type": "edge_case",
+      "actor": "任一服務",
+      "pre_conditions": [
+        "同一個事件（相同 id）已被該服務處理過一次"
+      ],
+      "trigger_event": "服務的 handle 再次收到同一事件（重複送達）",
+      "post_assertions": [
+        "服務狀態不再變動（庫存不再減少或放回、餘額不再扣款或退還、訂單狀態不變）",
+        "回傳空陣列"
+      ],
+      "resolved_by": "resolved/features/ORDER_SAGA_重複事件_回傳值.md"
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-016",
+      "type": "edge_case",
+      "actor": "任一服務",
+      "pre_conditions": [
+        "系統內已發出過若干事件"
+      ],
+      "trigger_event": "任一服務再發出事件",
+      "post_assertions": [
+        "新事件的 id 與系統內所有既有事件的 id 皆不相同"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-017",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "訂單編號已存在於訂單服務（不論狀態）"
+      ],
+      "trigger_event": "顧客以相同訂單編號再次呼叫 placeOrder",
+      "post_assertions": [
+        "回傳 ok: false，reason 為固定文案 MSG-003「DUPLICATE_ORDER」",
+        "既有訂單不變，不發出任何事件"
+      ],
+      "resolved_by": "resolved/features/ORDER_SAGA_下單_重複的訂單編號.md"
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-018",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "qty 或 amount 不是正整數（0、負數、非整數），或 orderId、customerId、sku 任一為空字串"
+      ],
+      "trigger_event": "顧客呼叫 placeOrder",
+      "post_assertions": [
+        "回傳 ok: false，reason 為固定文案 MSG-004「INVALID_INPUT」",
+        "不建立訂單（getOrder 回傳 undefined），不發出任何事件"
+      ],
+      "resolved_by": "resolved/features/ORDER_SAGA_下單_數量與金額的輸入驗證.md"
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-019",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "訂單編號不存在於訂單服務"
+      ],
+      "trigger_event": "顧客呼叫 cancelOrder（訂單編號、時間）",
+      "post_assertions": [
+        "回傳 ok: false，reason 為固定文案 MSG-001「ORDER_NOT_FOUND」",
+        "不發出任何事件"
+      ],
+      "resolved_by": "resolved/features/ORDER_SAGA_取消訂單_拒絕時的原因文案.md"
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-020",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "訂單狀態為 REJECTED、FAILED 或 CANCELLED"
+      ],
+      "trigger_event": "顧客呼叫 cancelOrder（訂單編號、時間）",
+      "post_assertions": [
+        "回傳 ok: false，reason 為固定文案 MSG-002「NOT_CANCELLABLE」",
+        "訂單狀態與 cancelReason 不變，不發出任何事件"
+      ],
+      "resolved_by": [
+        "resolved/features/ORDER_SAGA_取消訂單_允許的狀態.md",
+        "resolved/features/ORDER_SAGA_取消訂單_拒絕時的原因文案.md"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-021",
+      "type": "edge_case",
+      "actor": "庫存服務",
+      "pre_conditions": [
+        "該訂單沒有尚未放回的保留庫存（從未保留、被拒絕、或已放回）"
+      ],
+      "trigger_event": "庫存服務收到 OrderCancelled 或 PaymentFailed",
+      "post_assertions": [
+        "不發出 StockReleased，回傳空陣列",
+        "所有 SKU 的 getAvailable 不變",
+        "該訂單被記為已結束（之後再收到它的 OrderPlaced 不再保留）"
+      ],
+      "resolved_by": [
+        "resolved/features/ORDER_SAGA_取消訂單_無可放回或可退還時是否發事件.md",
+        "resolved/features/ORDER_SAGA_亂序_終結事件先於上游事件到達.md"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-022",
+      "type": "edge_case",
+      "actor": "付款服務",
+      "pre_conditions": [
+        "該訂單沒有尚未退還的扣款（從未扣款、扣款失敗、或已退款）"
+      ],
+      "trigger_event": "付款服務收到 OrderCancelled",
+      "post_assertions": [
+        "不發出 PaymentRefunded，回傳空陣列",
+        "所有顧客的 getBalance 不變",
+        "該訂單被記為已結束（之後再收到它的 StockReserved 不再扣款）"
+      ],
+      "resolved_by": [
+        "resolved/features/ORDER_SAGA_取消訂單_無可放回或可退還時是否發事件.md",
+        "resolved/features/ORDER_SAGA_亂序_終結事件先於上游事件到達.md"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-023",
+      "type": "edge_case",
+      "actor": "訂單服務",
+      "pre_conditions": [
+        "訂單不存在於訂單服務，或訂單狀態不是 PENDING（CONFIRMED、REJECTED、FAILED 或 CANCELLED）"
+      ],
+      "trigger_event": "訂單服務收到該訂單編號的 PaymentSucceeded、StockRejected 或 PaymentFailed",
+      "post_assertions": [
+        "訂單狀態與 cancelReason 不變（不存在的訂單不被建立，getOrder 仍回傳 undefined）",
+        "回傳空陣列"
+      ],
+      "resolved_by": [
+        "resolved/features/ORDER_SAGA_終態訂單收到後續結果事件.md",
+        "resolved/features/ORDER_SAGA_訂單服務收到未知訂單的結果事件.md"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-024",
+      "type": "edge_case",
+      "actor": "庫存服務",
+      "pre_conditions": [
+        "庫存服務已先收到該訂單的 OrderCancelled 或 PaymentFailed（訂單已被記為已結束）",
+        "SKU 的可用庫存 >= 事件中的 qty"
+      ],
+      "trigger_event": "庫存服務之後才收到該訂單的 OrderPlaced（亂序）",
+      "post_assertions": [
+        "不保留庫存，該 SKU 的 getAvailable 不變",
+        "回傳空陣列（不發 StockReserved 也不發 StockRejected）"
+      ],
+      "resolved_by": "resolved/features/ORDER_SAGA_亂序_終結事件先於上游事件到達.md"
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-025",
+      "type": "edge_case",
+      "actor": "付款服務",
+      "pre_conditions": [
+        "付款服務已先收到該訂單的 OrderCancelled（訂單已被記為已結束）",
+        "付款服務已知該訂單的顧客與金額，且顧客餘額 >= 訂單金額"
+      ],
+      "trigger_event": "付款服務之後才收到該訂單的 StockReserved（亂序）",
+      "post_assertions": [
+        "不扣款，顧客 getBalance 不變",
+        "回傳空陣列（不發 PaymentSucceeded 也不發 PaymentFailed）"
+      ],
+      "resolved_by": "resolved/features/ORDER_SAGA_亂序_終結事件先於上游事件到達.md"
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-026",
+      "type": "edge_case",
+      "actor": "付款服務",
+      "pre_conditions": [
+        "付款服務尚未記錄該訂單"
+      ],
+      "trigger_event": "付款服務收到 OrderPlaced",
+      "post_assertions": [
+        "記下該訂單的顧客與金額，供之後收到 StockReserved 時扣款",
+        "回傳空陣列，所有顧客的 getBalance 不變"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-027",
+      "type": "edge_case",
+      "actor": "呼叫端",
+      "pre_conditions": [
+        "SKU 不在 createInventoryService 的初始庫存表中，或顧客不在 createPaymentService 的初始餘額表中"
+      ],
+      "trigger_event": "呼叫 getAvailable(sku) 或 getBalance(customerId)",
+      "post_assertions": [
+        "回傳 0"
+      ],
+      "resolved_by": "resolved/data/ORDER_SAGA_未登錄的SKU或顧客.md"
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-028",
+      "type": "edge_case",
+      "actor": "付款服務",
+      "pre_conditions": [
+        "付款服務尚未收到該訂單的 OrderPlaced（不知道顧客與金額）",
+        "付款服務未曾收到該訂單的 OrderCancelled（訂單未被記為已結束）"
+      ],
+      "trigger_event": "付款服務先收到該訂單的 StockReserved（亂序）",
+      "post_assertions": [
+        "不扣款，所有顧客的 getBalance 不變",
+        "回傳空陣列",
+        "記下該訂單已保留庫存、等待 OrderPlaced"
+      ],
+      "resolved_by": "resolved/features/ORDER_SAGA_亂序_付款服務先收到StockReserved.md"
+    },
+    {
+      "rule_id": "R-ORDER_SAGA-029",
+      "type": "edge_case",
+      "actor": "付款服務",
+      "pre_conditions": [
+        "付款服務已先收到該訂單的 StockReserved 並記為等待 OrderPlaced",
+        "付款服務未曾收到該訂單的 OrderCancelled（訂單未被記為已結束）"
+      ],
+      "trigger_event": "付款服務之後才收到該訂單的 OrderPlaced（亂序）",
+      "post_assertions": [
+        "記下顧客與金額後立即依餘額判定：餘額 >= 金額 → 餘額減金額並回傳恰含一個 PaymentSucceeded（amount = 金額）；餘額 < 金額（未登錄顧客視為 0）→ 餘額不變並回傳恰含一個 PaymentFailed"
+      ],
+      "resolved_by": "resolved/features/ORDER_SAGA_亂序_付款服務先收到StockReserved.md"
+    }
+  ]
+}

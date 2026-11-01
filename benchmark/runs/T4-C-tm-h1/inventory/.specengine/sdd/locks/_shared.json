@@ -1,0 +1,9 @@
+{
+  "lockedAt": "2026-10-31T18:52:56.589Z",
+  "lockedBy": "INVENTORY",
+  "files": {
+    ".specengine/spec/erm.dbml": "d5ea045cae32de428421acf841ffb910feed59489bf4e6ae590d9cb4b438dab4",
+    ".specengine/spec/exclusions.md": "35a53b8175e008ec4dc27bf34441d6d5421cd3dbcb7556af1bee4866f603ea74",
+    ".specengine/spec/terms.md": "8d8b9e33f5950433390154d12d2d53ffe1a74d68a5936b985ba11b31cd77a575"
+  }
+}

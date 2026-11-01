@@ -1,0 +1,110 @@
+{
+  "下單結果為失敗，原因為 {string}": {
+    "count": 3,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "下單結果為成功": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "不發出任何事件": {
+    "count": 12,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "事件 {string}（PaymentSucceeded）已套用於訂單 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "取消原因為 {string}": {
+    "count": 3,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "取消結果為失敗，原因為 {string}": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "取消結果為成功": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "同一事件 {string} 再次送達": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "收到 {string} 事件，訂單編號為 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "時間推進到 {string}": {
+    "count": 3,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "發出事件 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "訂單 {string} 不存在": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "訂單 {string} 已存在且狀態為 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "訂單 {string} 狀態為 {string}": {
+    "count": 21,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "訂單 {string} 狀態為 {string}，下單時間為 {string}": {
+    "count": 3,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "訂單編號 {string} 尚未存在": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "顧客 {string} 下單 {string}，商品 {string}，數量 {string}，金額 {string}，時間 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "顧客 {string} 取消訂單 {string}，時間 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  }
+}

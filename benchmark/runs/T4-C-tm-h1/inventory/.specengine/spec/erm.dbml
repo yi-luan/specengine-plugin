@@ -1,0 +1,16 @@
+// 命名慣例待 manifest 核實，目前暫採 snake_case
+// 庫存服務資料模型。全部在記憶體中，不碰資料庫。
+
+Table stock_item {
+  sku varchar [pk, note: "商品 SKU"]
+  total_qty int [not null, note: "庫存總量（整數），必須 >= 0"]
+}
+
+Table reservation {
+  order_id varchar [pk, note: "訂單編號，每張訂單至多一筆保留紀錄"]
+  sku varchar [not null, note: "保留的商品 SKU"]
+  qty int [not null, note: "保留數量（整數）"]
+  status varchar [not null, note: "狀態: RESERVED | RELEASED"]
+}
+
+Ref: reservation.sku > stock_item.sku

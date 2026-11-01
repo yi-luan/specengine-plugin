@@ -1,0 +1,54 @@
+
+6be1642 2026-11-01 02:53:24 +0800 T4-C-tm-h1 inventory done
+
+ .claude/spec/architecture-manifest.md              |  77 +++++++++
+ .specengine/sdd/flow-design/INVENTORY.md           |  14 ++
+ ...270\213\345\226\256\344\277\235\347\225\231.md" |  27 ++++
+ ...266\210\346\231\202\346\224\276\345\233\236.md" |  26 +++
+ .specengine/sdd/locks/INVENTORY.lock.json          |  27 ++++
+ .specengine/sdd/locks/_shared.json                 |   9 ++
+ .specengine/sdd/matrix/INVENTORY.json              | 175 +++++++++++++++++++++
+ .specengine/sdd/overview.md                        |   3 +
+ .specengine/sdd/overview/INVENTORY.md              |  24 +++
+ ...241\250\347\232\204\350\231\225\347\220\206.md" |  31 ++++
+ ...224\276\345\233\236\350\253\213\346\261\202.md" |  31 ++++
+ ...270\213\345\226\256\346\212\265\351\201\224.md" |  31 ++++
+ ...244\240\347\232\204\351\202\212\347\225\214.md" |  30 ++++
+ ...20\246\347\231\274\345\207\272StockReleased.md" |  30 ++++
+ ...224\276\345\233\236\350\253\213\346\261\202.md" |  31 ++++
+ ...225\270\347\232\204\350\231\225\347\220\206.md" |  32 ++++
+ ...rPlaced\347\232\204\350\231\225\347\220\206.md" |  31 ++++
+ .specengine/sdd/steps-index.json                   |  68 ++++++++
+ .specengine/spec/erm.dbml                          |  16 ++
+ .specengine/spec/exclusions.md                     |   9 ++
+ ...53\345\255\230\346\234\215\345\213\231.feature" | 126 +++++++++++++++
+ .specengine/spec/terms.md                          |  13 ++
+ BENCH-LOG.md                                       |  81 ++++++++++
+ CLAUDE.md                                          |  95 +++++++++++
+ src/inventory.ts                                   |  85 +++++++++-
+ tests/steps/inventory.steps.ts                     | 108 +++++++++++++
+ tests/support/world.ts                             |  33 ++++
+ 27 files changed, 1261 insertions(+), 2 deletions(-)
+
+79c0bc9 2026-11-01 02:42:53 +0800 team base (inventory)
+
+ src/events.ts    | 24 ++++++++++++++++++++++++
+ src/index.ts     |  2 +-
+ src/inventory.ts |  6 ++++++
+ src/order.ts     |  6 ++++++
+ src/payment.ts   |  6 ++++++
+ src/shop.ts      |  5 +++++
+ 6 files changed, 48 insertions(+), 1 deletion(-)
+
+f3ade0a 2026-10-31 23:22:59 +0800 bench base
+
+ .gitignore             |    3 +
+ README.md              |    3 +
+ cucumber.cjs           |    7 +
+ package-lock.json      | 2317 ++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json           |   16 +
+ src/index.ts           |    2 +
+ tests/steps/.gitkeep   |    0
+ tests/support/.gitkeep |    0
+ tsconfig.json          |   13 +
+ 9 files changed, 2361 insertions(+)

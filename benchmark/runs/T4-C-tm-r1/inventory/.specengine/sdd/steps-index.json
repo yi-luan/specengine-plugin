@@ -1,0 +1,68 @@
+{
+  "商品 {string} 的初始庫存為 {string}": {
+    "count": 17,
+    "files": [
+      ".specengine/spec/features/庫存保留.feature"
+    ]
+  },
+  "商品 {string} 的可用庫存為 {string}": {
+    "count": 15,
+    "files": [
+      ".specengine/spec/features/庫存保留.feature"
+    ]
+  },
+  "回傳事件為訂單 {string} 的 {string}": {
+    "count": 8,
+    "files": [
+      ".specengine/spec/features/庫存保留.feature"
+    ]
+  },
+  "回傳事件的 id 與先前所有回傳事件的 id 皆不同": {
+    "count": 5,
+    "files": [
+      ".specengine/spec/features/庫存保留.feature"
+    ]
+  },
+  "回傳空陣列": {
+    "count": 7,
+    "files": [
+      ".specengine/spec/features/庫存保留.feature"
+    ]
+  },
+  "庫存服務已處理訂單 {string} 的 {string} 事件 {string}": {
+    "count": 5,
+    "files": [
+      ".specengine/spec/features/庫存保留.feature"
+    ]
+  },
+  "庫存服務已處理訂單 {string} 的下單事件 {string}，商品 {string} 數量 {string}": {
+    "count": 11,
+    "files": [
+      ".specengine/spec/features/庫存保留.feature"
+    ]
+  },
+  "庫存服務收到訂單 {string} 的 {string} 事件 {string}": {
+    "count": 8,
+    "files": [
+      ".specengine/spec/features/庫存保留.feature"
+    ]
+  },
+  "庫存服務收到訂單 {string} 的下單事件 {string}，商品 {string} 數量 {string}": {
+    "count": 7,
+    "files": [
+      ".specengine/spec/features/庫存保留.feature"
+    ]
+  },
+  "查詢商品 {string} 的可用庫存": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/庫存保留.feature"
+    ]
+  },
+  "查詢結果為 {string}": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/庫存保留.feature"
+    ]
+  }
+}

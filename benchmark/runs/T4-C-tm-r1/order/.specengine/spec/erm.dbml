@@ -1,0 +1,27 @@
+// 訂單服務（ORDER_SERVICE）記憶體實體模型。本專案無資料庫，所有實體存於 createOrderService() 的閉包內。
+// 命名慣例：manifest 第 3 節宣告無資料庫，依 contract-rules 第 2.4 節暫採 snake_case。
+
+Table orders {
+  order_id varchar [pk, note: "訂單編號，由顧客下單時指定，全服務唯一"]
+  customer_id varchar [note: "顧客識別字"]
+  sku varchar [note: "商品 SKU"]
+  qty int [note: "數量，整數"]
+  amount int [note: "金額，整數"]
+  placed_at timestamp [note: "下單時間，ISO 8601 字串，逾時判定以此為基準（下單後 15 分鐘）"]
+  status varchar [note: "狀態: PENDING（處理中） | CONFIRMED（已確認） | REJECTED（庫存不足） | FAILED（付款失敗） | CANCELLED（已取消）"]
+  cancel_reason varchar [null, note: "取消原因: CUSTOMER（顧客取消） | TIMEOUT（逾時自動取消）；僅狀態為 CANCELLED 時有值"]
+}
+
+Table processed_events {
+  event_id varchar [pk, note: "已處理過的入站事件 id，用於去除重複送達；全系統唯一"]
+  order_id varchar [note: "該事件所屬的訂單編號"]
+}
+
+Table emitted_events {
+  event_id varchar [pk, note: "本服務發出的事件 id，必須全系統唯一；由本服務自行產生"]
+  order_id varchar [note: "該事件所屬的訂單編號"]
+  type varchar [note: "事件型別: OrderPlaced | OrderCancelled（訂單服務只會發出這兩種）"]
+}
+
+Ref: processed_events.order_id > orders.order_id
+Ref: emitted_events.order_id > orders.order_id

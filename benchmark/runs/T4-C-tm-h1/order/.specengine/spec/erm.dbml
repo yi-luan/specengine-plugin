@@ -1,0 +1,16 @@
+// 訂單服務（ORDER_SERVICE）邏輯資料模型
+// 需求為純記憶體服務，不碰資料庫與網路；本檔只描述訂單狀態的邏輯欄位。
+// 命名慣例待 manifest 核實，目前暫採 snake_case。
+
+Table orders {
+  order_id varchar [pk, note: "訂單編號，全系統唯一；重複下單回傳 DUPLICATE_ORDER"]
+  customer_id varchar [not null, note: "顧客編號，不得為空字串"]
+  sku varchar [not null, note: "商品 SKU，不得為空字串"]
+  qty int [not null, note: "數量，正整數（> 0）"]
+  amount int [not null, note: "金額，正整數（> 0）"]
+  status varchar [not null, note: "狀態: PENDING | CONFIRMED | REJECTED | FAILED | CANCELLED；CANCELLED、REJECTED、FAILED 為終態"]
+  cancel_reason varchar [note: "取消原因: CUSTOMER | TIMEOUT；僅狀態為 CANCELLED 時有值"]
+  placed_at timestamp [not null, note: "下單時間（ISO 8601），逾時計時起點，滿 15 分鐘且仍為 PENDING 即逾時取消"]
+}
+
+// 單表，無外鍵關聯。

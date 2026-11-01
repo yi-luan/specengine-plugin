@@ -1,0 +1,17 @@
+// 命名慣例待 manifest 核實，目前暫採 snake_case
+// 付款服務的記憶體資料模型草稿（不落地資料庫，所有狀態只存在於記憶體）
+// 金額與數量一律為整數
+
+Table balance_account {
+  customer_id varchar [pk, note: "顧客識別碼"]
+  balance int [not null, note: "顧客餘額（整數），必須 >= 0"]
+}
+
+Table payment_charge {
+  order_id varchar [pk, note: "訂單編號"]
+  customer_id varchar [not null, note: "顧客識別碼，來自 OrderPlaced"]
+  amount int [not null, note: "已扣款金額（整數），等於訂單金額"]
+  status varchar [not null, note: "狀態: CHARGED | REFUNDED"]
+}
+
+Ref: payment_charge.customer_id > balance_account.customer_id

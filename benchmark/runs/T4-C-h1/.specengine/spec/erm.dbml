@@ -1,0 +1,62 @@
+// 命名慣例待 manifest 核實，目前暫採 snake_case
+// 三個服務各自持有獨立資料，彼此不共用資料庫，只透過事件溝通；以下依服務分區。
+// 本專案不碰資料庫（需求：全部在記憶體中），以下為各服務內部狀態的邏輯模型。
+
+// ===== 訂單服務 =====
+Table orders {
+  id varchar [pk, note: "訂單編號，非空字串"]
+  customer_id varchar [not null, note: "下單顧客編號，非空字串"]
+  sku varchar [not null, note: "商品 SKU，非空字串"]
+  qty int [not null, note: "商品數量，整數，必須 > 0"]
+  amount int [not null, note: "訂單金額，整數，必須 > 0"]
+  status varchar [not null, note: "狀態: PENDING | CONFIRMED | REJECTED | FAILED | CANCELLED（白話：處理中 | 已確認 | 庫存不足 | 付款失敗 | 已取消）；REJECTED、FAILED、CANCELLED 為終態"]
+  cancel_reason varchar [note: "取消原因: CUSTOMER | TIMEOUT；未取消時為空"]
+  placed_at timestamp [not null, note: "下單時間，ISO 8601 字串"]
+}
+
+// ===== 庫存服務 =====
+Table stock {
+  sku varchar [pk, note: "商品 SKU"]
+  total_qty int [not null, note: "庫存總量，整數，必須 >= 0"]
+}
+
+Table reservations {
+  order_id varchar [pk, note: "訂單編號；同一訂單最多一筆保留紀錄"]
+  sku varchar [not null, note: "商品 SKU"]
+  qty int [not null, note: "保留數量，整數，必須 > 0"]
+  status varchar [not null, note: "狀態: HELD | RELEASED（白話：保留中 | 已釋放）；RELEASED 後不得再次放回"]
+}
+
+Table cancelled_orders {
+  order_id varchar [pk, note: "已收到 OrderCancelled 的訂單編號；之後到的 OrderPlaced 不保留庫存"]
+}
+
+// ===== 付款服務 =====
+Table balances {
+  customer_id varchar [pk, note: "顧客編號"]
+  balance int [not null, note: "顧客餘額，整數，必須 >= 0"]
+}
+
+Table payment_orders {
+  order_id varchar [pk, note: "訂單編號（付款服務所知的訂單）"]
+  customer_id varchar [note: "顧客編號；尚未收到 OrderPlaced 時為空"]
+  amount int [note: "訂單金額，整數；尚未收到 OrderPlaced 時為空"]
+  state varchar [not null, note: "狀態: ORDERED | CANCELLED（付款服務所知的訂單狀態）"]
+}
+
+Table buffered_reservations {
+  order_id varchar [pk, note: "已收到 StockReserved 但尚未收到該訂單 OrderPlaced 的訂單編號，等待後再扣款"]
+}
+
+Table charges {
+  order_id varchar [pk, note: "訂單編號"]
+  customer_id varchar [not null, note: "被扣款的顧客編號"]
+  amount int [not null, note: "已扣款金額，整數，必須 > 0"]
+  status varchar [not null, note: "狀態: CHARGED | REFUNDED（白話：已扣款 | 已退款）；同一訂單最多退款一次"]
+}
+
+// ===== 關聯 =====
+Ref: reservations.sku > stock.sku
+Ref: charges.customer_id > balances.customer_id
+Ref: charges.order_id > payment_orders.order_id
+Ref: buffered_reservations.order_id > payment_orders.order_id

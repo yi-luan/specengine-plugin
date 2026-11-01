@@ -1,0 +1,23 @@
+
+ac4ccdc 2026-11-01 02:40:06 +0800 T4-A-r1 done
+
+ BENCH-LOG.md                |  40 ++++++
+ src/index.ts                |   2 +-
+ src/shop.ts                 | 302 ++++++++++++++++++++++++++++++++++++++++++++
+ tests/features/shop.feature | 293 ++++++++++++++++++++++++++++++++++++++++++
+ tests/steps/shop.steps.ts   | 182 ++++++++++++++++++++++++++
+ tests/support/world.ts      | 100 +++++++++++++++
+ 6 files changed, 918 insertions(+), 1 deletion(-)
+
+68db830 2026-10-31 23:22:56 +0800 bench base
+
+ .gitignore             |    3 +
+ README.md              |    3 +
+ cucumber.cjs           |    7 +
+ package-lock.json      | 2317 ++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json           |   16 +
+ src/index.ts           |    2 +
+ tests/steps/.gitkeep   |    0
+ tests/support/.gitkeep |    0
+ tsconfig.json          |   13 +
+ 9 files changed, 2361 insertions(+)

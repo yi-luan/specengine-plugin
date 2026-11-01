@@ -37,6 +37,7 @@ All three conditions started from the same project in [`base/`](base/): TypeScri
 | T2 | [Order state machine](tasks/t2/requirement.md) | 11 | 3 | 32 |
 | T3 | [Multi-tenant coupons](tasks/t3/requirement.md) | 14 | 3 | 38 |
 | E4 | [Change request on T1](tasks/e4/change.md): cap 30% → 35% | – | – | 12 |
+| T4 | [Event-driven order, inventory and payment services](tasks/t4/requirement.md), solo and as a [three-person team](tasks/t4/team-requirement.md) | 14 | 3 | 36 |
 
 Each requirement fixes the public interface, so one hidden test file can score every condition. The requirements are written in Traditional Chinese, as in the original study.
 
@@ -182,6 +183,47 @@ What it shows:
 
 Every condition writes strong tests. The baseline's tests are just as thorough, but they thoroughly check behaviour the agent guessed. **Test thoroughness is not where the conditions differ. The difference is whether the specification being tested is the right one**, which is decided at levels 2 and 3, where SpecEngine forces the questions.
 
+### Event-driven services and team development (T4)
+
+T1 to T3 are single modules with synchronous calls. T4 asks whether the method still holds for the case people worry about most: several services that share no data, talk only through events, and must stay consistent when events are duplicated or arrive out of order.
+
+**The task.** Three services, order, inventory and payment, broadcast events to each other: order placed, stock reserved or rejected, payment succeeded or failed, cancellation, refund and release, plus a 15-minute timeout. The requirement states that delivery is at-least-once and unordered, but not what to do about it. The answer sheet has 14 open boundaries: duplicates, a cancellation that overtakes the order, a cancellation racing a payment, compensation, the timeout boundary and the failure codes.
+
+**The hidden tests.** 32 scripted scenarios drive the services through a test-controlled bus, with explicit duplicates and reorderings. Four more tests replay 300 seeded random schedules with duplicates and reordering, and check four invariants: every order settles, stock is conserved, money is conserved, and no compensation event is sent twice. A deliberately naive implementation without deduplication or memory of cancellations scores 27/36.
+
+**Two ways of working.**
+
+- **Solo.** One agent implements all three services in `src/shop.ts`, as in T1 to T3.
+- **Team.** Three agents work in parallel, one per service, each in its own repository. Each sees only the shared event types (`src/events.ts`) and its own file; the other two services are empty stubs. Under Spec Kit and SpecEngine each developer runs the full tool on their own service and asks the stakeholder their own questions. [`assemble-team.mjs`](assemble-team.mjs) then takes each developer's one file, adds the original shared files, and the result is scored with the same hidden tests.
+
+Every condition ran with both Claude Fable 5.1 (`-r1`) and Claude Haiku 5.5 (`-h1`), SpecEngine 2.1.0, and the same Spec Kit commit as before. All questions from all 24 agents were answered from the answer sheet by one separate session.
+
+| Condition | Fable solo | Fable team | Haiku solo | Haiku team |
+| :--- | ---: | ---: | ---: | ---: |
+| No SDD tool | 30/36 | 29/36 | 30/36 | 29/36 |
+| Spec Kit | **36/36** | **36/36** | 30/36 | 35/36 |
+| SpecEngine | **36/36** | **36/36** | **36/36** | **36/36** |
+
+| Condition | Fable solo | Fable team | Haiku solo | Haiku team |
+| :--- | :--- | :--- | :--- | :--- |
+| No SDD tool | 4 min · 71k | 2.5 min · 176k | 2.3 min · 78k | 1.6 min · 194k |
+| Spec Kit | 22 min · 220k | 15.5 min · 579k | 13.5 min · 273k | 5.7 min · 497k |
+| SpecEngine | 29 min · 282k | 21 min · 684k | 15 min · 297k | 13 min · 751k |
+
+Team times are wall-clock from the first developer's start to the last developer's finish; team tokens are the sum over the three developers. Times include waiting for answers, and up to fifteen agents were waiting on the same answering session at once, so the times for B and C are inflated unevenly.
+
+What it shows:
+
+- **Data consistency was not where the conditions differed.** Eleven of the twelve runs passed every duplicate, reordering and conservation test, including the baseline teams whose developers never saw each other's code. The requirement states at-least-once, unordered delivery plainly, and every model handled it on its own.
+- **The one consistency failure came from a gap nobody asked about.** In T4-B-h1 the payment service dropped a stock-reserved event that arrived before it knew the order's customer and amount, and marked the event as seen. The order then stayed pending and its stock stayed reserved forever (seed 91 of 300). Both Haiku team payment developers handled this case; the Spec Kit one had asked about it.
+- **What the baseline teams lost were decisions made separately in each service.** Each developer invented their own failure codes, so the assembled system scored 0/7 and 1/7 on codes. One Haiku inventory developer decided that a cancellation releases stock silently, while the requirement only spells out the event for payment failure.
+- **SpecEngine scored full marks in all four settings.** As in T2 and T3, the gap opens with the weak model: Spec Kit's Haiku solo run scored 30.
+- **In SpecEngine's flow review, Haiku found answer-sheet boundaries that its own discovery stage had missed.** In T4-C-h1 the flow diagrams showed that only the payment service remembered early cancellations, and the agent asked about the inventory service (boundary H2). In the Haiku team, the payment developer asked the same about payment (H3).
+- **Neither tool checks the contract between services.** The teams stayed consistent because every developer asked the same stakeholder and got the same answers. If two teams each received different answers, nothing in either tool would notice. That is a limit of both tools, not of the runs.
+- **Three SpecEngine agents tripped over one script bug.** When a path field in the manifest also had back-quoted evidence on the same line, `spec-guard` and `spec-status` read the evidence as extra directories. The fake paths do not exist, so nothing failed, but the snapshot listed them. The agents rewrote the line.
+
+The lock held for every SpecEngine project in T4: `spec-guard audit` passes on the two solo runs and on all six team developers' projects, and `tamper.mjs` reports LOCK_DRIFT for both solo runs.
+
 ### What this means for the framework
 
 The three experiments point at two concrete improvements, both still to be built:
@@ -196,6 +238,7 @@ The three experiments point at two concrete improvements, both still to be built
 - **Interruptions.** Runs were interrupted by API rate limits and one session restart. Each agent resumed from where it stopped, and the interruption times are recorded in its `BENCH-LOG.md`.
 - **Test fix.** Two T3 tests (T3-35, T3-36) originally used coupons whose start date was after their end date. An agent reasonably rejected those as invalid coupons. The test data was corrected and every T3 run was rescored. The table above uses the corrected tests.
 - **Haiku runs.** Each weak-model cell is a single run. The Haiku runs used SpecEngine 2.1.0, while the earlier runs used 2.0.0. Between the two, the stage instructions for spec-01 to spec-05 are unchanged and `spec-run` differs by one routing line; the 2.1.0 scripts add matrix hashing and line-ending normalisation to the lock. The fault-injection counts treat an edited example cell as "noticed" when any own test turns red, so cells that are inputs and do not change any outcome count as not noticed.
+- **T4.** Every T4 cell is a single run. The team setting simulates parallel development without a shared specification: developers could not talk to each other, only to the stakeholder. Because one session answered every developer from one sheet, the teams never received conflicting answers; real teams can. One Fable SpecEngine developer (T4-C-tm-r1, order) was interrupted by a rate limit after its tests were green and finished about ten hours later; its time is counted up to the green run. Fable T4-B-r1 and T4-C-r1 were the slowest solo runs in part because they waited for answers while eight other agents were also waiting.
 - **Sample size.** Each cell has one or two clean runs. A difference of one or two tests is not evidence of a difference between tools.
 - **Recovery.** The run directories were restored from each run's git objects after the working copies were removed by an automatic temp-folder cleanup. Each run's `GIT-HISTORY.txt` lists its commits. Third-party files (Spec Kit's bundled skills and scripts) and `package-lock.json` are omitted. Local absolute paths in the logs were replaced with `<bench>`, `<plugin>` and `<home>`.
 
@@ -204,17 +247,20 @@ The three experiments point at two concrete improvements, both still to be built
 ```text
 benchmark/
 ├── base/          starting project shared by all runs
-├── tasks/         requirement and answer sheet per task; e4/change.md is the change request
+├── tasks/         requirement and answer sheet per task; e4/change.md is the change request;
+│                  t4/team-requirement.md and t4/team-src/ are the team version of T4
 ├── hidden/        hidden acceptance tests, one file per task
 ├── reference/     implementations written from the answer sheets
-├── runs/          one folder per run: BENCH-LOG.md, src/, tests/, the tool's spec artifacts, GIT-HISTORY.txt
+├── runs/          one folder per run: BENCH-LOG.md, src/, tests/, the tool's spec artifacts, GIT-HISTORY.txt;
+│                  team runs (-tm-) hold one folder per developer plus the assembled src/
 ├── results/       raw output of inject.mjs and mutate.mjs
 ├── grade.mjs      scores runs against the hidden tests
+├── assemble-team.mjs  combines the three developers' files of a T4 team run into one src/
 ├── tamper.mjs     tamper test for locked SpecEngine runs
 ├── inject.mjs     fault injection by layer
 └── mutate.mjs     mutation testing of each run's own tests
 ```
 
-Runs ending in `-h1` used Claude Haiku 5.5.
+Runs ending in `-h1` used Claude Haiku 5.5. Runs with `-tm-` in the name are T4 team runs.
 
 Each run's `BENCH-LOG.md` holds its timestamps, every question and answer, the assumptions it made on its own, and the tool errors it hit.

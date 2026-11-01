@@ -1,0 +1,6 @@
+node_modules/
+reports/
+.specengine/sdd/.spec-guard-snapshot.json
+dist/
+*.log
+.env*

@@ -1,0 +1,28 @@
+// 付款服務（PAYMENT）記憶體狀態模型。本專案不碰資料庫，以下 Table 描述服務閉包內保存的資料。
+// 命名慣例：manifest 第 3 節「Database Tables & Columns」為不適用，依 contract-rules 第 2.4 節 fallback 採 snake_case。
+
+Table customer_balance {
+  customer_id varchar [pk, note: "顧客識別字，來自建構時的初始餘額表或事件的 customerId"]
+  balance int [not null, note: "顧客目前餘額，整數，必須 >= 0；不在初始餘額表的顧客視為 0。扣款後 = 原餘額 - 訂單金額（只在餘額 >= 金額時扣），退款後加回原扣款金額"]
+}
+
+Table payment_order {
+  order_id varchar [pk, note: "訂單編號，來自 OrderPlaced.orderId 或先到的 StockReserved／OrderCancelled.orderId；每張訂單至多一筆"]
+  customer_id varchar [note: "下單顧客，來自 OrderPlaced.customerId；OrderPlaced 尚未到達時為空"]
+  amount int [note: "訂單金額，整數，來自 OrderPlaced.amount；< 0 視為無效金額（付款失敗）；OrderPlaced 尚未到達時為空；以第一次收到的 OrderPlaced 為準，不覆寫"]
+  status varchar [not null, note: "狀態: AWAITING_ORDER（StockReserved 先到，等待 OrderPlaced） | AWAITING_STOCK（已記錄下單，等待 StockReserved） | PAID（已扣款，已發 PaymentSucceeded） | FAILED（餘額不足或金額無效，已發 PaymentFailed，終態） | REFUNDED（已退款，已發 PaymentRefunded，終態） | CANCELLED（取消時尚未扣款，無退款，終態；之後的 StockReserved／OrderPlaced 一律忽略）"]
+}
+
+Table processed_event {
+  id varchar [pk, note: "付款服務已處理過的事件 id（任何類型）；相同 id 第二次起直接忽略，不改狀態、不發事件"]
+}
+
+Table emitted_event {
+  id varchar [pk, note: "付款服務自產事件 id，全系統唯一（以 pay- 前綴加 UUID 產生）"]
+  type varchar [not null, note: "事件類型: PaymentSucceeded | PaymentFailed | PaymentRefunded"]
+  order_id varchar [not null, note: "事件所屬訂單"]
+  amount int [note: "PaymentSucceeded／PaymentRefunded 帶的金額（= payment_order.amount）；PaymentFailed 無此欄"]
+}
+
+Ref: payment_order.customer_id > customer_balance.customer_id
+Ref: emitted_event.order_id > payment_order.order_id

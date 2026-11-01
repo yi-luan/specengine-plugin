@@ -1,0 +1,27 @@
+{
+  "module": "INVENTORY_RESERVATION",
+  "lockedAt": "2026-10-31T19:11:53.759Z",
+  "lockedAtLocal": "2026-11-01 03:11",
+  "matrix": {
+    ".specengine/sdd/matrix/INVENTORY_RESERVATION.json": "2c5a11b9ce6a1cc83a131a1be070a6f50d3514fc7a1a111f5e9a72bcca2f0898"
+  },
+  "features": {
+    ".specengine/spec/features/庫存保留.feature": "2cc9e97302fbb2825decaf1f85ee83fabb5a059102877bfbb52bda07cc6d3020"
+  },
+  "stepSignatures": {
+    "tests/steps/inventory-reservation.steps.ts": [
+      "Given::商品 {string} 的初始庫存為 {string}",
+      "Given::庫存服務已處理訂單 {string} 的 {string} 事件 {string}",
+      "Given::庫存服務已處理訂單 {string} 的下單事件 {string}，商品 {string} 數量 {string}",
+      "Then::商品 {string} 的可用庫存為 {string}",
+      "Then::回傳事件為訂單 {string} 的 {string}",
+      "Then::回傳事件的 id 與先前所有回傳事件的 id 皆不同",
+      "Then::回傳空陣列",
+      "Then::查詢結果為 {string}",
+      "When::庫存服務收到訂單 {string} 的 {string} 事件 {string}",
+      "When::庫存服務收到訂單 {string} 的下單事件 {string}，商品 {string} 數量 {string}",
+      "When::查詢商品 {string} 的可用庫存"
+    ]
+  },
+  "driverInterfaces": {}
+}

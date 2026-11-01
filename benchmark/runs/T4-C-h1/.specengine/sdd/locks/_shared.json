@@ -1,0 +1,9 @@
+{
+  "lockedAt": "2026-10-31T18:50:02.892Z",
+  "lockedBy": "EVENT_DRIVEN_ORDER",
+  "files": {
+    ".specengine/spec/erm.dbml": "25daf66d6e9c7dc8fff8ebd5296644307859cbba792086e0ea57ffa94a96d4a7",
+    ".specengine/spec/exclusions.md": "e54509a32bef09ddef8799a21f1ce49a72d646060b2cb5953b4d0e95f2a3ddca",
+    ".specengine/spec/terms.md": "7ed050f240c38f5df0be662b0d8c64bf4aec1f9a852a20dd6e07344c9cbb8971"
+  }
+}

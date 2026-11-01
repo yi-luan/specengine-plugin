@@ -1,0 +1,218 @@
+{
+  "spec_engine_version": "2.1.0",
+  "rules": [
+    {
+      "rule_id": "R-ORDER_SERVICE-000",
+      "type": "main_flow",
+      "actor": "顧客",
+      "pre_conditions": [
+        "訂單編號尚未被使用",
+        "數量與金額皆為正整數（≥ 1 的整數）",
+        "訂單編號、顧客、商品 SKU 皆為非空字串"
+      ],
+      "trigger_event": "顧客下單（placeOrder：訂單編號、顧客、商品 SKU、數量、金額、下單時間）",
+      "post_assertions": [
+        "訂單服務建立該訂單，狀態為「處理中」（PENDING），無取消原因",
+        "回傳 ok:true 且 events 恰含一個 OrderPlaced 事件，欄位 orderId、customerId、sku、qty、amount、at 逐一等於輸入",
+        "該 OrderPlaced 事件的 id 為非空字串，且與本服務先前發出的任何事件 id 不同",
+        "查詢該訂單（getOrder）回傳狀態「處理中」"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SERVICE-001",
+      "type": "edge_case",
+      "actor": "付款服務（事件）",
+      "pre_conditions": [
+        "訂單存在且狀態為「處理中」"
+      ],
+      "trigger_event": "訂單服務收到該訂單的 PaymentSucceeded 事件",
+      "post_assertions": [
+        "訂單狀態變為「已確認」（CONFIRMED）",
+        "handle 回傳空陣列（訂單服務不因此發出任何事件）"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SERVICE-002",
+      "type": "edge_case",
+      "actor": "庫存服務（事件）",
+      "pre_conditions": [
+        "訂單存在且狀態為「處理中」"
+      ],
+      "trigger_event": "訂單服務收到該訂單的 StockRejected 事件",
+      "post_assertions": [
+        "訂單狀態變為「庫存不足」（REJECTED）",
+        "handle 回傳空陣列"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SERVICE-003",
+      "type": "edge_case",
+      "actor": "付款服務（事件）",
+      "pre_conditions": [
+        "訂單存在且狀態為「處理中」"
+      ],
+      "trigger_event": "訂單服務收到該訂單的 PaymentFailed 事件",
+      "post_assertions": [
+        "訂單狀態變為「付款失敗」（FAILED）",
+        "handle 回傳空陣列"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SERVICE-004",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "訂單存在且狀態為「處理中」或「已確認」"
+      ],
+      "trigger_event": "顧客取消訂單（cancelOrder：訂單編號、取消時間）",
+      "post_assertions": [
+        "訂單狀態變為「已取消」（CANCELLED），取消原因為「顧客取消」（CUSTOMER）",
+        "回傳 ok:true 且 events 恰含一個該訂單的 OrderCancelled 事件（id 全系統唯一）",
+        "取消時間只記錄、不用於判定逾時：即使取消時間已超過下單時間 15 分鐘，取消原因仍為「顧客取消」（CUSTOMER）"
+      ],
+      "resolved_by": [
+        "resolved/features/訂單服務_已確認訂單可否取消.md",
+        "resolved/features/訂單服務_逾時後才取消的原因.md"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SERVICE-005",
+      "type": "edge_case",
+      "actor": "系統時鐘",
+      "pre_conditions": [
+        "訂單存在且訂單服務當下的狀態為「處理中」",
+        "推進到的時間 now 減去該訂單下單時間 ≥ 15 分鐘（剛好 15 分鐘即算逾時）"
+      ],
+      "trigger_event": "時間推進（tick：now）",
+      "post_assertions": [
+        "該訂單狀態變為「已取消」（CANCELLED），取消原因為「逾時」（TIMEOUT）",
+        "tick 回傳的事件含該訂單的一個 OrderCancelled 事件（id 全系統唯一）",
+        "同一次 tick 中每一張逾時的「處理中」訂單各發出一個 OrderCancelled",
+        "now 減去下單時間 < 15 分鐘的「處理中」訂單維持「處理中」，不為其發出事件",
+        "狀態為「已確認」「庫存不足」「付款失敗」「已取消」的訂單不受時間推進影響：狀態與取消原因不變，不為其發出事件"
+      ],
+      "resolved_by": [
+        "resolved/features/訂單服務_逾時15分鐘的邊界.md",
+        "resolved/features/訂單服務_逾時適用的訂單狀態.md"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SERVICE-006",
+      "type": "edge_case",
+      "actor": "事件傳遞機制",
+      "pre_conditions": [
+        "訂單服務已處理過某個事件（相同事件 id）"
+      ],
+      "trigger_event": "同一事件（相同 id）再次送達訂單服務",
+      "post_assertions": [
+        "訂單狀態與取消原因維持不變",
+        "handle 回傳空陣列（不產生額外效果）"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SERVICE-007",
+      "type": "edge_case",
+      "actor": "查詢者",
+      "pre_conditions": [
+        "訂單編號不存在"
+      ],
+      "trigger_event": "查詢訂單（getOrder：訂單編號）",
+      "post_assertions": [
+        "回傳 undefined"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SERVICE-008",
+      "type": "edge_case",
+      "actor": "庫存服務／付款服務（事件）",
+      "pre_conditions": [
+        "訂單存在且狀態為「已確認」「庫存不足」「付款失敗」或「已取消」（已離開「處理中」）"
+      ],
+      "trigger_event": "訂單服務收到該訂單遲來或亂序的 PaymentSucceeded、StockRejected 或 PaymentFailed 事件",
+      "post_assertions": [
+        "訂單狀態與取消原因維持不變（「已取消」「庫存不足」「付款失敗」為終態；「已確認」只會因顧客取消而變成「已取消」）",
+        "handle 回傳空陣列"
+      ],
+      "resolved_by": "resolved/features/訂單服務_最終狀態後再收到狀態事件.md"
+    },
+    {
+      "rule_id": "R-ORDER_SERVICE-009",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "訂單存在且狀態為「庫存不足」「付款失敗」或「已取消」"
+      ],
+      "trigger_event": "顧客取消訂單（cancelOrder：訂單編號、取消時間）",
+      "post_assertions": [
+        "回傳 ok:false 且 reason 為「NOT_CANCELLABLE」",
+        "訂單狀態與取消原因維持不變，不發出任何事件"
+      ],
+      "resolved_by": [
+        "resolved/features/訂單服務_已結束訂單的取消.md",
+        "resolved/features/訂單服務_重複取消.md"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SERVICE-010",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "訂單編號不存在"
+      ],
+      "trigger_event": "顧客取消訂單（cancelOrder：訂單編號、取消時間）",
+      "post_assertions": [
+        "回傳 ok:false 且 reason 為「ORDER_NOT_FOUND」",
+        "不建立訂單、不發出任何事件；查詢該訂單編號仍回傳 undefined"
+      ],
+      "resolved_by": "resolved/features/訂單服務_取消不存在的訂單.md"
+    },
+    {
+      "rule_id": "R-ORDER_SERVICE-011",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "訂單編號已被使用（不論該訂單目前為何種狀態）",
+        "其餘輸入皆合法"
+      ],
+      "trigger_event": "顧客以相同訂單編號再次下單（placeOrder）",
+      "post_assertions": [
+        "回傳 ok:false 且 reason 為「DUPLICATE_ORDER」",
+        "既有訂單的狀態、取消原因與內容維持不變，不發出任何事件"
+      ],
+      "resolved_by": "resolved/features/訂單服務_重複訂單編號下單.md"
+    },
+    {
+      "rule_id": "R-ORDER_SERVICE-012",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "訂單編號尚未被使用",
+        "輸入不合法：數量或金額不是正整數（0、負數、非整數），或訂單編號、顧客、商品 SKU 任一為空字串"
+      ],
+      "trigger_event": "顧客下單（placeOrder）",
+      "post_assertions": [
+        "回傳 ok:false 且 reason 為「INVALID_INPUT」",
+        "不建立訂單、不發出任何事件；查詢該訂單編號回傳 undefined"
+      ],
+      "resolved_by": [
+        "resolved/features/訂單服務_數量不合法的下單.md",
+        "resolved/features/訂單服務_金額不合法的下單.md",
+        "resolved/features/訂單服務_識別字空字串的下單.md"
+      ]
+    },
+    {
+      "rule_id": "R-ORDER_SERVICE-013",
+      "type": "edge_case",
+      "actor": "庫存服務／付款服務（事件）",
+      "pre_conditions": [
+        "事件中的訂單編號是訂單服務從未建立過的訂單"
+      ],
+      "trigger_event": "訂單服務收到 PaymentSucceeded、StockRejected 或 PaymentFailed 事件",
+      "post_assertions": [
+        "忽略該事件：不建立訂單、不改任何狀態，handle 回傳空陣列",
+        "查詢該訂單編號仍回傳 undefined"
+      ],
+      "resolved_by": "resolved/features/訂單服務_未知訂單的狀態事件.md"
+    }
+  ]
+}

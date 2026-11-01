@@ -1,0 +1,52 @@
+// 命名慣例待 manifest 核實，目前暫採 snake_case
+// 本專案不碰資料庫，全部在記憶體中；本 DBML 描述三個服務各自私有的領域資料模型，服務之間不共用資料。
+
+Table orders {
+  order_id varchar [pk, note: "訂單編號，由顧客下單時提供，訂單服務內唯一"]
+  customer_id varchar [not null, note: "顧客識別字"]
+  sku varchar [not null, note: "商品 SKU"]
+  qty int [not null, note: "下單數量，整數"]
+  amount int [not null, note: "訂單金額，整數"]
+  status varchar [not null, note: "訂單狀態: PENDING | CONFIRMED | REJECTED | FAILED | CANCELLED"]
+  cancel_reason varchar [note: "取消原因: CUSTOMER | TIMEOUT；僅 status 為 CANCELLED 時有值"]
+  placed_at timestamp [not null, note: "下單時間，ISO 8601 字串；逾時自動取消以此起算 15 分鐘"]
+}
+
+Table inventory_stock {
+  sku varchar [pk, note: "商品 SKU，庫存服務內唯一"]
+  available int [not null, note: "目前可供保留的庫存數量，整數，必須 >= 0"]
+}
+
+Table stock_reservations {
+  order_id varchar [pk, note: "訂單編號；一張訂單最多一筆保留"]
+  sku varchar [not null, note: "保留的商品 SKU"]
+  qty int [not null, note: "保留數量，整數，> 0"]
+  released boolean [not null, note: "是否已放回庫存；true 後不得再次放回"]
+}
+
+Table customer_balances {
+  customer_id varchar [pk, note: "顧客識別字，付款服務內唯一"]
+  balance int [not null, note: "顧客餘額，整數，必須 >= 0"]
+}
+
+Table inventory_ended_orders {
+  order_id varchar [pk, note: "庫存服務已收到 OrderCancelled 或 PaymentFailed 的訂單；之後晚到的 OrderPlaced 不再保留"]
+}
+
+Table payment_orders {
+  order_id varchar [pk, note: "訂單編號；由 OrderPlaced 記下，一張訂單最多一筆"]
+  customer_id varchar [note: "要被扣款的顧客，來自 OrderPlaced；status 為 RESERVED_AWAITING_ORDER 時尚未知"]
+  amount int [note: "要扣的金額，整數，來自 OrderPlaced；status 為 RESERVED_AWAITING_ORDER 時尚未知"]
+  status varchar [not null, note: "付款狀態: RESERVED_AWAITING_ORDER | AWAITING | CHARGED | REFUNDED | ENDED；RESERVED_AWAITING_ORDER 表示先收到 StockReserved、等 OrderPlaced 到達再扣款；ENDED 表示已收到 OrderCancelled，之後晚到的 StockReserved 不再扣款；CHARGED 退款一次後變 REFUNDED，不得再退"]
+}
+
+Table processed_events {
+  service varchar [not null, note: "服務名稱: ORDER | INVENTORY | PAYMENT"]
+  event_id varchar [not null, note: "已處理過的事件 id，用於重複送達時去重"]
+  indexes {
+    (service, event_id) [pk]
+  }
+}
+
+Ref: stock_reservations.sku > inventory_stock.sku
+Ref: payment_orders.customer_id > customer_balances.customer_id

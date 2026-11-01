@@ -1,0 +1,140 @@
+{
+  "命令結果為失敗，原因 {string}": {
+    "count": 7,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "命令結果為成功": {
+    "count": 5,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "所有發出的事件 id 皆為非空字串且互不重複": {
+    "count": 5,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "時間已推進到 {string}": {
+    "count": 3,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "時間推進到 {string}": {
+    "count": 6,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "查詢訂單 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "發出的 OrderPlaced 事件內容為顧客 {string} 商品 {string} 數量 {string} 金額 {string} 時間 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "發出的事件中不含訂單 {string} 的事件": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "發出的事件中含訂單 {string} 的 {string} 事件": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "發出的事件數為 {string}": {
+    "count": 26,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "第 {string} 個發出的事件類型為 {string}，訂單為 {string}": {
+    "count": 6,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "訂單 {string} 不存在": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "訂單 {string} 已收到事件 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "訂單 {string} 已被顧客取消於 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "訂單 {string} 無取消原因": {
+    "count": 8,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "訂單 {string} 狀態為 {string}": {
+    "count": 14,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "訂單 {string} 狀態為 {string}，取消原因為 {string}": {
+    "count": 13,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "訂單服務已啟動": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "訂單服務已收到事件 {string} 類型 {string} 訂單 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "訂單服務收到事件 {string} 類型 {string} 訂單 {string}": {
+    "count": 8,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "顧客 {string} 下單 {string}，商品 {string} 數量 {string} 金額 {string}，下單時間 {string}": {
+    "count": 5,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "顧客 {string} 已下單 {string}，商品 {string} 數量 {string} 金額 {string}，下單時間 {string}": {
+    "count": 26,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  },
+  "顧客取消訂單 {string} 於 {string}": {
+    "count": 7,
+    "files": [
+      ".specengine/spec/features/訂單服務.feature"
+    ]
+  }
+}

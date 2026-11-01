@@ -1,0 +1,98 @@
+{
+  "事件 {string} 發出次數為 {string}": {
+    "count": 13,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "商品 {string} 的可供保留庫存為 {string}": {
+    "count": 10,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "商品 {string} 的庫存為 {string}": {
+    "count": 19,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "將訂單 {string} 的事件 {string} 送達 {string}": {
+    "count": 19,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "將訂單 {string} 的事件 {string} 重複送達 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "所有待送達事件都送達所有服務": {
+    "count": 17,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "時間推進到 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "最近一次指令的失敗原因為 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "最近一次指令的結果為 {string}": {
+    "count": 6,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "本次操作發出事件數為 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "訂單 {string} 不存在": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "訂單 {string} 的取消原因為 {string}": {
+    "count": 4,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "訂單 {string} 的狀態為 {string}": {
+    "count": 17,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "顧客 {string} 在 {string} 下單 {string} 商品 {string} 數量 {string} 金額 {string}": {
+    "count": 20,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "顧客 {string} 的餘額為 {string}": {
+    "count": 32,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "顧客取消訂單 {string} 於 {string}": {
+    "count": 7,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "module": "PAYMENT",
+  "lockedAt": "2026-10-31T18:56:58.196Z",
+  "lockedAtLocal": "2026-11-01 02:56",
+  "matrix": {
+    ".specengine/sdd/matrix/PAYMENT.json": "3cc8cfe4e9b22ed2edbf81bb3f3bb9bf52c58a77cf47c222318c50315b6fb0a9"
+  },
+  "features": {
+    ".specengine/spec/features/付款服務.feature": "a278176594c715c15d985bbe399b953a76ef3a7d25713379b90e94f6429c0cdc"
+  },
+  "stepSignatures": {
+    "tests/steps/payment-service.steps.ts": [
+      "Given::付款服務尚未收到訂單 {string} 的下單事件",
+      "Given::付款服務已收到訂單 {string} 的下單事件，顧客為 {string}，金額為 {string}",
+      "Given::訂單 {string} 已被扣款 {string}，顧客為 {string}",
+      "Given::訂單 {string} 已被記錄為已取消",
+      "Given::訂單 {string} 已被退款",
+      "Given::訂單 {string} 從未被扣款",
+      "Given::顧客 {string} 未登錄餘額",
+      "Given::顧客 {string} 餘額為 {string}",
+      "Then::付款服務不再暫存訂單 {string} 的庫存保留事件",
+      "Then::付款服務不發出任何事件",
+      "Then::付款服務只發出一次事件 {string}",
+      "Then::付款服務暫存訂單 {string} 的庫存保留事件",
+      "Then::付款服務未發出事件 {string}",
+      "Then::付款服務發出事件 {string}",
+      "Then::付款服務發出的 {string} 金額為 {string}",
+      "Then::訂單 {string} 沒有暫存的庫存保留事件",
+      "Then::訂單 {string} 記錄為已取消",
+      "Then::訂單 {string} 記錄為已扣款，金額為 {string}",
+      "Then::訂單 {string} 記錄為已退款",
+      "When::付款服務再次收到取消事件 {string}，訂單為 {string}",
+      "When::付款服務再次收到庫存保留事件 {string}，訂單為 {string}",
+      "When::付款服務收到取消事件 {string}，訂單為 {string}",
+      "When::付款服務收到庫存保留事件 {string}，訂單為 {string}",
+      "When::付款服務收到訂單 {string} 的下單事件，顧客為 {string}，金額為 {string}"
+    ]
+  },
+  "driverInterfaces": {}
+}

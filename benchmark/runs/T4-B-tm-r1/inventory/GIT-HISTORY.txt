@@ -1,0 +1,76 @@
+
+96c0f41 2026-11-01 03:05:02 +0800 T4-B-tm-r1 inventory done
+
+ .specify/memory/constitution.md                    | 107 ++++++----
+ BENCH-LOG.md                                       |  72 +++++++
+ .../checklists/requirements.md                     |  36 ++++
+ .../contracts/inventory-service.md                 |  41 ++++
+ specs/001-inventory-service/data-model.md          |  59 ++++++
+ specs/001-inventory-service/plan.md                |  94 +++++++++
+ specs/001-inventory-service/quickstart.md          |  35 ++++
+ specs/001-inventory-service/research.md            |  57 ++++++
+ specs/001-inventory-service/spec.md                | 228 +++++++++++++++++++++
+ specs/001-inventory-service/tasks.md               | 188 +++++++++++++++++
+ src/inventory.ts                                   |  72 ++++++-
+ tests/features/inventory.feature                   | 202 ++++++++++++++++++
+ tests/steps/inventory.steps.ts                     |  63 ++++++
+ tests/support/events.ts                            |  68 ++++++
+ tests/support/world.ts                             |  32 +++
+ 15 files changed, 1317 insertions(+), 37 deletions(-)
+
+ba0f188 2026-11-01 02:42:48 +0800 team base (inventory)
+
+ src/events.ts    | 24 ++++++++++++++++++++++++
+ src/index.ts     |  2 +-
+ src/inventory.ts |  6 ++++++
+ src/order.ts     |  6 ++++++
+ src/payment.ts   |  6 ++++++
+ src/shop.ts      |  5 +++++
+ 6 files changed, 48 insertions(+), 1 deletion(-)
+
+1f5df68 2026-10-31 23:23:27 +0800 spec-kit init
+
+ .claude/skills/speckit-analyze/SKILL.md            | 262 +++++++
+ .claude/skills/speckit-checklist/SKILL.md          | 386 ++++++++++
+ .claude/skills/speckit-clarify/SKILL.md            | 294 ++++++++
+ .claude/skills/speckit-constitution/SKILL.md       | 182 +++++
+ .claude/skills/speckit-converge/SKILL.md           | 285 ++++++++
+ .claude/skills/speckit-implement/SKILL.md          | 229 ++++++
+ .claude/skills/speckit-plan/SKILL.md               | 169 +++++
+ .claude/skills/speckit-specify/SKILL.md            | 348 +++++++++
+ .claude/skills/speckit-tasks/SKILL.md              | 218 ++++++
+ .claude/skills/speckit-taskstoissues/SKILL.md      | 120 +++
+ .specify/.gitignore                                |  14 +
+ .specify/init-options.json                         |  10 +
+ .specify/integration.json                          |  15 +
+ .specify/integrations/claude.manifest.json         |  17 +
+ .specify/integrations/speckit.manifest.json        |  19 +
+ .specify/memory/.constitution-template.json        |   4 +
+ .specify/memory/constitution.md                    |  50 ++
+ .../scripts/powershell/check-prerequisites.ps1     | 194 +++++
+ .specify/scripts/powershell/common.ps1             | 813 +++++++++++++++++++++
+ .specify/scripts/powershell/create-new-feature.ps1 | 357 +++++++++
+ .specify/scripts/powershell/resolve-template.ps1   |  38 +
+ .specify/scripts/powershell/setup-plan.ps1         |  90 +++
+ .specify/scripts/powershell/setup-tasks.ps1        |  93 +++
+ .specify/templates/checklist-template.md           |  45 ++
+ .specify/templates/constitution-template.md        |  50 ++
+ .specify/templates/plan-template.md                | 113 +++
+ .specify/templates/spec-template.md                | 131 ++++
+ .specify/templates/tasks-template.md               | 252 +++++++
+ .specify/workflows/speckit/workflow.yml            |  74 ++
+ .specify/workflows/workflow-registry.json          |  13 +
+ 30 files changed, 4885 insertions(+)
+
+b8141de 2026-10-31 23:22:50 +0800 bench base
+
+ .gitignore             |    3 +
+ README.md              |    3 +
+ cucumber.cjs           |    7 +
+ package-lock.json      | 2317 ++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json           |   16 +
+ src/index.ts           |    2 +
+ tests/steps/.gitkeep   |    0
+ tests/support/.gitkeep |    0
+ tsconfig.json          |   13 +
+ 9 files changed, 2361 insertions(+)

@@ -1,0 +1,32 @@
+{
+  "module": "EVENT_DRIVEN_ORDER",
+  "lockedAt": "2026-10-31T18:50:02.892Z",
+  "lockedAtLocal": "2026-11-01 02:50",
+  "matrix": {
+    ".specengine/sdd/matrix/EVENT_DRIVEN_ORDER.json": "384c278b248409c322bf107d4ea26025a2f5efdf3ba377799856f4e713e9eba3"
+  },
+  "features": {
+    ".specengine/spec/features/事件驅動下單流程.feature": "27d35fa3a09fbcdb16970ca4fd8c5063c110cc016b90ddda917c976067ef9e01"
+  },
+  "stepSignatures": {
+    "tests/steps/event-driven-order.steps.ts": [
+      "Given::商品 {string} 的庫存為 {string}",
+      "Given::顧客 {string} 的餘額為 {string}",
+      "Then::事件 {string} 發出次數為 {string}",
+      "Then::商品 {string} 的可供保留庫存為 {string}",
+      "Then::最近一次指令的失敗原因為 {string}",
+      "Then::最近一次指令的結果為 {string}",
+      "Then::本次操作發出事件數為 {string}",
+      "Then::訂單 {string} 不存在",
+      "Then::訂單 {string} 的取消原因為 {string}",
+      "Then::訂單 {string} 的狀態為 {string}",
+      "When::將訂單 {string} 的事件 {string} 送達 {string}",
+      "When::將訂單 {string} 的事件 {string} 重複送達 {string}",
+      "When::所有待送達事件都送達所有服務",
+      "When::時間推進到 {string}",
+      "When::顧客 {string} 在 {string} 下單 {string} 商品 {string} 數量 {string} 金額 {string}",
+      "When::顧客取消訂單 {string} 於 {string}"
+    ]
+  },
+  "driverInterfaces": {}
+}

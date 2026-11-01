@@ -1,0 +1,128 @@
+{
+  "SKU {string} 的可用庫存為 {string}": {
+    "count": 11,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "付款服務顧客 {string} 的初始餘額為 {string}": {
+    "count": 22,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "將訂單 {string} 的事件 {string} 送達 {string}": {
+    "count": 73,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "將訂單 {string} 的外來事件 {string} 送達 {string}": {
+    "count": 6,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "庫存服務 SKU {string} 的初始庫存為 {string}": {
+    "count": 29,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "所有待傳遞的事件依序廣播給三個服務直到沒有新事件": {
+    "count": 3,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "指令結果為 {string}": {
+    "count": 3,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "指令結果為失敗，原因 {string}": {
+    "count": 6,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "本次產生的事件 {string} 內容為 訂單 {string} 顧客 {string} SKU {string} 數量 {string} 金額 {string} 時間 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "本次產生的事件 {string} 的金額為 {string}": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "本次產生的事件為 {string}": {
+    "count": 37,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "本次產生的事件皆屬於訂單 {string}": {
+    "count": 9,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "系統內所有已發出事件的 id 皆不重複": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "訂單 {string} 不存在": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "訂單 {string} 沒有取消原因": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "訂單 {string} 的取消原因為 {string}": {
+    "count": 6,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "訂單 {string} 的狀態為 {string}": {
+    "count": 20,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "訂單服務時間推進到 {string}": {
+    "count": 3,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "顧客 {string} 的餘額為 {string}": {
+    "count": 12,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "顧客下單 訂單 {string} 顧客 {string} SKU {string} 數量 {string} 金額 {string} 時間 {string}": {
+    "count": 41,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  },
+  "顧客於 {string} 取消訂單 {string}": {
+    "count": 14,
+    "files": [
+      ".specengine/spec/features/事件驅動下單流程.feature"
+    ]
+  }
+}

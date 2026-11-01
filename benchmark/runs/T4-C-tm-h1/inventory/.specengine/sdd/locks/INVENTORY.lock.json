@@ -1,0 +1,27 @@
+{
+  "module": "INVENTORY",
+  "lockedAt": "2026-10-31T18:52:56.589Z",
+  "lockedAtLocal": "2026-11-01 02:52",
+  "matrix": {
+    ".specengine/sdd/matrix/INVENTORY.json": "203775d3103c7e6cc3ce3e36ab7ca93758a639d0a138c772d5dd3c79d18152c2"
+  },
+  "features": {
+    ".specengine/spec/features/庫存服務.feature": "4344c966c21bee4419ce0bced26d1b01c6d19503974050240d9ebe19b4ff1d6a"
+  },
+  "stepSignatures": {
+    "tests/steps/inventory.steps.ts": [
+      "Given::商品 {string} 的可供保留庫存為 {string}",
+      "Given::訂單 {string} 已保留 {string} 個商品 {string}",
+      "Given::訂單 {string} 已被記為付款失敗",
+      "Given::訂單 {string} 已被記為已取消",
+      "Then::系統不發出 {string} 訂單 {string}",
+      "Then::系統不發出任何事件",
+      "Then::系統發出 {string} 訂單 {string}",
+      "When::同一事件再次送達",
+      "When::收到下單 訂單 {string} 商品 {string} 數量 {string}",
+      "When::收到付款失敗 訂單 {string}",
+      "When::收到取消 訂單 {string}"
+    ]
+  },
+  "driverInterfaces": {}
+}

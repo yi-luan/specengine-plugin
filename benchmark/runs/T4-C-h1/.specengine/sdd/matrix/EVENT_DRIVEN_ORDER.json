@@ -1,0 +1,231 @@
+{
+  "spec_engine_version": "2.1.0",
+  "rules": [
+    {
+      "rule_id": "R-EVENT_DRIVEN_ORDER-000",
+      "type": "main_flow",
+      "actor": "顧客",
+      "pre_conditions": [
+        "訂單服務、庫存服務、付款服務皆可接收事件",
+        "庫存服務的可供保留庫存 >= 訂單數量",
+        "顧客餘額 >= 訂單金額"
+      ],
+      "trigger_event": "顧客下單（placeOrder）",
+      "post_assertions": [
+        "訂單服務建立訂單，狀態為處理中（PENDING）",
+        "訂單服務發出 OrderPlaced",
+        "庫存服務收到 OrderPlaced 後保留庫存並發出 StockReserved",
+        "付款服務收到 StockReserved 後扣款並發出 PaymentSucceeded",
+        "訂單服務收到 PaymentSucceeded，訂單狀態變為已確認（CONFIRMED）"
+      ],
+      "resolved_by": ["事件順序_StockReserved早於OrderPlaced.md"]
+    },
+    {
+      "rule_id": "R-EVENT_DRIVEN_ORDER-001",
+      "type": "edge_case",
+      "actor": "庫存服務",
+      "pre_conditions": [
+        "訂單狀態為處理中（PENDING）",
+        "庫存服務的可供保留庫存 < 訂單數量"
+      ],
+      "trigger_event": "庫存服務收到 OrderPlaced",
+      "post_assertions": [
+        "庫存服務發出 StockRejected",
+        "庫存服務不保留任何庫存，不發出 StockReserved",
+        "付款服務不扣款",
+        "訂單服務收到 StockRejected，訂單狀態變為庫存不足（REJECTED）"
+      ]
+    },
+    {
+      "rule_id": "R-EVENT_DRIVEN_ORDER-002",
+      "type": "edge_case",
+      "actor": "付款服務",
+      "pre_conditions": [
+        "訂單狀態為處理中（PENDING）",
+        "庫存服務已為該訂單保留庫存",
+        "顧客餘額 < 訂單金額"
+      ],
+      "trigger_event": "付款服務收到 StockReserved",
+      "post_assertions": [
+        "付款服務不扣款，發出 PaymentFailed",
+        "訂單服務收到 PaymentFailed，訂單狀態變為付款失敗（FAILED）",
+        "庫存服務把為該訂單保留的庫存放回（同一訂單最多放回一次，只放回實際保留的數量），並發出 StockReleased"
+      ]
+    },
+    {
+      "rule_id": "R-EVENT_DRIVEN_ORDER-003",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "訂單狀態為已確認（CONFIRMED）",
+        "付款服務已對該訂單扣款，金額為訂單金額"
+      ],
+      "trigger_event": "顧客取消訂單（cancelOrder）",
+      "post_assertions": [
+        "訂單服務的訂單狀態變為已取消（CANCELLED），取消原因為 CUSTOMER",
+        "訂單服務發出 OrderCancelled",
+        "庫存服務把為該訂單保留的庫存放回（同一訂單最多放回一次，只放回實際保留的數量），並發出 StockReleased",
+        "付款服務把已扣的款項全額退還給顧客，並發出 PaymentRefunded（金額等於原扣款金額）"
+      ],
+      "resolved_by": ["取消訂單_可取消的訂單狀態.md", "取消後庫存放回_是否發出事件.md"]
+    },
+    {
+      "rule_id": "R-EVENT_DRIVEN_ORDER-004",
+      "type": "edge_case",
+      "actor": "系統（訂單服務的時間推進）",
+      "pre_conditions": [
+        "訂單狀態為處理中（PENDING）",
+        "現在時間減去下單時間 >= 15 分鐘（滿 15 分鐘即逾時）",
+        "該訂單尚未完成付款"
+      ],
+      "trigger_event": "時間推進到 now（tick）",
+      "post_assertions": [
+        "訂單狀態變為已取消（CANCELLED），取消原因為 TIMEOUT",
+        "訂單服務發出 OrderCancelled",
+        "若庫存已為該訂單保留，庫存服務把保留的庫存放回（同一訂單最多放回一次，只放回實際保留的數量），並發出 StockReleased"
+      ],
+      "resolved_by": ["逾時取消_時間邊界.md", "逾時取消_適用的訂單狀態.md", "取消後庫存放回_是否發出事件.md"]
+    },
+    {
+      "rule_id": "R-EVENT_DRIVEN_ORDER-005",
+      "type": "edge_case",
+      "actor": "系統（任一服務）",
+      "pre_conditions": [
+        "同一個事件 id 已被該服務處理過"
+      ],
+      "trigger_event": "同一事件因至少一次傳遞而重複送達",
+      "post_assertions": [
+        "服務狀態不因重複送達而改變",
+        "服務不重複發出事件",
+        "庫存不重複保留或重複放回，款項不重複扣除或重複退還"
+      ]
+    },
+    {
+      "rule_id": "R-EVENT_DRIVEN_ORDER-006",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "訂單狀態為處理中（PENDING）"
+      ],
+      "trigger_event": "顧客取消訂單（cancelOrder）",
+      "post_assertions": [
+        "訂單服務的訂單狀態變為已取消（CANCELLED），取消原因為 CUSTOMER",
+        "訂單服務發出 OrderCancelled",
+        "若庫存已為該訂單保留，庫存服務把保留的庫存放回（同一訂單最多放回一次，只放回實際保留的數量），並發出 StockReleased",
+        "付款服務收到 OrderCancelled 時，若尚未扣款則不扣款；若已扣款則全額退款並發出 PaymentRefunded"
+      ],
+      "resolved_by": ["取消訂單_可取消的訂單狀態.md", "取消後庫存放回_是否發出事件.md", "取消訂單_扣款在途時的處理.md"]
+    },
+    {
+      "rule_id": "R-EVENT_DRIVEN_ORDER-007",
+      "type": "edge_case",
+      "actor": "系統（訂單服務）",
+      "pre_conditions": [
+        "訂單狀態為終態（已取消、庫存不足、付款失敗），或訂單狀態為已確認且收到的事件不是 OrderCancelled 所對應的顧客取消"
+      ],
+      "trigger_event": "訂單服務收到不符合目前狀態的事件",
+      "post_assertions": [
+        "訂單狀態不變",
+        "不發出任何事件，回傳空陣列"
+      ],
+      "resolved_by": ["事件順序_不符狀態的事件.md"]
+    },
+    {
+      "rule_id": "R-EVENT_DRIVEN_ORDER-008",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "下單輸入的 qty 或 amount 不是正整數，或 orderId、customerId、sku 為空字串"
+      ],
+      "trigger_event": "顧客下單（placeOrder）",
+      "post_assertions": [
+        "回傳 ok 為 false，reason 為 INVALID_INPUT",
+        "不建立訂單，不發出任何事件"
+      ],
+      "resolved_by": ["下單_非法輸入的處理.md"]
+    },
+    {
+      "rule_id": "R-EVENT_DRIVEN_ORDER-009",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "該 orderId 已存在訂單"
+      ],
+      "trigger_event": "顧客下單（placeOrder）",
+      "post_assertions": [
+        "回傳 ok 為 false，reason 為 DUPLICATE_ORDER",
+        "原訂單不變，不發出任何事件"
+      ],
+      "resolved_by": ["下單_重複訂單編號.md"]
+    },
+    {
+      "rule_id": "R-EVENT_DRIVEN_ORDER-010",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "訂單存在，且狀態為庫存不足、付款失敗或已取消"
+      ],
+      "trigger_event": "顧客取消訂單（cancelOrder）",
+      "post_assertions": [
+        "回傳 ok 為 false，reason 為 NOT_CANCELLABLE",
+        "訂單狀態不變，不發出任何事件"
+      ],
+      "resolved_by": ["取消_終態訂單的取消請求.md"]
+    },
+    {
+      "rule_id": "R-EVENT_DRIVEN_ORDER-011",
+      "type": "edge_case",
+      "actor": "顧客",
+      "pre_conditions": [
+        "該 orderId 不存在訂單"
+      ],
+      "trigger_event": "顧客取消訂單（cancelOrder）",
+      "post_assertions": [
+        "回傳 ok 為 false，reason 為 ORDER_NOT_FOUND",
+        "不發出任何事件"
+      ],
+      "resolved_by": ["取消_終態訂單的取消請求.md"]
+    },
+    {
+      "rule_id": "R-EVENT_DRIVEN_ORDER-012",
+      "type": "edge_case",
+      "actor": "付款服務",
+      "pre_conditions": [
+        "付款服務已收到該訂單的 OrderCancelled"
+      ],
+      "trigger_event": "付款服務收到該訂單的 StockReserved",
+      "post_assertions": [
+        "付款服務不扣款，也不發出任何事件"
+      ],
+      "resolved_by": ["取消訂單_扣款在途時的處理.md"]
+    },
+    {
+      "rule_id": "R-EVENT_DRIVEN_ORDER-013",
+      "type": "edge_case",
+      "actor": "付款服務",
+      "pre_conditions": [
+        "付款服務尚未收到該訂單的 OrderPlaced，因此不知道顧客與金額"
+      ],
+      "trigger_event": "付款服務收到 StockReserved",
+      "post_assertions": [
+        "付款服務暫存此 StockReserved，不扣款、不發出任何事件",
+        "之後收到該訂單的 OrderPlaced 時，依 R-EVENT_DRIVEN_ORDER-000 的扣款規則處理（餘額不足則依 R-EVENT_DRIVEN_ORDER-002 處理）"
+      ],
+      "resolved_by": ["事件順序_StockReserved早於OrderPlaced.md"]
+    },
+    {
+      "rule_id": "R-EVENT_DRIVEN_ORDER-014",
+      "type": "edge_case",
+      "actor": "庫存服務",
+      "pre_conditions": [
+        "庫存服務已收到該訂單的 OrderCancelled，且尚未收到該訂單的 OrderPlaced"
+      ],
+      "trigger_event": "庫存服務收到該訂單的 OrderPlaced",
+      "post_assertions": [
+        "庫存服務不保留任何庫存",
+        "庫存服務不發出任何事件（不發 StockReserved，也不發 StockRejected）"
+      ],
+      "resolved_by": ["庫存_取消先到的OrderPlaced.md"]
+    }
+  ]
+}

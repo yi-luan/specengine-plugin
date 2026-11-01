@@ -6,7 +6,7 @@
 //   node grade.mjs T2-B-r1 T3-C-r3 # 只評指定回合
 //   node grade.mjs --reference     # 先用參考實作驗證隱藏測試本身沒寫錯
 //
-// 回合目錄名稱的前綴決定用哪份隱藏測試：T1 → t1、E4 → e4、T2 → t2、T3 → t3。
+// 回合目錄名稱的前綴決定用哪份隱藏測試：T1 → t1、E4 → e4、T2 → t2、T3 → t3、T4 → t4。
 // 評分只取回合的 src/，在 .grade/ 底下的暫存目錄執行，不會改動回合本身。
 
 import { spawnSync } from 'node:child_process';
@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const TSX = path.join(HERE, 'base', 'node_modules', 'tsx', 'dist', 'cli.mjs');
 const WORK = path.join(HERE, '.grade');
-const TASK = { T1: ['t1', 'points.ts'], E4: ['e4', 'points.ts'], T2: ['t2', 'order.ts'], T3: ['t3', 'coupon.ts'] };
+const TASK = { T1: ['t1', 'points.ts'], E4: ['e4', 'points.ts'], T2: ['t2', 'order.ts'], T3: ['t3', 'coupon.ts'], T4: ['t4', 'shop.ts'] };
 
 if (!fs.existsSync(TSX)) {
   console.error('找不到 tsx。請先執行：cd benchmark/base && npm ci');
@@ -56,6 +56,7 @@ if (args.includes('--reference')) {
   results.push(grade('reference-e4', 'e4', only('points.ts'), { LIMIT_PERCENT: '35' }));
   results.push(grade('reference-t2', 't2', only('order.ts')));
   results.push(grade('reference-t3', 't3', only('coupon.ts')));
+  results.push(grade('reference-t4', 't4', only('shop.ts')));
 } else {
   const runsDir = path.join(HERE, 'runs');
   const runs = args.length ? args : fs.readdirSync(runsDir).sort();

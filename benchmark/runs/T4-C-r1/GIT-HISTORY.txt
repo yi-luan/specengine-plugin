@@ -1,0 +1,54 @@
+
+54ce89b 2026-11-01 03:04:51 +0800 T4-C-r1 done
+
+ .claude/spec/architecture-manifest.md              |  77 +++
+ .specengine/sdd/flow-design/ORDER_SAGA.md          |  19 +
+ ...272\253\345\255\230\344\277\235\347\225\231.md" |  44 ++
+ ...277\203\347\232\204\344\272\213\344\273\266.md" |  36 ++
+ ...250\202\345\226\256\347\265\220\346\236\234.md" |  46 ++
+ ...207\252\345\213\225\345\217\226\346\266\210.md" |  26 +
+ ...224\276\345\233\236\351\200\200\351\202\204.md" |  39 ++
+ .specengine/sdd/locks/ORDER_SAGA.lock.json         |  37 ++
+ .specengine/sdd/locks/_shared.json                 |  10 +
+ .specengine/sdd/matrix/ORDER_SAGA.json             | 462 ++++++++++++++++++
+ .specengine/sdd/overview.md                        |   3 +
+ .specengine/sdd/overview/ORDER_SAGA.md             |  20 +
+ ...\204SKU\346\210\226\351\241\247\345\256\242.md" |  30 ++
+ ...274\270\345\205\245\351\251\227\350\255\211.md" |  31 ++
+ ...250\202\345\226\256\347\267\250\350\231\237.md" |  31 ++
+ ...05\210\346\224\266\345\210\260StockReserved.md" |  30 ++
+ ...272\213\344\273\266\345\210\260\351\201\224.md" |  31 ++
+ ...250\261\347\232\204\347\213\200\346\205\213.md" |  31 ++
+ ...20\246\347\231\274\345\207\272StockReleased.md" |  30 ++
+ ...216\237\345\233\240\346\226\207\346\241\210.md" |  31 ++
+ ...220\246\347\231\274\344\272\213\344\273\266.md" |  30 ++
+ ...265\220\346\236\234\344\272\213\344\273\266.md" |  30 ++
+ ...265\220\346\236\234\344\272\213\344\273\266.md" |  30 ++
+ ...220\230\347\232\204\351\202\212\347\225\214.md" |  30 ++
+ ...250\202\345\226\256\347\213\200\346\205\213.md" |  30 ++
+ ...73\266_\345\233\236\345\202\263\345\200\274.md" |  30 ++
+ .specengine/sdd/steps-index.json                   | 128 +++++
+ .specengine/spec/erm.dbml                          |  52 ++
+ .specengine/spec/exclusions.md                     |   6 +
+ ...13\345\226\256\346\265\201\347\250\213.feature" | 523 +++++++++++++++++++++
+ .specengine/spec/policy-defaults.md                |  11 +
+ .specengine/spec/terms.md                          |  51 ++
+ BENCH-LOG.md                                       | 232 +++++++++
+ CLAUDE.md                                          |  95 ++++
+ src/shop.ts                                        | 253 ++++++++++
+ tests/steps/order-saga.steps.ts                    | 186 ++++++++
+ tests/support/world.ts                             | 107 +++++
+ 37 files changed, 2888 insertions(+)
+
+f3ade0a 2026-10-31 23:22:59 +0800 bench base
+
+ .gitignore             |    3 +
+ README.md              |    3 +
+ cucumber.cjs           |    7 +
+ package-lock.json      | 2317 ++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json           |   16 +
+ src/index.ts           |    2 +
+ tests/steps/.gitkeep   |    0
+ tests/support/.gitkeep |    0
+ tsconfig.json          |   13 +
+ 9 files changed, 2361 insertions(+)

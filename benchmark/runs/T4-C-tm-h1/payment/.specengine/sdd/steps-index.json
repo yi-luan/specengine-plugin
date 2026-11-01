@@ -1,0 +1,146 @@
+{
+  "付款服務不再暫存訂單 {string} 的庫存保留事件": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "付款服務不發出任何事件": {
+    "count": 5,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "付款服務再次收到取消事件 {string}，訂單為 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "付款服務再次收到庫存保留事件 {string}，訂單為 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "付款服務只發出一次事件 {string}": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "付款服務尚未收到訂單 {string} 的下單事件": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "付款服務已收到訂單 {string} 的下單事件，顧客為 {string}，金額為 {string}": {
+    "count": 5,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "付款服務收到取消事件 {string}，訂單為 {string}": {
+    "count": 5,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "付款服務收到庫存保留事件 {string}，訂單為 {string}": {
+    "count": 7,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "付款服務收到訂單 {string} 的下單事件，顧客為 {string}，金額為 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "付款服務暫存訂單 {string} 的庫存保留事件": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "付款服務未發出事件 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "付款服務發出事件 {string}": {
+    "count": 5,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "付款服務發出的 {string} 金額為 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "訂單 {string} 已被扣款 {string}，顧客為 {string}": {
+    "count": 2,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "訂單 {string} 已被記錄為已取消": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "訂單 {string} 已被退款": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "訂單 {string} 從未被扣款": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "訂單 {string} 沒有暫存的庫存保留事件": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "訂單 {string} 記錄為已取消": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "訂單 {string} 記錄為已扣款，金額為 {string}": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "訂單 {string} 記錄為已退款": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "顧客 {string} 未登錄餘額": {
+    "count": 1,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  },
+  "顧客 {string} 餘額為 {string}": {
+    "count": 20,
+    "files": [
+      ".specengine/spec/features/付款服務.feature"
+    ]
+  }
+}

@@ -142,6 +142,18 @@ T2 and T3 were rerun with Claude Haiku 5.5, the smallest current Claude model.
 
 With a strong model the two SDD tools tied. With a weak model, Spec Kit's clarify step judged T2 to have no important ambiguities and asked one question, so it scored the same as using no tool. SpecEngine's discovery stage queues every open boundary as a question by procedure, so the weak model still asked about 9 of 11 and 13 of 14 boundaries and kept full marks. Each cell is a single run.
 
+### Event-driven services, solo and as a team
+
+T4 is three services, order, inventory and payment, that share no data and talk only through events. Delivery is at-least-once and unordered. The hidden tests replay 300 random schedules of duplicated and reordered events and check that stock and money are conserved. Each condition built the system twice: once with one agent, and once as a team of three agents developing one service each in parallel, without seeing each other's code.
+
+| Condition | Strong model, solo | Strong model, team | Haiku, solo | Haiku, team |
+| :--- | :---: | :---: | :---: | :---: |
+| No SDD tool | 30 | 29 | 30 | 29 |
+| GitHub Spec Kit | **36** | **36** | 30 | 35 |
+| SpecEngine 2.1 | **36** | **36** | **36** | **36** |
+
+Out of 36 tests. Data consistency was not where the conditions differed: 11 of 12 runs, including the teams with no tool, passed every duplicate, reordering and conservation test. The baseline teams lost points on decisions each developer made alone, such as failure codes. The one consistency failure, a weak-model Spec Kit run that left an order pending forever when two events arrived in the opposite order, came from a boundary nobody had asked about. SpecEngine kept full marks in all four settings without any change to the plugin. Neither tool checks the contract between services; the teams stayed consistent because every developer asked the same stakeholder.
+
 ### Where each layer catches mistakes
 
 Faults were planted one at a time into every run: a dropped rule, a dropped scenario, an edited example, a renamed step, hollow assertions. Only SpecEngine caught a dropped rule or scenario at creation time, through `feature-lint.js`. After locking it caught every specification edit. Two gaps remain in every tool, SpecEngine included: an example value that is wrong but consistent with the code, and step definitions emptied of assertions. Mutation testing showed that all three conditions write equally thorough tests; what differs is whether the behaviour being tested is the one the stakeholder asked for.

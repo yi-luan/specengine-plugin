@@ -1,0 +1,23 @@
+
+728dc60 2026-11-01 02:38:04 +0800 T4-A-h1 done
+
+ BENCH-LOG.md                      |  46 ++++++
+ src/shop.ts                       | 311 ++++++++++++++++++++++++++++++++++++++
+ tests/features/order-flow.feature | 128 ++++++++++++++++
+ tests/steps/order.steps.ts        |  74 +++++++++
+ tests/support/bus.ts              |  41 +++++
+ tests/support/world.ts            |  38 +++++
+ 6 files changed, 638 insertions(+)
+
+68db830 2026-10-31 23:22:56 +0800 bench base
+
+ .gitignore             |    3 +
+ README.md              |    3 +
+ cucumber.cjs           |    7 +
+ package-lock.json      | 2317 ++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json           |   16 +
+ src/index.ts           |    2 +
+ tests/steps/.gitkeep   |    0
+ tests/support/.gitkeep |    0
+ tsconfig.json          |   13 +
+ 9 files changed, 2361 insertions(+)

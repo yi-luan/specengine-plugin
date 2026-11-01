@@ -1,0 +1,179 @@
+{
+  "spec_engine_version": "2.1.0",
+  "rules": [
+    {
+      "rule_id": "R-INVENTORY_RESERVATION-000",
+      "type": "main_flow",
+      "actor": "訂單服務（透過 OrderPlaced 事件）",
+      "pre_conditions": [
+        "該 SKU 的可用庫存 >= 下單數量 qty",
+        "下單數量 qty >= 1",
+        "該訂單編號沒有任何紀錄（未保留、未拒絕、未放回、未被記為已結束）",
+        "該事件 id 未處理過"
+      ],
+      "trigger_event": "庫存服務收到 OrderPlaced 事件",
+      "post_assertions": [
+        "該 SKU 的可用庫存減少 qty，成為該訂單的保留庫存",
+        "回傳一個 StockReserved 事件，orderId 為該訂單編號",
+        "回傳事件的 id 由庫存服務產生，全系統唯一"
+      ]
+    },
+    {
+      "rule_id": "R-INVENTORY_RESERVATION-001",
+      "type": "edge_case",
+      "actor": "訂單服務（透過 OrderPlaced 事件）",
+      "pre_conditions": [
+        "該 SKU 的可用庫存 < 下單數量 qty（初始庫存表沒有的 SKU 視為可用庫存 0）",
+        "下單數量 qty >= 1",
+        "該訂單編號沒有任何紀錄",
+        "該事件 id 未處理過"
+      ],
+      "trigger_event": "庫存服務收到 OrderPlaced 事件",
+      "post_assertions": [
+        "整筆拒絕，不部分保留：該 SKU 的可用庫存不變",
+        "回傳一個 StockRejected 事件，orderId 為該訂單編號",
+        "回傳事件的 id 由庫存服務產生，全系統唯一"
+      ],
+      "resolved_by": "resolved/data/INVENTORY_RESERVATION_初始庫存表沒有的SKU.md"
+    },
+    {
+      "rule_id": "R-INVENTORY_RESERVATION-002",
+      "type": "edge_case",
+      "actor": "付款服務（透過 PaymentFailed 事件）",
+      "pre_conditions": [
+        "該訂單有保留中的庫存",
+        "該事件 id 未處理過"
+      ],
+      "trigger_event": "庫存服務收到 PaymentFailed 事件",
+      "post_assertions": [
+        "該 SKU 的可用庫存加回該訂單實際保留的數量",
+        "該訂單的保留狀態變為已放回（同一張訂單最多放回一次）",
+        "回傳一個 StockReleased 事件，orderId 為該訂單編號"
+      ],
+      "resolved_by": "resolved/features/INVENTORY_RESERVATION_取消訂單放回庫存時是否發出StockReleased.md"
+    },
+    {
+      "rule_id": "R-INVENTORY_RESERVATION-003",
+      "type": "edge_case",
+      "actor": "訂單服務（透過 OrderCancelled 事件）",
+      "pre_conditions": [
+        "該訂單有保留中的庫存",
+        "該事件 id 未處理過"
+      ],
+      "trigger_event": "庫存服務收到 OrderCancelled 事件",
+      "post_assertions": [
+        "該 SKU 的可用庫存加回該訂單實際保留的數量",
+        "該訂單的保留狀態變為已放回（同一張訂單最多放回一次）",
+        "回傳一個 StockReleased 事件，orderId 為該訂單編號"
+      ],
+      "resolved_by": "resolved/features/INVENTORY_RESERVATION_取消訂單放回庫存時是否發出StockReleased.md"
+    },
+    {
+      "rule_id": "R-INVENTORY_RESERVATION-004",
+      "type": "edge_case",
+      "actor": "任一服務（透過事件匯流排廣播）",
+      "pre_conditions": [],
+      "trigger_event": "庫存服務收到 StockReserved、StockRejected、StockReleased、PaymentSucceeded、PaymentRefunded 任一事件",
+      "post_assertions": [
+        "回傳空陣列",
+        "可用庫存與保留紀錄皆不變"
+      ]
+    },
+    {
+      "rule_id": "R-INVENTORY_RESERVATION-005",
+      "type": "edge_case",
+      "actor": "事件匯流排（重複送達）",
+      "pre_conditions": [
+        "該訂單編號已處理過 OrderPlaced（已保留或已拒絕）",
+        "再次收到的 OrderPlaced 事件 id 與第一次相同（重複送達），或事件 id 不同但訂單編號相同"
+      ],
+      "trigger_event": "庫存服務再次收到同一訂單的 OrderPlaced 事件",
+      "post_assertions": [
+        "該 SKU 的可用庫存不變（不重複保留、不重複拒絕），保留紀錄不變",
+        "回傳空陣列，不發出任何事件"
+      ],
+      "resolved_by": [
+        "resolved/features/INVENTORY_RESERVATION_重複收到同一訂單OrderPlaced的回應.md",
+        "resolved/data/INVENTORY_RESERVATION_重複送達的判定依據.md"
+      ]
+    },
+    {
+      "rule_id": "R-INVENTORY_RESERVATION-006",
+      "type": "edge_case",
+      "actor": "事件匯流排（重複或多餘送達）",
+      "pre_conditions": [
+        "該訂單編號有紀錄但沒有保留中的庫存（已放回、當初被拒絕，或已被記為已結束）"
+      ],
+      "trigger_event": "庫存服務收到該訂單的 PaymentFailed 或 OrderCancelled 事件",
+      "post_assertions": [
+        "該 SKU 的可用庫存不變（不重複放回、沒保留過就不加庫存）",
+        "回傳空陣列，不發出 StockReleased"
+      ],
+      "resolved_by": [
+        "resolved/features/INVENTORY_RESERVATION_沒有可放回庫存時收到放回事件的回應.md",
+        "resolved/features/INVENTORY_RESERVATION_取消訂單放回庫存時是否發出StockReleased.md"
+      ]
+    },
+    {
+      "rule_id": "R-INVENTORY_RESERVATION-007",
+      "type": "main_flow",
+      "actor": "整合人員或任一呼叫端",
+      "pre_conditions": [],
+      "trigger_event": "呼叫 getAvailable(sku)",
+      "post_assertions": [
+        "回傳該 SKU 目前可供保留的數量，即初始庫存減去保留中數量（已放回的數量已加回）",
+        "初始庫存表沒有的 SKU 回傳 0",
+        "回傳值為整數"
+      ],
+      "resolved_by": "resolved/data/INVENTORY_RESERVATION_初始庫存表沒有的SKU.md"
+    },
+    {
+      "rule_id": "R-INVENTORY_RESERVATION-008",
+      "type": "edge_case",
+      "actor": "事件匯流排（亂序送達）",
+      "pre_conditions": [
+        "該訂單編號沒有任何紀錄（OrderPlaced 尚未到達）",
+        "該事件 id 未處理過"
+      ],
+      "trigger_event": "庫存服務收到該訂單的 OrderCancelled 或 PaymentFailed 事件",
+      "post_assertions": [
+        "記住該訂單已結束",
+        "可用庫存不變，不加任何庫存",
+        "回傳空陣列，不發出任何事件"
+      ],
+      "resolved_by": "resolved/features/INVENTORY_RESERVATION_放回事件先於下單事件到達.md"
+    },
+    {
+      "rule_id": "R-INVENTORY_RESERVATION-009",
+      "type": "edge_case",
+      "actor": "事件匯流排（亂序送達）",
+      "pre_conditions": [
+        "該訂單已被記為已結束（OrderCancelled 或 PaymentFailed 先到）",
+        "該事件 id 未處理過"
+      ],
+      "trigger_event": "庫存服務之後收到該訂單的 OrderPlaced 事件",
+      "post_assertions": [
+        "不保留庫存，該 SKU 的可用庫存不變",
+        "回傳空陣列，不發出任何事件"
+      ],
+      "resolved_by": "resolved/features/INVENTORY_RESERVATION_放回事件先於下單事件到達.md"
+    },
+    {
+      "rule_id": "R-INVENTORY_RESERVATION-010",
+      "type": "edge_case",
+      "actor": "訂單服務（透過 OrderPlaced 事件）",
+      "pre_conditions": [
+        "下單數量 qty <= 0（0 或負數）",
+        "該訂單編號沒有任何紀錄",
+        "該事件 id 未處理過"
+      ],
+      "trigger_event": "庫存服務收到 OrderPlaced 事件",
+      "post_assertions": [
+        "視為不合法，不保留：該 SKU 的可用庫存不變",
+        "回傳一個 StockRejected 事件，orderId 為該訂單編號",
+        "該訂單記為已拒絕（之後的 OrderPlaced 依 R-INVENTORY_RESERVATION-005 忽略）"
+      ],
+      "resolved_by": "resolved/features/INVENTORY_RESERVATION_下單數量為零或負數.md"
+    }
+  ]
+}
