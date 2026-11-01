@@ -6,7 +6,8 @@
 
 - [x] 作者欄、致謝段的生成式 AI 使用聲明
 - [x] 編譯通過、版面檢查
-- [ ] GitHub repo 轉公開（tag `arxiv-v1` 與 `v2.0.0` 已推上去）
+- [ ] 推上 GitHub：`git push github main` 與 `git push -f github arxiv-v1`（tag 已移到含 T4 的版本，所以要強制推）
+- [ ] 確認 repo 是公開的
 - [ ] 上傳後檢查 arXiv 產生的 PDF 預覽
 
 ## 表單欄位
@@ -17,7 +18,7 @@
 | Cross-list | cs.AI |
 | Title | Constraining LLM-Assisted Behavior-Driven Development with Script-Enforced Specification Contracts: Design and Evaluation of SpecEngine |
 | Authors | Allen Tsai |
-| Abstract | 複製 `main.tex` 的 abstract 段（1,882 字元，上限 1,920） |
+| Abstract | 複製 `main.tex` 的 abstract 段（1,858 字元，上限 1,920） |
 | Comments | `14 pages, 2 figures, 9 tables. Code, benchmark and replication package: https://github.com/yi-luan/specengine-plugin` （若 arXiv 編出的頁數不同就改） |
 | ACM class | D.2.1; D.2.4; D.2.5 |
 | License | 建議 CC BY 4.0 |
