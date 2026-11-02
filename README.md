@@ -1,6 +1,9 @@
 <div align="center">
 
-# SpecEngine
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.svg">
+  <img src="docs/assets/logo-light.svg" alt="SpecEngine" width="380">
+</picture>
 
 **Stepwise refinement from requirements to test code, enforced for AI coding agents.**
 

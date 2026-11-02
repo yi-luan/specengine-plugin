@@ -1,6 +1,9 @@
 <div align="center">
 
-# SpecEngine
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.svg">
+  <img src="docs/assets/logo-light.svg" alt="SpecEngine" width="380">
+</picture>
 
 **從需求到測試程式的逐步細化，由腳本對 AI 寫程式代理強制執行。**
 
