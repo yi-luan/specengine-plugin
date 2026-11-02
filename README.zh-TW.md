@@ -5,7 +5,9 @@
   <img src="docs/assets/logo-light.svg" alt="SpecEngine" width="260">
 </picture>
 
-**從需求到測試程式的逐步細化，由腳本對 AI 寫程式代理強制執行。**
+<br>
+
+從需求到測試程式的逐步細化，由腳本對 AI 寫程式代理強制執行。
 
 SpecEngine 是一個 Claude Code plugin。它不讓代理從需求直接跳到測試，而是把需求一層一層降低抽象，一路降到 Step Definitions 和測試程式。每一層的空白由人填，每一層由腳本檢查，下層無法回頭改寫上層。
 

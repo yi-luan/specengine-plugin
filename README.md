@@ -5,7 +5,9 @@
   <img src="docs/assets/logo-light.svg" alt="SpecEngine" width="260">
 </picture>
 
-**Stepwise refinement from requirements to test code, enforced for AI coding agents.**
+<br>
+
+Stepwise refinement from requirements to test code, enforced for AI coding agents.
 
 SpecEngine is a Claude Code plugin that never lets an agent jump from a requirement straight to tests. It lowers the requirement one level of abstraction at a time, down to step definitions and test code. Humans fill every gap, scripts check every level, and no lower level can rewrite the one above it.
 
