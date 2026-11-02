@@ -4,7 +4,7 @@
 | --- | --- |
 | `arxiv-source.tar.gz` | **上傳這個。** 內含 `main.tex` 一個檔案：參考文獻內嵌、兩張圖用 TikZ 畫。arXiv 會用 pdfLaTeX 自己編出 PDF。 |
 | `arxiv-abstract.txt` | 表單 Abstract 欄位的純文字，直接貼上。 |
-| `main.pdf` | 本機預覽（tectonic／XeTeX 編譯），共 14 頁。arXiv 編出來的字型是正式的 Times，換行可能略有不同。 |
+| `main.pdf` | 用 pdfLaTeX（與 arXiv 相同的引擎）從 `arxiv-source.tar.gz` 編出的版本，共 14 頁，無錯誤、無未定義參照。arXiv 預覽應與它一致。 |
 | `main.tex` | 原始檔。第一行的 `\pdfoutput=1` 是 arXiv 要求的，請保留。 |
 
 arXiv 不收由 LaTeX 產生的 PDF 單檔，一定要上傳原始碼；PDF 由 arXiv 產生。
