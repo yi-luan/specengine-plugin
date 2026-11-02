@@ -120,7 +120,7 @@ Three requirements of increasing difficulty were implemented under three conditi
 
 | Tamper test: one value changed in a locked specification | Result |
 | :--- | :--- |
-| SpecEngine | **8 of 8** detected by `spec-guard.js audit` in under a second |
+| SpecEngine | **11 of 11** detected by `spec-guard.js audit` in under a second |
 | GitHub Spec Kit | 1 of 2 detected by `converge`; a changed threshold was noted but still reported as converged |
 | No SDD tool | No mechanism; tests kept passing |
 

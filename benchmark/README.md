@@ -100,14 +100,20 @@ SpecEngine, reproducible with `node tamper.mjs`:
 
 | Run | Change | Audit before | Audit after |
 | :--- | :--- | :--- | :--- |
+| E4-C | 1000 → 1001 | pass | LOCK_DRIFT (exit 1) |
 | T1-C-r1 | 1000 → 1001 | pass | LOCK_DRIFT (exit 1) |
 | T1-C-r2 | 1000 → 1001 | pass | LOCK_DRIFT (exit 1) |
+| T2-C-h1 | no example value to change | – | – |
 | T2-C-r1 | 300 → 301 | pass | LOCK_DRIFT (exit 1) |
 | T2-C-r2 | 300 → 301 | pass | LOCK_DRIFT (exit 1) |
-| T3-C-r1 | 2000 → 2001 | pass | LOCK_DRIFT (exit 1) |
-| T3-C-r2 | 100 → 101 | pass | LOCK_DRIFT (exit 1) |
+| T3-C-h1 | 0 → 1 | pass | LOCK_DRIFT (exit 1) |
+| T3-C-r1 *void* | 2000 → 2001 | pass | LOCK_DRIFT (exit 1) |
+| T3-C-r2 *void* | 100 → 101 | pass | LOCK_DRIFT (exit 1) |
 | T3-C-r3 | 10 → 11 | pass | LOCK_DRIFT (exit 1) |
-| E4-C | 1000 → 1001 | pass | LOCK_DRIFT (exit 1) |
+| T4-C-h1 | 0 → 1 | pass | LOCK_DRIFT (exit 1) |
+| T4-C-r1 | 9 → 10 | pass | LOCK_DRIFT (exit 1) |
+
+Every locked run in which the script found an example value was caught: 11 of 11, nine of them from clean runs. T2-C-h1's feature file has no example table, so the script had nothing to change. The six T4 team developers' projects are not in this table; their audits pass on the untouched projects.
 
 Spec Kit has no lock, so each tamper was committed by hand and `speckit-converge` was run read-only by a fresh agent. Both tamper commits and their reverts are in the runs' `GIT-HISTORY.txt`.
 
@@ -174,11 +180,11 @@ What it shows:
 
 ### Mutation testing of each run's own tests
 
-`mutate.mjs` makes one small change at a time to each run's product code and runs both the run's own tests and the hidden tests. A mutant that breaks a hidden test the original passed has broken real required behaviour. The score is the share of those mutants that the run's own tests also catch. Raw data is in [`results/mutation.json`](results/mutation.json).
+`mutate.mjs` makes one small change at a time to each run's product code and runs both the run's own tests and the hidden tests. A mutant that breaks a hidden test the original passed has broken real required behaviour. The score is the share of those mutants that the run's own tests also catch. Raw data is in [`results/mutation.json`](results/mutation.json). The 29 runs include E4, the Haiku runs and the three void T3 runs.
 
 | Condition | Runs | Specification-relevant mutation score |
 | :--- | ---: | :--- |
-| No SDD tool | 8 | 91–100% |
+| No SDD tool | 9 | 91–100% |
 | Spec Kit | 10 | 100% in every run |
 | SpecEngine | 10 | 95–100% |
 

@@ -120,7 +120,7 @@ flowchart LR
 
 | 偷改測試：在已上鎖的規格中改掉一個值 | 結果 |
 | :--- | :--- |
-| SpecEngine | **8 次全部**被 `spec-guard.js audit` 在一秒內抓到 |
+| SpecEngine | **11 次全部**被 `spec-guard.js audit` 在一秒內抓到 |
 | GitHub Spec Kit | `converge` 2 次抓到 1 次；改掉的門檻值有被提到，但仍判定已收斂 |
 | 不用 SDD 工具 | 沒有機制，測試照樣通過 |
 
