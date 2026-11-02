@@ -269,15 +269,15 @@ specengine-plugin/
 
 ## 論文
 
-設計與個案研究見：
+設計、個案研究與評測見：
 
-> Allen Tsai. *Constraining LLM-Assisted Behavior-Driven Development with Externally Enforced Specification Contracts: Design and Case Study of SpecEngine.* 2026. 原始檔在 [`paper/`](paper/)。
+> Yilun Tsai. *Constraining LLM-Assisted Behavior-Driven Development with Script-Enforced Specification Contracts: Design and Evaluation of SpecEngine.* 2026. 原始檔在 [`paper/`](paper/)。
 
 ```bibtex
 @misc{tsai2026specengine,
-  author = {Tsai, Allen},
-  title  = {Constraining {LLM}-Assisted Behavior-Driven Development with Externally
-            Enforced Specification Contracts: Design and Case Study of {SpecEngine}},
+  author = {Tsai, Yilun},
+  title  = {Constraining {LLM}-Assisted Behavior-Driven Development with Script-Enforced
+            Specification Contracts: Design and Evaluation of {SpecEngine}},
   year   = {2026},
   note   = {Manuscript}
 }

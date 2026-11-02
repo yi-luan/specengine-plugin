@@ -24,7 +24,7 @@ arXiv 不收由 LaTeX 產生的 PDF 單檔，一定要上傳原始碼；PDF 由 
 | Primary category | cs.SE (Software Engineering) |
 | Cross-list | cs.AI |
 | Title | Constraining LLM-Assisted Behavior-Driven Development with Script-Enforced Specification Contracts: Design and Evaluation of SpecEngine |
-| Authors | Allen Tsai |
+| Authors | Yilun Tsai |
 | Abstract | 貼上 `arxiv-abstract.txt`（1,858 字元，上限 1,920） |
 | Comments | `14 pages, 2 figures, 9 tables. Code, benchmark and replication package: https://github.com/yi-luan/specengine-plugin` （若 arXiv 編出的頁數不同就改） |
 | ACM class | D.2.1; D.2.4; D.2.5 |

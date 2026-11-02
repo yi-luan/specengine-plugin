@@ -269,15 +269,15 @@ your-project/  (after onboarding)
 
 ## Paper
 
-The design and case study are described in:
+The design, case study and benchmark are described in:
 
-> Allen Tsai. *Constraining LLM-Assisted Behavior-Driven Development with Externally Enforced Specification Contracts: Design and Case Study of SpecEngine.* 2026. Source in [`paper/`](paper/).
+> Yilun Tsai. *Constraining LLM-Assisted Behavior-Driven Development with Script-Enforced Specification Contracts: Design and Evaluation of SpecEngine.* 2026. Source in [`paper/`](paper/).
 
 ```bibtex
 @misc{tsai2026specengine,
-  author = {Tsai, Allen},
-  title  = {Constraining {LLM}-Assisted Behavior-Driven Development with Externally
-            Enforced Specification Contracts: Design and Case Study of {SpecEngine}},
+  author = {Tsai, Yilun},
+  title  = {Constraining {LLM}-Assisted Behavior-Driven Development with Script-Enforced
+            Specification Contracts: Design and Evaluation of {SpecEngine}},
   year   = {2026},
   note   = {Manuscript}
 }
