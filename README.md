@@ -1,13 +1,16 @@
 <div align="center">
 
+<br/>
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.svg">
   <img src="docs/assets/logo-light.svg" alt="SpecEngine" width="260">
 </picture>
 
-<br>
-<br>
+<br/>
+<br/>
 SpecEngine is a Claude Code plugin that never lets an agent jump from a requirement straight to tests. It lowers the requirement one level of abstraction at a time, down to step definitions and test code. Humans fill every gap, scripts check every level, and no lower level can rewrite the one above it.
+<br/>
+<br/>
 
 [![Version](https://img.shields.io/badge/version-2.1.0-blue)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
