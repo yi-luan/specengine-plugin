@@ -6,7 +6,8 @@
 </picture>
 
 <br>
-
+<br>
+<br>
 SpecEngine is a Claude Code plugin that never lets an agent jump from a requirement straight to tests. It lowers the requirement one level of abstraction at a time, down to step definitions and test code. Humans fill every gap, scripts check every level, and no lower level can rewrite the one above it.
 
 [![Version](https://img.shields.io/badge/version-2.1.0-blue)](CHANGELOG.md)
